@@ -46,7 +46,7 @@ export default function ToastContainer() {
   const getToastStyles = (type: string) => {
     switch (type) {
       case 'success':
-        return 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400';
+        return 'bg-amber-500/20 border-amber-500/50 text-amber-400';
       case 'error':
         return 'bg-red-500/20 border-red-500/50 text-red-400';
       case 'achievement':
@@ -57,7 +57,7 @@ export default function ToastContainer() {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-3 w-80">
+    <div className="fixed top-24 right-4 z-50 space-y-3 w-80">
       {toasts.map((toast) => (
         <div
           key={toast.id}

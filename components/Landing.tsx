@@ -39,7 +39,7 @@ export default function Landing({ onConnect, onGoogle, onApple }: LandingProps) 
             <button onClick={onApple} className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-full text-sm font-semibold hover:bg-zinc-200 active:scale-[0.985] transition-all">
               <span>🍎</span> Apple
             </button>
-            <button onClick={onConnect} className="bg-emerald-600 hover:bg-emerald-500 px-6 py-2.5 rounded-full font-semibold text-sm active:scale-[0.985] transition-all">
+            <button onClick={onConnect} className="bg-amber-600 hover:bg-amber-500 px-6 py-2.5 rounded-full font-semibold text-sm active:scale-[0.985] transition-all">
               CONNECT WALLET
             </button>
           </div>
@@ -69,13 +69,13 @@ export default function Landing({ onConnect, onGoogle, onApple }: LandingProps) 
         </div>
 
         <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-white/5 text-emerald-400 text-sm mb-6 border border-white/10 animate-pulse">
+          <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-white/5 text-amber-400 text-sm mb-6 border border-white/10 animate-pulse">
             🔥 LIVE ON BASE • {soldiers.toLocaleString()} ACTIVE SOLDIERS
           </div>
 
           <h1 className="text-5xl sm:text-7xl md:text-[92px] lg:text-[130px] font-black tracking-[-3px] md:tracking-[-7px] leading-[0.88] mb-8">
             JOIN THE<br />
-            <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 bg-clip-text text-transparent">SHIT ARMY</span>
+            <span className="bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent">SHIT ARMY</span>
           </h1>
 
           <p className="max-w-[560px] mx-auto text-2xl text-zinc-400 mb-12">
@@ -85,7 +85,7 @@ export default function Landing({ onConnect, onGoogle, onApple }: LandingProps) 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
               onClick={onConnect} 
-              className="group relative overflow-hidden bg-white text-black text-xl font-semibold px-16 py-5 rounded-2xl flex items-center gap-4 mx-auto hover:bg-emerald-400 active:scale-[0.985] transition-all"
+              className="group relative overflow-hidden bg-white text-black text-xl font-semibold px-16 py-5 rounded-2xl flex items-center gap-4 mx-auto hover:bg-amber-400 active:scale-[0.985] transition-all"
             >
               <span>CONNECT WALLET &amp; JOIN</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-[200%] transition-transform duration-700" />
@@ -124,7 +124,7 @@ export default function Landing({ onConnect, onGoogle, onApple }: LandingProps) 
             { number: "8,472", label: "Daily Active" },
           ].map((stat, i) => (
             <div key={i} className="animate-fadeInUp" style={{ animationDelay: `${i * 100}ms` }}>
-              <div className="text-4xl font-bold text-emerald-400 tabular-nums">{stat.number}</div>
+              <div className="text-4xl font-bold text-amber-400 tabular-nums">{stat.number}</div>
               <div className="text-xs text-zinc-500 mt-1 tracking-widest">{stat.label}</div>
             </div>
           ))}
@@ -134,7 +134,7 @@ export default function Landing({ onConnect, onGoogle, onApple }: LandingProps) 
       {/* HOW IT WORKS */}
       <div className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <div className="text-emerald-500 text-sm tracking-[3px]">4 SIMPLE STEPS</div>
+          <div className="text-amber-500 text-sm tracking-[3px]">4 SIMPLE STEPS</div>
           <h2 className="text-6xl font-bold tracking-tight mt-3">How Shit Army Works</h2>
         </div>
         
@@ -147,10 +147,10 @@ export default function Landing({ onConnect, onGoogle, onApple }: LandingProps) 
           ].map((item, i) => (
             <div 
               key={i} 
-              className="group bg-zinc-950 border border-white/10 rounded-3xl p-9 hover:border-emerald-500/50 transition-all hover:-translate-y-1 duration-300"
+              className="group bg-zinc-950 border border-white/10 rounded-3xl p-9 hover:border-amber-500/50 transition-all hover:-translate-y-1 duration-300"
             >
               <div className="text-6xl mb-8 group-hover:scale-110 transition-transform">{item.icon}</div>
-              <div className="text-emerald-500 text-6xl font-black mb-6">{item.step}</div>
+              <div className="text-amber-500 text-6xl font-black mb-6">{item.step}</div>
               <div className="text-3xl font-semibold mb-4">{item.title}</div>
               <div className="text-zinc-400 text-[15px]">{item.desc}</div>
             </div>

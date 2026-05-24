@@ -830,22 +830,22 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
           <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <div>
-                <div className="text-emerald-500 text-sm tracking-[2px]">WELCOME BACK, SOLDIER {isGeneral && "👑"}</div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">Dashboard</h1>
+                <div className="text-amber-500 text-sm font-bold tracking-[3px] uppercase">WELCOME BACK, SOLDIER {isGeneral && "👑"}</div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Dashboard</h1>
               </div>
               <div className="flex items-center gap-3">
                 <div className="bg-zinc-950 border border-white/10 px-6 py-3 rounded-2xl text-sm flex items-center gap-3">🔥 {dailyStreak} day streak</div>
-                <button onClick={claimDailyBonus} className="bg-emerald-600 hover:bg-emerald-500 px-8 py-3 rounded-2xl text-sm font-semibold active:scale-[0.985]">CLAIM DAILY BONUS</button>
+                <button onClick={claimDailyBonus} className="bg-gradient-to-r from-amber-500 to-orange-500 text-black px-8 py-3 rounded-2xl text-sm font-black active:scale-[0.985] shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-shadow">CLAIM DAILY BONUS</button>
               </div>
             </div>
 
             {isGeneral && (
-              <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-3xl p-6 flex items-center justify-between">
+              <div className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-600 rounded-3xl p-6 flex items-center justify-between animate-glow-pulse">
                 <div>
-                  <div className="font-bold text-xl">👑 GENERAL PASS ACTIVE</div>
-                  <div className="text-emerald-100 text-sm">+25% offer rewards • {generalDaysLeft} days remaining</div>
+                  <div className="font-black text-xl">👑 GENERAL PASS ACTIVE</div>
+                  <div className="text-amber-100 text-sm">+25% offer rewards • {generalDaysLeft > 0 ? `${generalDaysLeft} days remaining` : 'Active'}</div>
                 </div>
-                <div className="text-4xl">🔥</div>
+                <div className="text-4xl animate-subtle-float">🔥</div>
               </div>
             )}
 
@@ -859,24 +859,24 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-zinc-950 border border-white/10 rounded-3xl p-8">
-                <div className="text-sm text-zinc-500 mb-1">$SHIT BALANCE</div>
-                <div className="text-4xl md:text-5xl lg:text-6xl font-semibold tabular-nums tracking-tighter text-emerald-400">{shitBalance.toLocaleString()}</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all">
+                <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">$SHIT BALANCE</div>
+                <div className="text-2xl md:text-4xl lg:text-5xl font-black tabular-nums tracking-tighter text-amber-400">{shitBalance.toLocaleString()}</div>
               </div>
-              <div className="bg-zinc-950 border border-white/10 rounded-3xl p-8">
-                <div className="text-sm text-zinc-500 mb-1">POINTS</div>
-                <div className="text-4xl md:text-5xl lg:text-6xl font-semibold tabular-nums tracking-tighter">{points.toLocaleString()}</div>
+              <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all">
+                <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">POINTS</div>
+                <div className="text-2xl md:text-4xl lg:text-5xl font-black tabular-nums tracking-tighter">{points.toLocaleString()}</div>
               </div>
-              <div className="bg-zinc-950 border border-white/10 rounded-3xl p-8">
-                <div className="text-sm text-zinc-500 mb-1">CURRENT RANK</div>
-                <div className="text-3xl md:text-4xl lg:text-5xl font-bold">Private {isGeneral && "👑"}</div>
-                <div className="text-emerald-500 text-sm mt-2">2,160 $SHIT to Sergeant</div>
+              <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all">
+                <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">CURRENT RANK</div>
+                <div className="text-xl md:text-3xl lg:text-4xl font-black">Private {isGeneral && "👑"}</div>
+                <div className="text-amber-500 text-xs md:text-sm mt-1 md:mt-2">2,160 to Sergeant</div>
               </div>
-              <div className="bg-zinc-950 border border-white/10 rounded-3xl p-8">
-                <div className="text-sm text-zinc-500 mb-1">TOTAL EARNED</div>
-                <div className="text-3xl md:text-4xl lg:text-5xl font-semibold tabular-nums">{totalEarned.toLocaleString()}</div>
-                <div className="text-xs text-emerald-500">$SHIT all-time {streakMultiplier > 0 && `(+${streakMultiplier}% streak)`}</div>
+              <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all">
+                <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">TOTAL EARNED</div>
+                <div className="text-2xl md:text-3xl lg:text-4xl font-black tabular-nums">{totalEarned.toLocaleString()}</div>
+                <div className="text-xs text-amber-500">$SHIT all-time {streakMultiplier > 0 && `(+${streakMultiplier}% streak)`}</div>
               </div>
             </div>
 
@@ -905,7 +905,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
             })()}
 
             <div className="flex gap-4">
-              <button className="flex-1 bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-semibold text-lg active:scale-[0.985]">BUY $SHIT</button>
+              <button className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 py-4 rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">BUY $SHIT</button>
               <button onClick={() => {
                 // Check KYC requirement (example: >$100 equivalent needs KYC)
                 const KYC_THRESHOLD = 100; // USD
@@ -921,36 +921,36 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
             </div>
 
             {/* BATTLE PASS */}
-            <div onClick={() => setShowBattlePass(true)} className="bg-zinc-950 border border-emerald-500/40 rounded-3xl p-7 cursor-pointer hover:border-emerald-500 transition-all active:scale-[0.985]">
+            <div onClick={() => setShowBattlePass(true)} className="glass-card rounded-3xl p-7 cursor-pointer hover:border-amber-500/40 transition-all active:scale-[0.985] border border-amber-500/20">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <div className="text-emerald-500 text-xs tracking-[2px] font-bold">SEASON 1: SHIT RISING</div>
+                  <div className="text-amber-500 text-xs tracking-[2px] font-bold">SEASON 1: SHIT RISING</div>
                   <div className="text-xl font-bold tracking-tight">Battle Pass</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-emerald-400">{currentTier}</div>
+                  <div className="text-3xl font-bold text-amber-400">{currentTier}</div>
                   <div className="text-xs text-zinc-500">/ {MAX_TIER} Tiers</div>
                 </div>
               </div>
               <div className="h-3 bg-white/10 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 rounded-full transition-all" style={{ width: `${tierProgress}%` }} />
+                <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all" style={{ width: `${tierProgress}%` }} />
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-zinc-400">{battlePassXP} XP earned</span>
-                <span className="text-emerald-400 font-semibold">{claimedTiers.length} claimed</span>
+                <span className="text-amber-400 font-semibold">{claimedTiers.length} claimed</span>
               </div>
             </div>
 
             {/* AIRDROP PROGRESS */}
-            <div className="bg-zinc-950 border border-white/10 rounded-3xl p-9">
+            <div className="glass-card rounded-3xl p-9">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <div className="font-semibold text-xl flex items-center gap-3">🪂 YOUR AIRDROP</div>
+                  <div className="font-black text-xl flex items-center gap-3">🪂 YOUR AIRDROP</div>
                   <div className="text-sm text-zinc-400 mt-1">The more you earn, the bigger your reward</div>
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-zinc-500">CURRENT TIER</div>
-                  <div className="text-emerald-400 font-semibold">
+                  <div className="text-amber-400 font-semibold">
                     {totalEarned >= 25000 ? "LEGENDARY" : totalEarned >= 10000 ? "EPIC" : totalEarned >= 5000 ? "RARE" : "COMMON"}
                   </div>
                 </div>
@@ -959,7 +959,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               <div className="bg-black/60 rounded-2xl p-6 mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <div>Progress to next tier</div>
-                  <div className="font-mono text-emerald-400">
+                  <div className="font-mono text-amber-400">
                     {totalEarned >= 25000 ? "MAX" : totalEarned >= 10000 ? `${totalEarned}/25000` : totalEarned >= 5000 ? `${totalEarned}/10000` : `${totalEarned}/5000`}
                   </div>
                 </div>
@@ -984,9 +984,9 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               </div>
             </div>
 
-            <div className="bg-zinc-950 border border-white/10 rounded-3xl p-9">
+            <div className="glass-card rounded-3xl p-9">
               <div className="flex justify-between items-center mb-6">
-                <div className="font-semibold text-xl flex items-center gap-3">📅 DAILY QUESTS <span className="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-px rounded">RESET IN 18H</span></div>
+                <div className="font-black text-xl flex items-center gap-3">📅 DAILY QUESTS <span className="text-xs bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full font-bold">RESET IN 18H</span></div>
                 <div className="text-xs text-zinc-500">Complete all for +650 PTS bonus</div>
               </div>
               <div className="space-y-4">
@@ -1000,8 +1000,8 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-emerald-400 font-mono">+{q.reward} PTS</div>
-                      <div className="w-28 h-1.5 bg-white/10 rounded mt-2"><div className="h-1.5 bg-emerald-500 rounded" style={{width: `${(q.progress/q.max)*100}%`}}></div></div>
+                      <div className="text-amber-400 font-mono font-bold">+{q.reward} PTS</div>
+                      <div className="w-28 h-1.5 bg-white/10 rounded-full mt-2"><div className="h-1.5 bg-gradient-to-r from-amber-500 to-orange-400 rounded-full" style={{width: `${(q.progress/q.max)*100}%`}}></div></div>
                     </div>
                   </div>
                 ))}
@@ -1009,20 +1009,20 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
-              <div onClick={() => setCurrentTab("offerwall")} className="cursor-pointer bg-zinc-950 border border-white/10 hover:border-emerald-500/60 rounded-3xl p-8 active:scale-[0.985] transition-all">
-                <div className="text-5xl mb-6">⚡</div>
-                <div className="text-3xl font-semibold">Go to Offerwall</div>
-                <div className="text-zinc-400 mt-2">8 offers • Highest: 2,100 PTS {streakMultiplier > 0 && `(+${streakMultiplier}%)`}</div>
+              <div onClick={() => setCurrentTab("offerwall")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">⚡</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Go to Offerwall</div>
+                <div className="text-zinc-400 mt-2 text-sm">8 offers • Highest: 2,100 PTS {streakMultiplier > 0 && `(+${streakMultiplier}%)`}</div>
               </div>
-              <div onClick={() => setCurrentTab("stake")} className="cursor-pointer bg-zinc-950 border border-white/10 hover:border-emerald-500/60 rounded-3xl p-8 active:scale-[0.985] transition-all">
-                <div className="text-5xl mb-6">🏆</div>
-                <div className="text-3xl font-semibold">Stake $SHIT</div>
-                <div className="text-zinc-400 mt-2">48% APY • TVL $1.24M</div>
+              <div onClick={() => setCurrentTab("stake")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">🏆</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Stake $SHIT</div>
+                <div className="text-zinc-400 mt-2 text-sm">48% APY • TVL $1.24M</div>
               </div>
-              <div onClick={() => setCurrentTab("quests")} className="cursor-pointer bg-zinc-950 border border-white/10 hover:border-emerald-500/60 rounded-3xl p-8 active:scale-[0.985] transition-all">
-                <div className="text-5xl mb-6">📜</div>
-                <div className="text-3xl font-semibold">Quests</div>
-                <div className="text-zinc-400 mt-2">Daily &amp; Weekly Missions</div>
+              <div onClick={() => setCurrentTab("quests")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">📜</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Quests</div>
+                <div className="text-zinc-400 mt-2 text-sm">Daily &amp; Weekly Missions</div>
               </div>
             </div>
           </div>
@@ -1032,8 +1032,8 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
         {currentTab === "offerwall" && (
           <div>
             <div className="mb-10">
-              <div className="text-emerald-500 text-sm tracking-[2px]">EARN REAL $SHIT {streakMultiplier > 0 && `(+${streakMultiplier}% STREAK)`}</div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">Offerwall</h2>
+              <div className="text-amber-500 text-sm font-bold tracking-[3px]">EARN REAL $SHIT {streakMultiplier > 0 && `(+${streakMultiplier}% STREAK)`}</div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Offerwall</h2>
             </div>
 
             {/* ACTIVE OFFERS */}
@@ -1056,23 +1056,23 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                             <div className="text-xs text-zinc-500 mt-1">{active.status === 'completed' ? '✅ Ready to claim!' : `⏱️ ${offer.time} estimated`}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-emerald-400 font-mono font-bold">+{active.estimatedReward}</div>
+                            <div className="text-amber-400 font-mono font-bold">+{active.estimatedReward}</div>
                             <div className="text-[10px] text-zinc-500">PTS</div>
                           </div>
                         </div>
                         <div className="mt-4">
                           <div className="flex justify-between text-xs mb-1">
-                            <span className={active.progress >= 100 ? 'text-emerald-400' : 'text-amber-400'}>
+                            <span className={active.progress >= 100 ? 'text-green-400' : 'text-amber-400'}>
                               {active.progress >= 100 ? 'Completed!' : `${active.progress}% done`}
                             </span>
                             <span className="text-zinc-500">{active.progress}%</span>
                           </div>
                           <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full transition-all duration-500 ${active.progress >= 100 ? 'bg-emerald-500' : 'bg-amber-500'}`} style={{ width: `${active.progress}%` }} />
+                            <div className={`h-full rounded-full transition-all duration-500 ${active.progress >= 100 ? 'bg-green-500' : 'bg-amber-500'}`} style={{ width: `${active.progress}%` }} />
                           </div>
                         </div>
                         {active.status === 'completed' && (
-                          <button onClick={() => completeOffer(offer, active.userOfferId || active.id)} className="w-full mt-4 py-3 bg-emerald-600 rounded-xl text-sm font-bold active:scale-[0.985]">
+                          <button onClick={() => completeOffer(offer, active.userOfferId || active.id)} className="w-full mt-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-xl text-sm font-black active:scale-[0.985] shadow-lg shadow-amber-500/20">
                             CLAIM REWARD
                           </button>
                         )}
@@ -1083,16 +1083,16 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               </div>
             )}
 
-            <div className="bg-zinc-950 border border-emerald-500/30 rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-center gap-8">
+            <div className="glass-card border-amber-500/20 rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-center gap-8">
               <div>
                 <div className="text-sm text-zinc-400">YOUR POINTS</div>
-                <div className="text-5xl md:text-6xl lg:text-7xl font-semibold tabular-nums tracking-tighter text-emerald-400">{points}</div>
+                <div className="text-5xl md:text-6xl lg:text-7xl font-black tabular-nums tracking-tighter text-amber-400">{points}</div>
               </div>
               <div className="flex-1 text-center md:text-left">
                 <div className="text-xs text-zinc-500">EXCHANGE RATE</div>
                 <div className="font-mono text-3xl">1 $SHIT = 12 PTS</div>
               </div>
-              <button onClick={() => triggerSuccess("Points converted!")} disabled={points < 100} className="bg-emerald-600 disabled:bg-zinc-800 px-12 py-4 rounded-2xl font-semibold text-lg active:scale-[0.985]">CONVERT TO $SHIT</button>
+              <button onClick={() => triggerSuccess("Points converted!")} disabled={points < 100} className="bg-gradient-to-r from-amber-500 to-orange-500 disabled:bg-zinc-800 disabled:from-zinc-800 disabled:to-zinc-800 px-12 py-4 rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">CONVERT TO $SHIT</button>
             </div>
 
             {/* BOOST BANNER */}
@@ -1124,7 +1124,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                 const boost = offerBoosts.find(b => b.offerId === offer.id && b.expiresAt > new Date());
                 const boostedReward = boost ? offer.reward * boost.multiplier : offer.reward;
                 return (
-                  <div key={idx} onClick={() => !active && setSelectedOffer(offer)} className={`bg-zinc-950 border ${offer.exclusive && isGeneral ? 'border-emerald-500' : active ? 'border-amber-500/60' : 'border-white/10'} hover:border-emerald-500/60 rounded-3xl p-8 cursor-pointer active:scale-[0.985] transition-all group relative overflow-hidden`}>
+                  <div key={idx} onClick={() => !active && setSelectedOffer(offer)} className={`glass-card ${offer.exclusive && isGeneral ? 'border-amber-500/50' : active ? 'border-amber-500/60' : ''} hover:border-amber-500/40 rounded-3xl p-8 cursor-pointer active:scale-[0.985] transition-all group relative overflow-hidden`}>
                     {boost && (
                       <div className="absolute top-0 right-0 bg-purple-600 text-white text-xs px-3 py-1 rounded-bl-xl font-bold">
                         {boost.multiplier}x BOOST
@@ -1138,18 +1138,18 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                     <div className="flex justify-between mb-8">
                       <div className="text-4xl md:text-5xl lg:text-6xl">{offer.icon}</div>
                       <div className="text-right">
-                        <div className={`text-3xl md:text-4xl lg:text-5xl font-semibold tabular-nums ${boost ? 'text-purple-400' : 'text-emerald-400'}`}>
+                        <div className={`text-3xl md:text-4xl lg:text-5xl font-black tabular-nums ${boost ? 'text-purple-400' : 'text-amber-400'}`}>
                           +{boostedReward}
                         </div>
                         <div className="text-xs text-zinc-500">POINTS</div>
                       </div>
                     </div>
-                    <div className="font-semibold text-2xl mb-3 group-hover:text-emerald-400 transition">{offer.title}</div>
+                    <div className="font-bold text-2xl mb-3 group-hover:text-amber-400 transition">{offer.title}</div>
                     <div className="text-zinc-400 text-[15px] mb-6 line-clamp-2">{offer.description}</div>
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <div className="px-4 py-1 bg-white/5 rounded-full text-xs">{offer.category}</div>
-                        {offer.exclusive && <div className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-full">GENERAL ONLY</div>}
+                        {offer.exclusive && <div className="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs rounded-full font-bold">GENERAL ONLY</div>}
                       </div>
                       <div className={active ? 'text-amber-400' : ''}>{active ? '⏱️ In Progress' : offer.time}</div>
                     </div>
@@ -1172,7 +1172,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               <div className="flex justify-between mb-10">
                 <div>
                   <div className="text-sm text-zinc-500">CURRENT APY</div>
-                  <div className="text-5xl md:text-7xl lg:text-[92px] font-bold text-emerald-400 tabular-nums leading-none">48<span className="text-3xl md:text-5xl align-super">%</span></div>
+                  <div className="text-5xl md:text-7xl lg:text-[92px] font-black text-amber-400 tabular-nums leading-none">48<span className="text-3xl md:text-5xl align-super">%</span></div>
                 </div>
                 <div className="text-right text-sm text-zinc-400">TVL: $1.24M<br />Stakers: 8,472</div>
               </div>
@@ -1180,16 +1180,16 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                 <div className="text-sm mb-3 text-zinc-400">AMOUNT TO STAKE</div>
                 <div className="flex items-center gap-4 mb-8">
                   <input type="number" value={stakeAmount} onChange={(e) => setStakeAmount(e.target.value)} placeholder="0" className="bg-transparent text-5xl md:text-6xl lg:text-7xl font-semibold w-full outline-none placeholder:text-zinc-700" />
-                  <div className="text-4xl text-emerald-500">$SHIT</div>
+                  <div className="text-4xl text-amber-500">$SHIT</div>
                 </div>
                 <div className="flex gap-3 mb-8">
                   {[7,30,90].map(days => (
-                    <button key={days} onClick={() => setStakeLock(days)} className={`flex-1 py-4 rounded-2xl text-sm transition ${stakeLock === days ? "bg-emerald-600" : "bg-white/5 hover:bg-white/10"}`}>
+                    <button key={days} onClick={() => setStakeLock(days)} className={`flex-1 py-4 rounded-2xl text-sm font-bold transition ${stakeLock === days ? "bg-gradient-to-r from-amber-500 to-orange-500 text-black" : "bg-white/5 hover:bg-white/10"}`}>
                       {days} DAYS<br /><span className="text-xs opacity-60">{days === 7 ? "32%" : days === 30 ? "48%" : "67%"} APY</span>
                     </button>
                   ))}
                 </div>
-                <button onClick={stakeTokens} disabled={!stakeAmount} className="w-full py-5 bg-white text-black rounded-2xl font-semibold text-lg active:scale-[0.985] disabled:bg-zinc-800">STAKE NOW</button>
+                <button onClick={stakeTokens} disabled={!stakeAmount} className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] disabled:bg-zinc-800 disabled:from-zinc-800 disabled:to-zinc-800 disabled:text-zinc-500 shadow-lg shadow-amber-500/20">STAKE NOW</button>
               </div>
             </div>
           </div>
@@ -1206,19 +1206,19 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
 
             <div className="grid md:grid-cols-2 gap-4">
               {marketListings.map((listing) => (
-                <div key={listing.id} className="bg-zinc-950 border border-white/10 rounded-3xl p-8 hover:border-emerald-500/60 transition-all">
+                <div key={listing.id} className="glass-card glass-card-hover rounded-3xl p-8 transition-all">
                   <div className="flex justify-between mb-6">
                     <div>
-                      <div className="font-semibold text-xl">{listing.name}</div>
-                      <div className="text-emerald-400 text-sm">{listing.rank} • Power {listing.power}</div>
+                      <div className="font-bold text-xl">{listing.name}</div>
+                      <div className="text-amber-400 text-sm">{listing.rank} • Power {listing.power}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-bold text-emerald-400">{listing.price}</div>
+                      <div className="text-3xl font-black text-amber-400">{listing.price}</div>
                       <div className="text-xs text-zinc-500">$SHIT</div>
                     </div>
                   </div>
                   <div className="text-xs text-zinc-500 mb-6">Seller: {listing.seller}</div>
-                  <button onClick={() => { setBuyingNFT(listing); setShowBuyModal(true); }} className="w-full py-4 bg-emerald-600 rounded-2xl font-semibold active:scale-[0.985]">
+                  <button onClick={() => { setBuyingNFT(listing); setShowBuyModal(true); }} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black active:scale-[0.985] shadow-lg shadow-amber-500/20">
                     BUY NOW
                   </button>
                 </div>
@@ -1241,30 +1241,30 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
             <div className="mb-10">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <div className="text-emerald-500 text-sm tracking-[2px]">RESET IN 6H 42M</div>
-                  <div className="text-3xl font-bold tracking-tight">Daily Quests</div>
+                  <div className="text-amber-500 text-sm font-bold tracking-[3px]">RESET IN 6H 42M</div>
+                  <div className="text-3xl font-black tracking-tight">Daily Quests</div>
                 </div>
                 <div className="text-sm text-zinc-500">{quests.filter(q => q.category === 'daily' && q.claimed).length}/{quests.filter(q => q.category === 'daily').length} completed</div>
               </div>
               <div className="space-y-4">
                 {quests.filter(q => q.category === 'daily').map(q => (
-                  <div key={q.id} className={`bg-zinc-950 border ${q.claimed ? 'border-emerald-500/40' : 'border-white/10'} rounded-3xl p-6 flex items-center gap-5`}>
+                  <div key={q.id} className={`glass-card ${q.claimed ? 'border-amber-500/30' : ''} rounded-3xl p-6 flex items-center gap-5`}>
                     <div className="text-4xl">{q.icon}</div>
                     <div className="flex-1">
-                      <div className="font-semibold text-lg">{q.title}</div>
+                      <div className="font-bold text-lg">{q.title}</div>
                       <div className="text-sm text-zinc-400">{q.description}</div>
                       <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all" style={{width: `${(q.progress / q.max) * 100}%`}} />
+                        <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all" style={{width: `${(q.progress / q.max) * 100}%`}} />
                       </div>
                       <div className="text-xs text-zinc-500 mt-1">{q.progress} / {q.max}</div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className="text-emerald-400 font-mono font-bold text-xl">+{q.reward}</div>
+                      <div className="text-amber-400 font-mono font-bold text-xl">+{q.reward}</div>
                       <div className="text-xs text-zinc-500">$SHIT</div>
                       {q.progress >= q.max && !q.claimed && (
-                        <button onClick={() => claimQuest(q.id)} className="mt-2 px-5 py-2 bg-emerald-600 rounded-xl text-xs font-bold active:scale-[0.985]">CLAIM</button>
+                        <button onClick={() => claimQuest(q.id)} className="mt-2 px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-xl text-xs font-black active:scale-[0.985]">CLAIM</button>
                       )}
-                      {q.claimed && <div className="mt-2 text-emerald-400 text-xs">✓ CLAIMED</div>}
+                      {q.claimed && <div className="mt-2 text-amber-400 text-xs font-bold">✓ CLAIMED</div>}
                     </div>
                   </div>
                 ))}
@@ -1372,19 +1372,19 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {MERCH_PRODUCTS.map((product) => (
-                <div key={product.id} className="bg-zinc-950 border border-white/10 rounded-3xl p-8 hover:border-emerald-500/60 transition-all group">
+                <div key={product.id} className="glass-card glass-card-hover rounded-3xl p-8 transition-all group">
                   <div className="text-6xl md:text-8xl mb-8 text-center group-hover:scale-110 transition-transform">{product.emoji}</div>
                   
-                  <div className="font-semibold text-2xl mb-2">{product.name}</div>
-                  <div className="text-emerald-400 text-sm mb-4">{product.color}</div>
+                  <div className="font-bold text-2xl mb-2">{product.name}</div>
+                  <div className="text-amber-400 text-sm mb-4">{product.color}</div>
                   <div className="text-zinc-400 text-sm mb-8">{product.description}</div>
                   
                   <div className="flex items-end justify-between">
                     <div>
                       <div className="text-xs text-zinc-500">PRICE</div>
-                      <div className="text-4xl font-bold text-emerald-400 tabular-nums">{product.price}</div>
+                      <div className="text-4xl font-black text-amber-400 tabular-nums">{product.price}</div>
                     </div>
-                    <button onClick={() => { setSelectedMerch(product); setShowMerchModal(true); }} className="bg-emerald-600 hover:bg-emerald-500 px-8 py-3 rounded-2xl font-semibold text-sm active:scale-[0.985]">
+                    <button onClick={() => { setSelectedMerch(product); setShowMerchModal(true); }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-black px-8 py-3 rounded-2xl font-black text-sm active:scale-[0.985] shadow-lg shadow-amber-500/20">
                       BUY NOW
                     </button>
                   </div>
@@ -1461,10 +1461,10 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                       <div className="text-xs text-zinc-500">{tx.timestamp.toLocaleString()}</div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className={`font-mono font-semibold tabular-nums ${tx.amount >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <div className={`font-mono font-bold tabular-nums ${tx.amount >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                         {tx.amount >= 0 ? '+' : ''}{tx.amount} $SHIT
                       </div>
-                      <div className={`text-[10px] uppercase tracking-wider ${tx.status === 'completed' ? 'text-emerald-500' : tx.status === 'pending' ? 'text-amber-500' : 'text-red-500'}`}>
+                      <div className={`text-[10px] uppercase tracking-wider ${tx.status === 'completed' ? 'text-green-500' : tx.status === 'pending' ? 'text-amber-500' : 'text-red-500'}`}>
                         {tx.status}
                       </div>
                     </div>
@@ -1495,7 +1495,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                   <div className="flex justify-between text-sm mb-6 px-4">
                     <div>
                       <div className="text-zinc-500">REWARD</div>
-                      <div className={`text-4xl font-semibold ${boost ? 'text-purple-400' : 'text-emerald-400'}`}>
+                      <div className={`text-4xl font-black ${boost ? 'text-purple-400' : 'text-amber-400'}`}>
                         +{boostedReward}
                       </div>
                       {boost && <div className="text-xs text-purple-400 mt-1">🔥 {boost.multiplier}x BOOST ACTIVE!</div>}
@@ -1549,7 +1549,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                       }
                     }}
                     disabled={isCompleting}
-                    className="w-full py-5 bg-emerald-600 rounded-2xl font-bold text-lg active:scale-[0.985] disabled:bg-zinc-800"
+                    className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] disabled:bg-zinc-800 disabled:from-zinc-800 disabled:to-zinc-800 disabled:text-zinc-500 shadow-lg shadow-amber-500/20"
                   >
                     {(() => {
                       const active = activeOffers.find(a => a.offerId === selectedOffer.id);
@@ -1603,7 +1603,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                   <div className="text-xs text-zinc-500 mb-2">SELECT NETWORK</div>
                   <div className="grid grid-cols-3 gap-3">
                     {NETWORKS.map(net => (
-                      <button key={net.id} onClick={() => setSelectedNetwork(net)} className={`p-3 rounded-2xl border text-center transition-all ${selectedNetwork.id === net.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 hover:bg-white/5'}`}>
+                      <button key={net.id} onClick={() => setSelectedNetwork(net)} className={`p-3 rounded-2xl border text-center transition-all ${selectedNetwork.id === net.id ? 'border-amber-500 bg-amber-500/10' : 'border-white/10 hover:bg-white/5'}`}>
                         <div className="text-2xl mb-1">{net.icon}</div>
                         <div className="text-xs font-semibold">{net.name}</div>
                         <div className="text-[10px] text-zinc-500">Fee: {net.fee}</div>
@@ -1620,7 +1620,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                   </div>
                   <div className="flex items-center gap-3 bg-black/60 border border-white/10 rounded-2xl px-5 py-4">
                     <input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} placeholder="0.00" className="bg-transparent text-3xl font-semibold w-full outline-none placeholder:text-zinc-700" />
-                    <span className="text-emerald-500 font-semibold text-sm">$SHIT</span>
+                    <span className="text-amber-500 font-bold text-sm">$SHIT</span>
                   </div>
                   <div className="flex gap-2 mt-2">
                     {[25, 50, 100].map(pct => (
@@ -1633,7 +1633,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                 {/* Address */}
                 <div className="mb-8">
                   <div className="text-xs text-zinc-500 mb-2">RECEIVING ADDRESS</div>
-                  <input type="text" value={withdrawAddress} onChange={(e) => setWithdrawAddress(e.target.value)} placeholder="0x..." className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm outline-none focus:border-emerald-500 placeholder:text-zinc-700" />
+                  <input type="text" value={withdrawAddress} onChange={(e) => setWithdrawAddress(e.target.value)} placeholder="0x..." className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-4 text-sm outline-none focus:border-amber-500 placeholder:text-zinc-700" />
                 </div>
 
                 <button
@@ -1645,7 +1645,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                     }
                     setWithdrawStep(2);
                   }}
-                  className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-bold text-lg active:scale-[0.985]"
+                  className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20"
                 >
                   REVIEW WITHDRAWAL
                 </button>
@@ -1664,13 +1664,13 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                   <div className="flex justify-between"><span className="text-zinc-500">Network</span><span className="font-semibold">{selectedNetwork.icon} {selectedNetwork.name}</span></div>
                   <div className="flex justify-between"><span className="text-zinc-500">Amount</span><span className="font-semibold">{parseFloat(withdrawAmount).toFixed(2)} $SHIT</span></div>
                   <div className="flex justify-between"><span className="text-zinc-500">Network Fee</span><span className="font-semibold text-amber-400">-{selectedNetwork.fee} $SHIT</span></div>
-                  <div className="border-t border-white/10 pt-4 flex justify-between"><span className="text-zinc-500">You Receive</span><span className="font-bold text-emerald-400 text-lg">{(parseFloat(withdrawAmount) - selectedNetwork.fee).toFixed(2)} $SHIT</span></div>
+                  <div className="border-t border-white/10 pt-4 flex justify-between"><span className="text-zinc-500">You Receive</span><span className="font-black text-amber-400 text-lg">{(parseFloat(withdrawAmount) - selectedNetwork.fee).toFixed(2)} $SHIT</span></div>
                   <div className="flex justify-between"><span className="text-zinc-500">To Address</span><span className="font-mono text-xs">{withdrawAddress.slice(0, 10)}...{withdrawAddress.slice(-6)}</span></div>
                 </div>
 
                 <div className="flex gap-4">
                   <button onClick={() => setWithdrawStep(1)} className="flex-1 py-4 rounded-2xl border border-white/30">BACK</button>
-                  <button onClick={submitWithdrawal} className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-bold active:scale-[0.985]">CONFIRM</button>
+                  <button onClick={submitWithdrawal} className="flex-1 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black active:scale-[0.985]">CONFIRM</button>
                 </div>
               </>
             )}
@@ -1681,7 +1681,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                 <div className="text-8xl mb-6">✅</div>
                 <div className="text-3xl font-bold tracking-tight mb-2">Withdrawal Sent!</div>
                 <div className="text-zinc-400 mb-8">{(parseFloat(withdrawAmount) - selectedNetwork.fee).toFixed(2)} $SHIT → {selectedNetwork.name}</div>
-                <button onClick={() => setShowWithdrawModal(false)} className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-bold active:scale-[0.985]">DONE</button>
+                <button onClick={() => setShowWithdrawModal(false)} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black active:scale-[0.985]">DONE</button>
               </div>
             )}
           </div>
@@ -1694,11 +1694,11 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
             <div className="text-center mb-8">
               <div className="text-8xl mb-6">{selectedMerch.emoji}</div>
               <div className="text-3xl font-bold mb-2">{selectedMerch.name}</div>
-              <div className="text-emerald-400">{selectedMerch.color}</div>
+              <div className="text-amber-400">{selectedMerch.color}</div>
             </div>
             
             <div className="text-center mb-8">
-              <div className="text-5xl font-bold text-emerald-400 tabular-nums">{selectedMerch.price}</div>
+              <div className="text-5xl font-black text-amber-400 tabular-nums">{selectedMerch.price}</div>
               <div className="text-xs text-zinc-500 mt-1">$SHIT</div>
             </div>
 
@@ -1707,7 +1707,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               Printed & shipped by Printful • 7-14 business days
             </div>
 
-            <button onClick={() => buyMerch(selectedMerch)} className="w-full py-5 bg-emerald-600 rounded-2xl font-bold text-lg active:scale-[0.985]">
+            <button onClick={() => buyMerch(selectedMerch)} className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">
               CONFIRM ORDER
             </button>
           </div>
@@ -1720,13 +1720,13 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
             <div className="text-center mb-8">
               <div className="text-6xl mb-4">🪖</div>
               <div className="text-2xl font-bold">{buyingNFT.name}</div>
-              <div className="text-emerald-400">{buyingNFT.rank} • Power {buyingNFT.power}</div>
+              <div className="text-amber-400">{buyingNFT.rank} • Power {buyingNFT.power}</div>
             </div>
             <div className="flex justify-between text-sm mb-8">
               <div>Price</div>
-              <div className="font-bold text-emerald-400">{buyingNFT.price} $SHIT</div>
+              <div className="font-black text-amber-400">{buyingNFT.price} $SHIT</div>
             </div>
-            <button onClick={() => buyNFT(buyingNFT)} className="w-full py-5 bg-emerald-600 rounded-2xl font-bold text-lg active:scale-[0.985]">
+            <button onClick={() => buyNFT(buyingNFT)} className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">
               CONFIRM PURCHASE
             </button>
           </div>
@@ -1738,8 +1738,8 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
         <div className="fixed inset-0 z-[100] bg-black/95 p-6 overflow-y-auto" onClick={() => setShowBattlePass(false)}>
           <div className="max-w-2xl mx-auto py-8" onClick={e => e.stopPropagation()}>
             <div className="text-center mb-10">
-              <div className="text-emerald-500 text-xs tracking-[2px] font-bold mb-2">SEASON 1: SHIT RISING</div>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">Battle Pass</h2>
+              <div className="text-amber-500 text-xs tracking-[3px] font-bold mb-2">SEASON 1: SHIT RISING</div>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-3">Battle Pass</h2>
               <p className="text-zinc-400">Earn XP by completing offers, quests & staking. {isGeneral ? 'Premium rewards active!' : 'General Pass unlocks 3x rewards.'}</p>
             </div>
 
@@ -1747,7 +1747,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
             <div className="bg-zinc-950 border border-white/10 rounded-3xl p-8 mb-8">
               <div className="flex justify-between items-end mb-4">
                 <div>
-                  <div className="text-5xl font-bold text-emerald-400">Tier {currentTier}</div>
+                  <div className="text-5xl font-black text-amber-400">Tier {currentTier}</div>
                   <div className="text-sm text-zinc-500 mt-1">{battlePassXP} / {currentTier * XP_PER_TIER} XP to next tier</div>
                 </div>
                 <div className="text-right">
@@ -1756,16 +1756,16 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                 </div>
               </div>
               <div className="h-4 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 rounded-full transition-all" style={{ width: `${tierProgress}%` }} />
+                <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all" style={{ width: `${tierProgress}%` }} />
               </div>
             </div>
 
             {/* XP Sources */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10 text-center text-sm">
-              <div className="bg-zinc-950 border border-white/10 rounded-2xl p-4"><div className="text-emerald-400 font-bold">+50 XP</div><div className="text-zinc-500 text-xs">Per Offer</div></div>
-              <div className="bg-zinc-950 border border-white/10 rounded-2xl p-4"><div className="text-emerald-400 font-bold">+100 XP</div><div className="text-zinc-500 text-xs">Per Quest</div></div>
-              <div className="bg-zinc-950 border border-white/10 rounded-2xl p-4"><div className="text-emerald-400 font-bold">+30 XP</div><div className="text-zinc-500 text-xs">Per Stake</div></div>
-              <div className="bg-zinc-950 border border-white/10 rounded-2xl p-4"><div className="text-emerald-400 font-bold">+25 XP</div><div className="text-zinc-500 text-xs">Daily Login</div></div>
+              <div className="glass-card rounded-2xl p-4"><div className="text-amber-400 font-bold">+50 XP</div><div className="text-zinc-500 text-xs">Per Offer</div></div>
+              <div className="glass-card rounded-2xl p-4"><div className="text-amber-400 font-bold">+100 XP</div><div className="text-zinc-500 text-xs">Per Quest</div></div>
+              <div className="glass-card rounded-2xl p-4"><div className="text-amber-400 font-bold">+30 XP</div><div className="text-zinc-500 text-xs">Per Stake</div></div>
+              <div className="glass-card rounded-2xl p-4"><div className="text-amber-400 font-bold">+25 XP</div><div className="text-zinc-500 text-xs">Daily Login</div></div>
             </div>
 
             {/* Tiers Grid */}
@@ -1774,8 +1774,8 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                 const unlocked = tier.tier <= currentTier;
                 const claimed = claimedTiers.includes(tier.tier);
                 return (
-                  <div key={tier.tier} className={`bg-zinc-950 border ${claimed ? 'border-emerald-500/40' : unlocked ? 'border-emerald-500/30' : 'border-white/10'} rounded-2xl p-5 flex items-center gap-5`}>
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${claimed ? 'bg-emerald-500 text-black' : unlocked ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-zinc-600'}`}>
+                  <div key={tier.tier} className={`glass-card ${claimed ? 'border-amber-500/30' : unlocked ? 'border-amber-500/20' : ''} rounded-2xl p-5 flex items-center gap-5`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${claimed ? 'bg-amber-500 text-black' : unlocked ? 'bg-amber-500/20 text-amber-400' : 'bg-white/5 text-zinc-600'}`}>
                       {claimed ? '✓' : tier.tier}
                     </div>
                     <div className="flex-1">
@@ -1787,9 +1787,9 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
                       </div>
                     </div>
                     {unlocked && !claimed && (
-                      <button onClick={() => claimTierReward(tier.tier)} className="px-5 py-2 bg-emerald-600 rounded-xl text-sm font-bold active:scale-[0.985]">CLAIM</button>
+                      <button onClick={() => claimTierReward(tier.tier)} className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-xl text-sm font-black active:scale-[0.985]">CLAIM</button>
                     )}
-                    {claimed && <div className="text-emerald-400 text-sm font-bold">CLAIMED</div>}
+                    {claimed && <div className="text-amber-400 text-sm font-bold">CLAIMED</div>}
                   </div>
                 );
               })}
@@ -1801,8 +1801,8 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       )}
 
       {showSuccess && (
-        <div className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-emerald-600 text-white px-9 py-4 rounded-2xl flex items-center gap-3 font-medium shadow-2xl">
-          ✅ {successMessage}
+        <div className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-gradient-to-r from-amber-500 to-orange-500 text-black px-9 py-4 rounded-2xl flex items-center gap-3 font-black shadow-2xl shadow-amber-500/30">
+          💩 {successMessage}
         </div>
       )}
 

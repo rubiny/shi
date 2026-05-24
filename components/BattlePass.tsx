@@ -190,12 +190,12 @@ export default function BattlePass({ userId }: { userId: string }) {
               {canClaim ? (
                 <button 
                   onClick={() => claimReward(tier.level)}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl font-bold hover:scale-105 transition-transform animate-pulse"
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-xl font-black hover:scale-105 transition-transform animate-pulse shadow-lg shadow-amber-500/20"
                 >
                   CLAIM 🎁
                 </button>
               ) : isClaimed ? (
-                <div className="px-6 py-3 bg-zinc-800 rounded-xl text-emerald-400 font-bold">
+                <div className="px-6 py-3 bg-zinc-800 rounded-xl text-amber-400 font-bold">
                   ✓ CLAIMED
                 </div>
               ) : tier.premium && !premium ? (

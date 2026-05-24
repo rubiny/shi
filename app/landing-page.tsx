@@ -47,7 +47,7 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
             <p className="text-xl sm:text-2xl text-zinc-400 max-w-3xl mx-auto mb-8">
               Join the most degenerate army on Base. 
               <span className="text-amber-400 font-bold">Complete offers, stake $SHIT,</span> recruit soldiers & 
-              <span className="text-emerald-400 font-bold"> earn real crypto</span>. 
+              <span className="text-amber-300 font-bold"> earn real crypto</span>. 
               <br />
               <span className="text-sm text-zinc-500">No BS. Just poop & profit. 💩</span>
             </p>
@@ -147,13 +147,13 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
             {/* Trust badges */}
             <div className="flex flex-wrap justify-center gap-6 text-sm text-zinc-500">
               <span className="flex items-center gap-2">
-                <span className="text-emerald-400">✓</span> Instant Withdrawals
+                <span className="text-amber-400">✓</span> Instant Withdrawals
               </span>
               <span className="flex items-center gap-2">
-                <span className="text-emerald-400">✓</span> No KYC under $500
+                <span className="text-amber-400">✓</span> No KYC under $500
               </span>
               <span className="flex items-center gap-2">
-                <span className="text-emerald-400">✓</span> Base Chain
+                <span className="text-amber-400">✓</span> Base Chain
               </span>
             </div>
           </motion.div>
@@ -215,7 +215,7 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
                 whileHover={{ y: -5 }}
                 className="bg-zinc-900/50 border border-white/10 rounded-3xl p-6 hover:border-amber-500/30 transition-all"
               >
-                <div className={`w-12 h-12 rounded-2xl bg-${item.color}-500/20 flex items-center justify-center text-2xl mb-4`}>
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-2xl mb-4">
                   {item.icon}
                 </div>
                 <div className="text-xs text-zinc-500 mb-2">Step {item.step}</div>
@@ -387,7 +387,7 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
                   <span className="text-sm text-amber-400">❤️ {meme.likes}</span>
                 </div>
                 {/* Placeholder for meme image */}
-                <div className="w-full h-full flex items-center justify-center text-6xl group-hover:scale-110 transition-transform">
+                <div className="w-full h-full flex items-center justify-center text-7xl group-hover:scale-110 transition-transform opacity-60 group-hover:opacity-100">
                   {['💩', '🚀', '🌙', '💎', '🚽', '🎮'][i]}
                 </div>
               </motion.div>

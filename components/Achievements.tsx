@@ -100,7 +100,7 @@ export default function Achievements({ userId }: { userId: string }) {
           <div className="text-xs text-zinc-500 uppercase">Unlocked</div>
         </div>
         <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/10 text-center">
-          <div className="text-3xl font-black text-emerald-400">{totalRewards.toLocaleString()}</div>
+          <div className="text-3xl font-black text-amber-400">{totalRewards.toLocaleString()}</div>
           <div className="text-xs text-zinc-500 uppercase">$SHIT Earned</div>
         </div>
         <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/10 text-center">
@@ -220,7 +220,7 @@ export default function Achievements({ userId }: { userId: string }) {
                 {/* Footer */}
                 <div className="flex items-center justify-between">
                   {ach.unlocked ? (
-                    <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                    <div className="flex items-center gap-2 text-amber-400 text-sm">
                       <span>✓</span>
                       <span>Unlocked {ach.unlockedAt && `• ${new Date(ach.unlockedAt).toLocaleDateString()}`}</span>
                     </div>
@@ -233,7 +233,7 @@ export default function Achievements({ userId }: { userId: string }) {
                       onClick={() => claimReward(ach.id)}
                       className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
                         isClaiming
-                          ? 'bg-emerald-500 scale-95'
+                          ? 'bg-amber-500 scale-95'
                           : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white'
                       }`}
                     >

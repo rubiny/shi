@@ -179,9 +179,9 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/5">
-          <div className="text-2xl font-bold text-emerald-400">{stats?.totalUsers.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-amber-400">{stats?.totalUsers.toLocaleString()}</div>
           <div className="text-xs text-zinc-500 uppercase">Total Users</div>
-          <div className="text-xs text-emerald-400 mt-1">+{stats?.newUsersToday} today</div>
+          <div className="text-xs text-amber-400 mt-1">+{stats?.newUsersToday} today</div>
         </div>
         <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/5">
           <div className="text-2xl font-bold text-amber-400">{stats?.dailyActiveUsers}</div>
@@ -280,7 +280,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                       title={`${day.users} new users`}
                     />
                     <div 
-                      className="flex-1 bg-emerald-500/50 rounded-t"
+                      className="flex-1 bg-amber-500/50 rounded-t"
                       style={{ height: `${(day.offers / 150) * 100}%` }}
                       title={`${day.offers} offers completed`}
                     />
@@ -295,7 +295,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                 <span className="text-zinc-400">New Users</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <div className="w-3 h-3 bg-emerald-500/50 rounded" />
+                <div className="w-3 h-3 bg-amber-500/50 rounded" />
                 <span className="text-zinc-400">Offers Completed</span>
               </div>
             </div>
@@ -318,7 +318,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                       <span className="text-sm text-zinc-500 w-6">#{i + 1}</span>
                       <span>{user.name}</span>
                     </div>
-                    <span className="font-bold text-emerald-400">+{user.earned} $SHIT</span>
+                    <span className="font-bold text-amber-400">+{user.earned} $SHIT</span>
                   </div>
                 ))}
               </div>
@@ -390,7 +390,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                     <td className="p-4 text-center">
                       {user.is_general && <span className="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs mr-1">👑 GENERAL</span>}
                       {user.is_banned && <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">🚫 BANNED</span>}
-                      {!user.is_general && !user.is_banned && <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-xs">✓ Active</span>}
+                      {!user.is_general && !user.is_banned && <span className="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs">✓ Active</span>}
                     </td>
                     <td className="p-4 text-right text-sm text-zinc-400">{new Date(user.created_at).toLocaleDateString()}</td>
                     <td className="p-4 text-center">
@@ -405,7 +405,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                           onClick={() => handleBanUser(user.id, !user.is_banned)}
                           className={`px-3 py-1.5 rounded-lg text-xs ${
                             user.is_banned 
-                              ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' 
+                              ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30' 
                               : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                           }`}
                         >
@@ -436,7 +436,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                   <div className="flex items-center gap-4 mt-2 text-xs">
                     <span className="text-amber-400">{offer.reward} PTS</span>
                     <span className="text-zinc-500">{offer.completions} completions</span>
-                    <span className={`px-2 py-0.5 rounded ${offer.is_active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-700 text-zinc-400'}`}>
+                    <span className={`px-2 py-0.5 rounded ${offer.is_active ? 'bg-amber-500/20 text-amber-400' : 'bg-zinc-700 text-zinc-400'}`}>
                       {offer.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </div>
@@ -448,7 +448,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                     offer.is_active 
                       ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
-                      : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
+                      : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
                   }`}
                 >
                   {offer.is_active ? 'Disable' : 'Enable'}
@@ -481,7 +481,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={() => handleApproveWithdrawal(withdrawal.id)}
-                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-black rounded-xl text-sm font-semibold"
+                    className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black rounded-xl text-sm font-semibold"
                   >
                     ✓ Approve
                   </button>
@@ -507,7 +507,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                     <span className="text-sm text-zinc-400 ml-2">{withdrawal.amount.toLocaleString()} $SHIT</span>
                   </div>
                   <span className={`px-2 py-1 rounded text-xs ${
-                    withdrawal.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                    withdrawal.status === 'approved' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'
                   }`}>
                     {withdrawal.status === 'approved' ? '✓ Approved' : '✗ Rejected'}
                   </span>
@@ -560,7 +560,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 bg-zinc-800 rounded-xl">
                   <div className="text-sm text-zinc-400">Total Earned</div>
-                  <div className="text-xl font-bold text-emerald-400">{selectedUser.total_earned.toLocaleString()} $SHIT</div>
+                  <div className="text-xl font-bold text-amber-400">{selectedUser.total_earned.toLocaleString()} $SHIT</div>
                 </div>
                 <div className="p-3 bg-zinc-800 rounded-xl">
                   <div className="text-sm text-zinc-400">Member Since</div>
@@ -572,7 +572,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                   onClick={() => { handleBanUser(selectedUser.id, !selectedUser.is_banned); setShowUserModal(false); }}
                   className={`flex-1 py-3 rounded-xl font-semibold ${
                     selectedUser.is_banned 
-                      ? 'bg-emerald-500/20 text-emerald-400' 
+                      ? 'bg-amber-500/20 text-amber-400' 
                       : 'bg-red-500/20 text-red-400'
                   }`}
                 >

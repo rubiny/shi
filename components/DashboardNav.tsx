@@ -47,7 +47,7 @@ export default function DashboardNav({
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/95 border-b border-white/10">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
           <div
@@ -56,7 +56,7 @@ export default function DashboardNav({
           >
             <span className="text-3xl">💩</span>
             <div className="font-black text-xl tracking-tighter">
-              SHIT<span className="text-emerald-500">.ARMY</span>
+              SHIT<span className="text-amber-500">.ARMY</span>
             </div>
           </div>
 
@@ -68,7 +68,7 @@ export default function DashboardNav({
                 onClick={() => setCurrentTab(tab.id as TabId)}
                 className={`px-5 py-2.5 rounded-full flex items-center gap-2 transition-all ${
                   currentTab === tab.id
-                    ? "bg-white text-black font-semibold"
+                    ? "bg-amber-500 text-black font-semibold shadow-lg shadow-amber-500/20"
                     : "hover:bg-white/10 text-zinc-400"
                 }`}
               >
@@ -87,7 +87,7 @@ export default function DashboardNav({
                     : "hover:bg-white/10 text-zinc-400"
                 }`}
               >
-                <span className="text-base">☰</span>
+                <span className="text-base">💩</span>
                 <span>More</span>
               </button>
 
@@ -104,7 +104,7 @@ export default function DashboardNav({
                     <button
                       key={item.id}
                       onClick={() => { setCurrentTab(item.id as TabId); setShowMoreMenu(false); }}
-                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-emerald-400' : ''}`}
+                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-amber-400' : ''}`}
                     >
                       <span>{item.icon}</span> <span>{item.label}</span>
                     </button>
@@ -120,7 +120,7 @@ export default function DashboardNav({
                     <button
                       key={item.id}
                       onClick={() => { setCurrentTab(item.id as TabId); setShowMoreMenu(false); }}
-                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-emerald-400' : ''}`}
+                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-amber-400' : ''}`}
                     >
                       <span>{item.icon}</span> <span>{item.label}</span>
                     </button>
@@ -138,7 +138,7 @@ export default function DashboardNav({
                     <button
                       key={item.id}
                       onClick={() => { setCurrentTab(item.id as TabId); setShowMoreMenu(false); }}
-                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-emerald-400' : ''}`}
+                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-amber-400' : ''}`}
                     >
                       <span>{item.icon}</span> <span>{item.label}</span>
                     </button>
@@ -175,10 +175,10 @@ export default function DashboardNav({
                 onClick={() => setShowKYCModal(true)}
                 className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                   kycStatus === 'none'
-                    ? 'bg-red-500/20 border-red-500/40 text-red-400 hover:bg-red-500/30'
+                    ? 'bg-red-500/20 border-red-500/40 text-red-400 hover:bg-red-500/30 animate-pulse'
                     : kycStatus === 'pending'
                     ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-                    : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                    : 'bg-green-500/20 border-green-500/40 text-green-400'
                 }`}
               >
                 <span>{kycStatus === 'none' ? '⚠️' : kycStatus === 'pending' ? '⏳' : '✓'}</span>
@@ -188,7 +188,7 @@ export default function DashboardNav({
               </button>
             )}
             {kycStatus === 'verified' && (
-              <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/20 border border-emerald-500/40 text-emerald-400">
+              <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-green-500/20 border border-green-500/40 text-green-400">
                 <span>✓</span>
                 <span className="uppercase tracking-wider">Verified</span>
               </div>
@@ -225,7 +225,7 @@ export default function DashboardNav({
               key={tab.id}
               onClick={() => setCurrentTab(tab.id as TabId)}
               className={`flex flex-col items-center px-2 py-1 ${
-                currentTab === tab.id ? 'text-emerald-400' : 'text-zinc-400'
+                currentTab === tab.id ? 'text-amber-400' : 'text-zinc-400'
               }`}
             >
               <span className="text-xl mb-0.5">{tab.icon}</span>

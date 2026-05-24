@@ -17,7 +17,7 @@ const EVENT_TYPES = [
   { id: 'double_xp', name: 'Double XP Weekend', icon: '⚡', color: 'blue' },
   { id: 'bonus_rewards', name: 'Bonus Rewards', icon: '💰', color: 'amber' },
   { id: 'flash_sale', name: 'Flash Sale (Market)', icon: '🛒', color: 'purple' },
-  { id: 'special_quest', name: 'Special Quest', icon: '📜', color: 'emerald' },
+  { id: 'special_quest', name: 'Special Quest', icon: '📜', color: 'amber' },
 ];
 
 export default function AdminEventsModal({ onClose }: { onClose: () => void }) {
@@ -109,7 +109,7 @@ export default function AdminEventsModal({ onClose }: { onClose: () => void }) {
                         onClick={() => toggleEvent(event.id)}
                         className={`px-4 py-2 rounded-xl text-sm font-bold ${
                           event.active 
-                            ? 'bg-emerald-500/20 text-emerald-400' 
+                            ? 'bg-amber-500/20 text-amber-400' 
                             : 'bg-zinc-700 text-zinc-400'
                         }`}
                       >

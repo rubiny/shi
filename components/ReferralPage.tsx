@@ -199,7 +199,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
       {/* Stats Grid with 3D cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { value: stats?.total_referrals || 0, label: 'Shit Soldiers', emoji: '🪖', color: 'emerald', sub: 'recruited' },
+          { value: stats?.total_referrals || 0, label: 'Shit Soldiers', emoji: '🪖', color: 'amber', sub: 'recruited' },
           { value: stats?.active_referrals || 0, label: 'Active Poopers', emoji: '💩', color: 'amber', sub: 'earning' },
           { value: (stats?.total_earnings || 0).toFixed(0), label: '$SHIT Harvest', emoji: '🚜', color: 'purple', sub: 'from army' },
           { value: stats?.current_tier || 'Recruit', label: 'Your Rank', emoji: SHIT_TIERS.find(t => t.name === (stats?.current_tier || 'Recruit'))?.emoji || '🪖', color: 'blue', sub: 'tier' },
@@ -224,7 +224,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
       <div className="flex flex-wrap gap-2 mb-6">
         {[
           { id: 'overview', label: 'War Room', icon: '🎯', color: 'from-amber-500 to-orange-500' },
-          { id: 'referrals', label: 'My Soldiers', icon: '🪖', color: 'from-emerald-500 to-teal-500' },
+          { id: 'referrals', label: 'My Soldiers', icon: '🪖', color: 'from-amber-500 to-teal-500' },
           { id: 'leaderboard', label: 'Top Poopers', icon: '🏆', color: 'from-purple-500 to-pink-500' },
         ].map((tab) => (
           <button
@@ -251,8 +251,8 @@ export default function ReferralPage({ userId }: { userId: string }) {
           <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
             <h3 className="font-bold mb-4">💰 Earnings Breakdown</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                <div className="text-lg font-bold text-emerald-400">{(stats?.offer_earnings || 0).toFixed(0)}</div>
+              <div className="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                <div className="text-lg font-bold text-amber-400">{(stats?.offer_earnings || 0).toFixed(0)}</div>
                 <div className="text-xs text-zinc-500">From Offers ({currentTier?.offer_commission}%)</div>
               </div>
               <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
@@ -302,7 +302,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
                   </div>
                   <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-emerald-500 rounded-full transition-all"
+                      className="h-full bg-amber-500 rounded-full transition-all"
                       style={{ width: `${Math.min(100, ((stats?.total_earnings || 0) / nextTier.min_earnings) * 100)}%` }}
                     />
                   </div>
@@ -313,7 +313,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
                 </p>
               </div>
             ) || (
-              <p className="text-emerald-400 font-semibold">🎉 You've reached the maximum tier!</p>
+              <p className="text-amber-400 font-semibold">🎉 You've reached the maximum tier!</p>
             )}
           </div>
 
@@ -387,7 +387,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
                             {ref.referred_wallet.slice(0, 6)}...{ref.referred_wallet.slice(-4)}
                           </span>
                           {ref.is_active && (
-                            <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Active</span>
+                            <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">Active</span>
                           )}
                         </div>
                       </td>
@@ -398,7 +398,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
                         {ref.total_earned_by_referred.toFixed(0)} $SHIT
                       </td>
                       <td className="p-4 text-right">
-                        <span className="text-emerald-400 font-bold">+{ref.commission_earned.toFixed(0)}</span>
+                        <span className="text-amber-400 font-bold">+{ref.commission_earned.toFixed(0)}</span>
                       </td>
                     </tr>
                   ))}

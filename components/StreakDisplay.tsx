@@ -85,19 +85,19 @@ export default function StreakDisplay() {
       </div>
 
       {/* Offer Streak */}
-      <div className="bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 rounded-2xl p-4 border border-emerald-500/30">
+      <div className="bg-gradient-to-r from-amber-500/20 via-teal-500/20 to-amber-500/20 rounded-2xl p-4 border border-amber-500/30">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <span className="text-3xl">⚡</span>
             <div>
               <div className="font-bold text-lg">Offer Streak</div>
-              <div className="text-sm text-emerald-400">
+              <div className="text-sm text-amber-400">
                 {offerStreak} days in a row • {offerReward.multiplier}x rewards
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-black text-emerald-400">{offerStreak}</div>
+            <div className="text-2xl font-black text-amber-400">{offerStreak}</div>
             <div className="text-xs text-zinc-500">offers</div>
           </div>
         </div>
@@ -106,11 +106,11 @@ export default function StreakDisplay() {
         <div className="mb-2">
           <div className="flex justify-between text-xs mb-1">
             <span className="text-zinc-500">Progress to next bonus</span>
-            <span className="text-emerald-400">{offerStreak % 7}/7</span>
+            <span className="text-amber-400">{offerStreak % 7}/7</span>
           </div>
           <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all"
+              className="h-full bg-gradient-to-r from-amber-500 to-teal-500 rounded-full transition-all"
               style={{ width: `${((offerStreak % 7) / 7) * 100}%` }}
             />
           </div>
@@ -152,12 +152,12 @@ export default function StreakDisplay() {
               key={item.days}
               className={`p-3 rounded-xl text-center ${
                 item.current 
-                  ? 'bg-emerald-500/20 border border-emerald-500/30' 
+                  ? 'bg-amber-500/20 border border-amber-500/30' 
                   : 'bg-zinc-800/50'
               }`}
             >
               <div className="text-xl mb-1">{item.icon}</div>
-              <div className={`text-xs font-bold ${item.current ? 'text-emerald-400' : 'text-zinc-500'}`}>
+              <div className={`text-xs font-bold ${item.current ? 'text-amber-400' : 'text-zinc-500'}`}>
                 {item.days}d
               </div>
               <div className="text-[10px] text-zinc-400">{item.reward}</div>

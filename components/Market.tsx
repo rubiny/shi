@@ -25,7 +25,7 @@ const LISTINGS: Listing[] = [
 
 const RANK_COLORS = {
   Common: 'from-zinc-600 to-zinc-500',
-  Uncommon: 'from-green-600 to-emerald-500',
+  Uncommon: 'from-green-600 to-green-500',
   Rare: 'from-blue-600 to-cyan-500',
   Epic: 'from-purple-600 to-pink-500',
   Legendary: 'from-amber-500 via-orange-500 to-red-500',
@@ -60,11 +60,11 @@ export default function Market({ userId }: { userId: string }) {
     <div className="max-w-6xl mx-auto p-4 sm:p-6">
       {/* Header */}
       <div className="mb-8 relative">
-        <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 blur-2xl rounded-full"></div>
+        <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 blur-2xl rounded-full"></div>
         <div className="relative">
           <div className="text-center mb-6">
             <div className="text-5xl mb-2">🛒</div>
-            <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
               Shit Market
             </h1>
             <p className="text-zinc-400">Buy, sell, and trade NFT soldiers & gear</p>
@@ -78,7 +78,7 @@ export default function Market({ userId }: { userId: string }) {
                 placeholder="Search items..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full px-4 py-3 pl-12 bg-zinc-900/50 border border-white/10 rounded-2xl focus:border-emerald-500/50 focus:outline-none"
+                className="w-full px-4 py-3 pl-12 bg-zinc-900/50 border border-white/10 rounded-2xl focus:border-amber-500/50 focus:outline-none"
               />
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">🔍</span>
             </div>
@@ -97,7 +97,7 @@ export default function Market({ userId }: { userId: string }) {
               
               <button 
                 onClick={() => setShowSell(true)}
-                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold hover:scale-105 transition-transform"
+                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
               >
                 📤 Sell Item
               </button>
@@ -114,7 +114,7 @@ export default function Market({ userId }: { userId: string }) {
             onClick={() => setCategory(cat.id)}
             className={`px-4 py-2 rounded-xl font-bold transition-all ${
               category === cat.id
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg font-black'
                 : 'bg-zinc-800/50 text-zinc-400 hover:text-white border border-white/10'
             }`}
           >
@@ -157,7 +157,7 @@ export default function Market({ userId }: { userId: string }) {
           <div 
             key={item.id}
             onClick={() => setSelectedItem(item)}
-            className="group relative p-4 rounded-2xl bg-zinc-900/50 border border-white/10 hover:border-emerald-500/50 transition-all hover:scale-105 cursor-pointer"
+            className="group relative p-4 rounded-2xl bg-zinc-900/50 border border-white/10 hover:border-amber-500/40 transition-all hover:scale-105 cursor-pointer"
           >
             {/* Glow */}
             <div className={`absolute -inset-px bg-gradient-to-r ${RANK_COLORS[item.rank]} opacity-0 group-hover:opacity-20 rounded-2xl transition-opacity blur-xl`} />
@@ -197,7 +197,7 @@ export default function Market({ userId }: { userId: string }) {
               
               {/* Price & Seller */}
               <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                <div className="text-emerald-400 font-bold">{item.price.toLocaleString()} $SHIT</div>
+                <div className="text-amber-400 font-bold">{item.price.toLocaleString()} $SHIT</div>
                 <div className="text-xs text-zinc-500">@{item.seller}</div>
               </div>
             </div>
@@ -219,7 +219,7 @@ export default function Market({ userId }: { userId: string }) {
             <div key={i} className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-xl text-sm">
               <span className="text-zinc-300">{sale.item}</span>
               <div className="flex items-center gap-4">
-                <span className="text-emerald-400 font-bold">{sale.price.toLocaleString()} $SHIT</span>
+                <span className="text-amber-400 font-bold">{sale.price.toLocaleString()} $SHIT</span>
                 <span className="text-zinc-500 text-xs">{sale.time}</span>
               </div>
             </div>
@@ -256,7 +256,7 @@ export default function Market({ userId }: { userId: string }) {
                 <div className="text-xs text-zinc-500">Power</div>
               </div>
               <div className="p-3 bg-zinc-800 rounded-xl text-center">
-                <div className="text-xl font-bold text-emerald-400">{selectedItem.price.toLocaleString()}</div>
+                <div className="text-xl font-bold text-amber-400">{selectedItem.price.toLocaleString()}</div>
                 <div className="text-xs text-zinc-500">Price</div>
               </div>
             </div>
@@ -281,7 +281,7 @@ export default function Market({ userId }: { userId: string }) {
               </button>
               <button 
                 onClick={() => setSelectedItem(null)}
-                className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold hover:scale-105 transition-transform"
+                className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
               >
                 💰 BUY NOW
               </button>
@@ -315,7 +315,7 @@ export default function Market({ userId }: { userId: string }) {
                 <input 
                   type="number" 
                   placeholder="Enter price..."
-                  className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-emerald-500/50 focus:outline-none"
+                  className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500/50 focus:outline-none"
                 />
               </div>
               
@@ -333,7 +333,7 @@ export default function Market({ userId }: { userId: string }) {
               </button>
               <button 
                 onClick={() => setShowSell(false)}
-                className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold hover:scale-105 transition-transform"
+                className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
               >
                 📤 LIST ITEM
               </button>

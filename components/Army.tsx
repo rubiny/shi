@@ -41,7 +41,7 @@ const MISSIONS: Mission[] = [
 
 const RANK_COLORS = {
   Common: 'from-zinc-600 to-zinc-500',
-  Uncommon: 'from-green-600 to-emerald-500',
+  Uncommon: 'from-green-600 to-green-500',
   Rare: 'from-blue-600 to-cyan-500',
   Epic: 'from-purple-600 to-pink-500',
   Legendary: 'from-amber-500 via-orange-500 to-red-500',
@@ -50,7 +50,7 @@ const RANK_COLORS = {
 
 const RANK_BORDER = {
   Common: 'border-zinc-600',
-  Uncommon: 'border-emerald-500',
+  Uncommon: 'border-green-500',
   Rare: 'border-blue-500',
   Epic: 'border-purple-500',
   Legendary: 'border-amber-500',
@@ -58,7 +58,7 @@ const RANK_BORDER = {
 };
 
 const DIFFICULTY_COLORS = {
-  Easy: 'text-emerald-400',
+  Easy: 'text-green-400',
   Medium: 'text-amber-400',
   Hard: 'text-orange-400',
   Extreme: 'text-red-400',
@@ -114,7 +114,7 @@ export default function Army({ userId }: { userId: string }) {
         {[
           { id: 'army', label: 'My Squad', icon: '🪖', color: 'from-purple-500 to-pink-500' },
           { id: 'missions', label: 'Missions', icon: '🎯', color: 'from-amber-500 to-orange-500' },
-          { id: 'recruit', label: 'Recruit', icon: '➕', color: 'from-emerald-500 to-teal-500' },
+          { id: 'recruit', label: 'Recruit', icon: '➕', color: 'from-amber-500 to-orange-500' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -159,7 +159,7 @@ export default function Army({ userId }: { userId: string }) {
                       {nft.rank}
                     </div>
                     {nft.equipped && (
-                      <div className="mt-2 text-emerald-400 text-xs font-bold">
+                      <div className="mt-2 text-amber-400 text-xs font-bold">
                         ⚡ EQUIPPED
                       </div>
                     )}
@@ -288,7 +288,7 @@ export default function Army({ userId }: { userId: string }) {
             <div className="space-y-2 mb-6 text-left">
               {[
                 { rank: 'Common', chance: '50%', color: 'bg-zinc-600' },
-                { rank: 'Uncommon', chance: '30%', color: 'bg-emerald-500' },
+                { rank: 'Uncommon', chance: '30%', color: 'bg-green-500' },
                 { rank: 'Rare', chance: '15%', color: 'bg-blue-500' },
                 { rank: 'Epic', chance: '4%', color: 'bg-purple-500' },
                 { rank: 'Legendary', chance: '0.9%', color: 'bg-amber-500' },

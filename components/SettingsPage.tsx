@@ -43,7 +43,7 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
       {message && (
         <div className={`mb-6 p-4 rounded-2xl border-2 ${
           message.type === 'success' 
-            ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' 
+            ? 'bg-amber-500/10 border-amber-500/50 text-amber-400' 
             : 'bg-red-500/10 border-red-500/50 text-red-400'
         }`}>
           <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
       <div className="flex flex-wrap gap-2 mb-8">
         {[
           { id: 'profile', label: 'Profile', icon: '�', color: 'from-amber-500 to-orange-500' },
-          { id: 'security', label: 'Security', icon: '🔒', color: 'from-emerald-500 to-teal-500' },
+          { id: 'security', label: 'Security', icon: '🔒', color: 'from-amber-500 to-teal-500' },
           { id: 'connections', label: 'Connect', icon: '🔗', color: 'from-blue-500 to-indigo-500' },
         ].map((tab) => (
           <button
@@ -245,7 +245,7 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
             </button>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-600/20 to-green-600/20 rounded-2xl p-6 border border-emerald-500/30">
+          <div className="bg-gradient-to-br from-amber-600/20 to-green-600/20 rounded-2xl p-6 border border-amber-500/30">
             <h3 className="font-bold mb-2">Connection Rewards</h3>
             <p className="text-sm text-zinc-400">Connect all 3 socials to earn +500 $SHIT</p>
           </div>
