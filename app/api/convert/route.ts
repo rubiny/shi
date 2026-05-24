@@ -38,7 +38,7 @@ export async function POST(request: Request) {
   // Check user has enough points
   const { data: balance } = await supabase
     .from('user_balances')
-    .select('points, shit_balance')
+    .select('points, shit_balance, total_earned')
     .eq('user_id', user.id)
     .single();
 
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     .update({
       points: balance.points - points,
       shit_balance: Number(balance.shit_balance) + shitAmount,
-      total_earned: Number(balance.shit_balance) + shitAmount,
+      total_earned: Number(balance.total_earned) + shitAmount,
     })
     .eq('user_id', user.id);
 

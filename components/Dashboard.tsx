@@ -261,7 +261,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                   🔥 {db.dailyStreak} day streak
                   {getStreakTimeLeft() && <span className="text-red-400 text-xs font-mono">{'\u23F1\uFE0F'} {getStreakTimeLeft()}</span>}
                 </div>
-                <button onClick={() => { sfx.click(); db.claimDailyBonus(); }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-black px-8 py-3 rounded-2xl text-sm font-black active:scale-[0.985] shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-shadow">CLAIM DAILY BONUS</button>
+                <button onClick={() => { sfx.click(); db.claimDailyBonus(); }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-black px-8 py-3 rounded-2xl text-sm font-black active:scale-[0.985] shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-shadow animate-border-glow border border-amber-500/30">CLAIM DAILY BONUS</button>
               </div>
             </div>
 
@@ -286,16 +286,16 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             )}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all">
+              <div className="glass-card glass-card-shine rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover hover-lift transition-all">
                 <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">$SHIT BALANCE</div>
-                <div className="text-2xl md:text-4xl lg:text-5xl font-black tabular-nums tracking-tighter text-amber-400">{db.shitBalance.toLocaleString()}</div>
+                <div className="text-2xl md:text-4xl lg:text-5xl font-black tabular-nums tracking-tighter text-amber-400 balance-glow">{db.shitBalance.toLocaleString()}</div>
               </div>
-              <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all">
+              <div className="glass-card glass-card-shine rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover hover-lift transition-all">
                 <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">POINTS</div>
                 <div className="text-2xl md:text-4xl lg:text-5xl font-black tabular-nums tracking-tighter">{db.points.toLocaleString()}</div>
               </div>
               <Tooltip content={`${rank.toNext.toLocaleString()} $SHIT to ${rank.next?.name || 'MAX'}`}>
-                <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all w-full">
+                <div className="glass-card glass-card-shine rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover hover-lift transition-all w-full">
                   <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">CURRENT RANK</div>
                   <div className="text-xl md:text-3xl lg:text-4xl font-black">{rank.current.emoji} {rank.current.name}</div>
                   {rank.next && (
@@ -303,7 +303,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                   )}
                 </div>
               </Tooltip>
-              <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover transition-all">
+              <div className="glass-card glass-card-shine rounded-2xl md:rounded-3xl p-5 md:p-8 glass-card-hover hover-lift transition-all">
                 <div className="text-[10px] md:text-sm text-zinc-500 mb-1 tracking-wider">TOTAL EARNED</div>
                 <div className="text-2xl md:text-3xl lg:text-4xl font-black tabular-nums">{db.totalEarned.toLocaleString()}</div>
                 <div className="text-xs text-amber-500">$SHIT all-time {db.streakMultiplier > 0 && `(+${db.streakMultiplier}% streak)`}</div>
@@ -331,7 +331,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             })()}
 
             <div className="flex gap-4">
-              <button onClick={() => setCurrentTab("fiat")} className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 py-4 rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">BUY $SHIT</button>
+              <button onClick={() => setCurrentTab("fiat")} className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 py-4 rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20 animate-glow-pulse">BUY $SHIT</button>
               <button onClick={() => {
                 const KYC_THRESHOLD = 100;
                 const shitPrice = 0.01;
@@ -477,24 +477,24 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             </div>
 
             <div className="grid md:grid-cols-3 gap-4 mb-4">
-              <div onClick={() => setCurrentTab("offerwall")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("offerwall")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u26A1'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">GRIND OFFERS</div>
                 <div className="text-zinc-400 mt-2 text-sm">8 offers {'\u2022'} up to 2,100 PTS {db.streakMultiplier > 0 && `(+${db.streakMultiplier}% streak)`}</div>
               </div>
-              <div onClick={() => setCurrentTab("spin")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("spin")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3B0}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">SPIN TO WIN</div>
                 <div className="text-zinc-400 mt-2 text-sm">daily spins {'\u2022'} up to 10K PTS jackpot</div>
               </div>
-              <div onClick={() => setCurrentTab("games")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("games")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3B2}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">DEGEN GAMES</div>
                 <div className="text-zinc-400 mt-2 text-sm">coin flip {'\u2022'} dice {'\u2022'} pump or dump</div>
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <div onClick={() => setCurrentTab("army")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group border border-amber-500/20 hover:border-amber-500/40">
+              <div onClick={() => setCurrentTab("army")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group border border-amber-500/20 hover:border-amber-500/40">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F4A9}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">SHIT ARMY</div>
                 <div className="text-zinc-400 mt-2 text-sm">mint degens {'\u2022'} raid sewers {'\u2022'} stack $SHIT passively</div>
@@ -504,24 +504,24 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                   <span className="text-green-400">+{Math.floor((db.squadPower ?? 450) / 100)}% offerwall bonus</span>
                 </div>
               </div>
-              <div onClick={() => setCurrentTab("market")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group border border-amber-500/20 hover:border-amber-500/40">
+              <div onClick={() => setCurrentTab("market")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group border border-amber-500/20 hover:border-amber-500/40">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3EA}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">SHIT BAZAAR</div>
                 <div className="text-zinc-400 mt-2 text-sm">buy juice {'\u2022'} trade degens {'\u2022'} flex drip</div>
               </div>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
-              <div onClick={() => setCurrentTab("stake")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("stake")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3C6}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">LOCK YOUR BAGS</div>
                 <div className="text-zinc-400 mt-2 text-sm">32-67% APY {'\u2022'} diamond hands only</div>
               </div>
-              <div onClick={() => setCurrentTab("vip")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("vip")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F48E}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">VIP PASS</div>
                 <div className="text-zinc-400 mt-2 text-sm">up to +50% bonus {'\u2022'} 0% fees {'\u2022'} whale perks</div>
               </div>
-              <div onClick={() => setCurrentTab("quests")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("quests")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F4DC}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">MISSIONS</div>
                 <div className="text-zinc-400 mt-2 text-sm">daily & weekly grinds {'\u2022'} stack rewards</div>
@@ -559,26 +559,26 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             </div>
 
             <div className="grid md:grid-cols-4 gap-4 mt-4">
-              <div onClick={() => setCurrentTab("memes")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("memes")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-2xl p-6 active:scale-[0.985] transition-all group">
                 <div className="text-3xl mb-3">{'\u{1F92A}'}</div>
                 <div className="text-lg font-black group-hover:text-amber-400 transition-colors">MEME FEED</div>
                 <div className="text-zinc-500 mt-1 text-xs">post {'\u2022'} vote {'\u2022'} earn</div>
               </div>
-              <div onClick={() => setCurrentTab("guilds")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("guilds")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-2xl p-6 active:scale-[0.985] transition-all group">
                 <div className="text-3xl mb-3">{'\u{1F3F0}'}</div>
                 <div className="text-lg font-black group-hover:text-amber-400 transition-colors">GUILDS</div>
                 <div className="text-zinc-500 mt-1 text-xs">clans {'\u2022'} raids {'\u2022'} chat</div>
               </div>
-              <div onClick={() => setCurrentTab("referral")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("referral")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-2xl p-6 active:scale-[0.985] transition-all group">
                 <div className="text-3xl mb-3">{'\u{1F4E3}'}</div>
                 <div className="text-lg font-black group-hover:text-amber-400 transition-colors">RECRUIT</div>
                 <div className="text-zinc-500 mt-1 text-xs">refer {'\u2022'} grow {'\u2022'} earn</div>
               </div>
-              <div onClick={() => setCurrentTab("events")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group border border-amber-500/20">
+              <div onClick={() => setCurrentTab("events")} className="cursor-pointer glass-card glass-card-hover glass-card-shine hover-lift rounded-2xl p-6 active:scale-[0.985] transition-all group border border-amber-500/20">
                 <div className="text-3xl mb-3">{'\u{1F3D6}\uFE0F'}</div>
                 <div className="text-lg font-black group-hover:text-amber-400 transition-colors">EVENTS</div>
                 <div className="text-zinc-500 mt-1 text-xs">seasonal {'\u2022'} limited {'\u2022'} exclusive</div>
-                <div className="text-xs text-green-400 mt-1 font-semibold">LIVE NOW</div>
+                <div className="text-xs text-green-400 mt-1 font-semibold animate-badge-bounce">LIVE NOW</div>
               </div>
             </div>
           </motion.div>

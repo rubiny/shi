@@ -1,7 +1,7 @@
 import { getAuthUser, getServerSupabase, jsonError, jsonSuccess, notConfigured, unauthorized } from '@/lib/api-helpers';
 import { parseBody, formatZodErrors, stakeSchema } from '@/lib/validations/schemas';
 
-const APY_MAP: Record<number, number> = { 7: 32, 14: 40, 30: 48, 90: 67 };
+const APY_MAP: Record<number, number> = { 7: 32, 30: 48, 90: 67 };
 
 export async function POST(request: Request) {
   const supabase = getServerSupabase();
@@ -17,23 +17,19 @@ export async function POST(request: Request) {
   const apy = APY_MAP[lock_days];
   if (!apy) return jsonError('Invalid lock period', 400);
 
-  // Check balance
+  // Atomic balance check + debit (prevents double-spend race condition)
+  const { error: deductError } = await supabase.rpc('debit_balance', {
+    p_user_id: user.id,
+    p_amount: amount,
+  });
+  if (deductError) return jsonError(deductError.message?.includes('insufficient') ? 'Insufficient balance' : 'Failed to deduct balance', deductError.message?.includes('insufficient') ? 400 : 500);
+
+  // Fetch updated balance for response
   const { data: balance } = await supabase
     .from('user_balances')
     .select('shit_balance')
     .eq('user_id', user.id)
     .single();
-
-  if (!balance || Number(balance.shit_balance) < amount) {
-    return jsonError(`Insufficient balance: ${balance?.shit_balance || 0} $SHIT`, 400);
-  }
-
-  // Deduct balance
-  const { error: deductError } = await supabase.rpc('debit_balance', {
-    p_user_id: user.id,
-    p_amount: amount,
-  });
-  if (deductError) return jsonError('Failed to deduct balance', 500);
 
   // Create staking position
   const unlockDate = new Date(Date.now() + lock_days * 86400000).toISOString();
@@ -74,6 +70,6 @@ export async function POST(request: Request) {
       unlock_at: unlockDate,
       estimated_reward: Math.round(estimatedReward * 100) / 100,
     },
-    new_balance: Number(balance.shit_balance) - amount,
+    new_balance: Number(balance?.shit_balance ?? 0),
   });
 }

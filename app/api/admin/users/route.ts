@@ -23,7 +23,8 @@ export async function GET(request: Request) {
     .select('*, user_balances(shit_balance, points, total_earned), kyc_verifications(status)', { count: 'exact' });
 
   if (search) {
-    query = query.or(`username.ilike.%${search}%,wallet_address.ilike.%${search}%`);
+    const sanitizedSearch = search.replace(/[%,.()\\/]/g, '');
+    query = query.or(`username.ilike.%${sanitizedSearch}%,wallet_address.ilike.%${sanitizedSearch}%`);
   }
 
   const { data: users, count, error } = await query

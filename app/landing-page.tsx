@@ -124,10 +124,11 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
-        {/* Animated background */}
+        {/* Animated background orbs */}
         <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-amber-500/8 rounded-full blur-[100px] animate-subtle-float" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[100px] animate-subtle-float" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[120px] animate-pulse" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -137,16 +138,30 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             transition={{ duration: 0.5 }}
           >
             {/* Floating emoji */}
-            <div className="text-8xl mb-6 animate-bounce">
+            <motion.div 
+              className="text-8xl mb-6"
+              animate={{ y: [0, -15, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
               {emojis[currentEmoji]}
-            </div>
+            </motion.div>
 
             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
+              <motion.span 
+                className="bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent inline-block animate-gradient-shift"
+                style={{ backgroundSize: '200% 200%' }}
+              >
                 APE IN OR
-              </span>
+              </motion.span>
               <br />
-              <span className="text-white">STAY POOR</span>
+              <motion.span 
+                className="text-white inline-block"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                STAY POOR
+              </motion.span>
             </h1>
 
             <p className="text-xl sm:text-2xl text-zinc-400 max-w-3xl mx-auto mb-8">
@@ -160,15 +175,22 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mb-12">
               {[
-                { value: `$${(CONFIG.PLATFORM_STATS.TOTAL_EARNED / 1_000_000).toFixed(1)}M`, label: 'LOOTED' },
-                { value: `${(CONFIG.PLATFORM_STATS.TOTAL_SOLDIERS / 1000).toFixed(0)}K`, label: 'DEGENS' },
-                { value: `${(CONFIG.PLATFORM_STATS.OFFERS_COMPLETED / 1_000_000).toFixed(1)}M`, label: 'OFFERS CRUSHED' },
-                { value: `${(CONFIG.PLATFORM_STATS.SHIT_STAKED / 1000).toFixed(0)}K`, label: 'BAGS LOCKED' }
+                { value: `$${(CONFIG.PLATFORM_STATS.TOTAL_EARNED / 1_000_000).toFixed(1)}M`, label: 'LOOTED', icon: '💰' },
+                { value: `${(CONFIG.PLATFORM_STATS.TOTAL_SOLDIERS / 1000).toFixed(0)}K`, label: 'DEGENS', icon: '🦍' },
+                { value: `${(CONFIG.PLATFORM_STATS.OFFERS_COMPLETED / 1_000_000).toFixed(1)}M`, label: 'OFFERS CRUSHED', icon: '🎯' },
+                { value: `${(CONFIG.PLATFORM_STATS.SHIT_STAKED / 1000).toFixed(0)}K`, label: 'BAGS LOCKED', icon: '🔒' }
               ].map((stat, i) => (
-                <div key={i} className="bg-zinc-900/50 border border-white/10 rounded-2xl px-6 py-4 backdrop-blur-sm">
-                  <div className="text-2xl sm:text-3xl font-black text-amber-400">{stat.value}</div>
+                <motion.div 
+                  key={i} 
+                  className="bg-zinc-900/50 border border-white/10 rounded-2xl px-6 py-4 backdrop-blur-sm glass-card-shine hover-lift cursor-default"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1, duration: 0.4 }}
+                >
+                  <div className="text-lg mb-1">{stat.icon}</div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-400 balance-glow">{stat.value}</div>
                   <div className="text-xs text-zinc-500">{stat.label}</div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -178,7 +200,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onConnect}
-                className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-black text-lg shadow-lg shadow-amber-500/20"
+                className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-black text-lg shadow-lg shadow-amber-500/20 animate-glow-pulse"
               >
                 💩 APE IN NOW
               </motion.button>
@@ -275,7 +297,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -5 }}
-                className="bg-zinc-900/50 border border-white/10 rounded-3xl p-6 hover:border-amber-500/30 transition-all"
+                className="bg-zinc-900/50 border border-white/10 rounded-3xl p-6 hover:border-amber-500/30 transition-all glass-card-shine hover-lift"
               >
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-2xl mb-4">
                   {item.icon}
@@ -542,7 +564,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-zinc-900/80 border border-green-500/20 rounded-2xl p-5 hover:border-green-500/40 transition-all"
+                className="bg-zinc-900/80 border border-green-500/20 rounded-2xl p-5 hover:border-green-500/40 transition-all glass-card-shine hover-lift"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="text-2xl">{tx.emoji}</div>
@@ -584,17 +606,20 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               { q: 'What\'s the Army / soldiers thing?', a: 'Mint NFT soldiers, send them on missions (raids), earn $SHIT passively. Higher level soldiers = better missions = more loot. Think of it as idle earnings.' },
               { q: 'Can I get banned?', a: 'Only for fraud: multi-accounting, VPN abuse, bot farming, or fake offer completions. Play fair and you\'re good ser.' },
             ].map((faq, i) => (
-              <div key={i} className="border border-white/10 rounded-2xl overflow-hidden">
+              <div key={i} className="border border-white/10 rounded-2xl overflow-hidden hover:border-amber-500/20 transition-colors">
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors"
                 >
                   <span className="font-bold text-sm">{faq.q}</span>
-                  <span className={`text-amber-400 text-xl transition-transform ${openFaq === i ? 'rotate-45' : ''}`}>+</span>
+                  <span className={`text-amber-400 text-xl transition-transform duration-300 ${openFaq === i ? 'rotate-45' : ''}`}>+</span>
                 </button>
-                {openFaq === i && (
+                <div 
+                  className="overflow-hidden transition-all duration-300 ease-out"
+                  style={{ maxHeight: openFaq === i ? '200px' : '0px', opacity: openFaq === i ? 1 : 0 }}
+                >
                   <div className="px-5 pb-5 text-sm text-zinc-400 leading-relaxed">{faq.a}</div>
-                )}
+                </div>
               </div>
             ))}
           </div>

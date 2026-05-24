@@ -23,7 +23,7 @@ export type ConvertInput = z.infer<typeof convertSchema>;
 // Stake
 export const stakeSchema = z.object({
   amount: positiveNumber.min(10, 'Minimum stake is 10 $SHIT'),
-  lock_days: z.enum(['7', '14', '30', '90']).transform(Number),
+  lock_days: z.enum(['7', '30', '90']).transform(Number),
 });
 export type StakeInput = z.infer<typeof stakeSchema>;
 

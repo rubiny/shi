@@ -522,16 +522,21 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
             {/* Result */}
             {coinResult && (
               <div
-                className={`text-center ${coinResult.won ? 'text-green-400' : 'text-red-400'}`}
+                className={`text-center px-8 py-4 rounded-2xl ${coinResult.won ? 'text-green-400 animate-win-glow' : 'text-red-400'}`}
                 style={{
-                  animation: coinResult.won ? 'resultPop 0.4s ease-out' : 'loseShake 0.5s ease-out',
+                  animation: coinResult.won 
+                    ? 'resultPop 0.4s ease-out, win-glow 1.5s ease-in-out infinite' 
+                    : 'loseShake 0.5s ease-out',
+                  background: coinResult.won 
+                    ? 'rgba(34, 197, 94, 0.05)' 
+                    : 'rgba(239, 68, 68, 0.05)',
                 }}
               >
-                <div className="text-3xl font-black mb-1">
+                <div className="text-4xl font-black mb-1">
                   {coinResult.won ? `+${coinBet} $SHIT` : `-${coinBet} $SHIT`}
                 </div>
-                <div className="text-sm opacity-70">
-                  {coinResult.side.toUpperCase()} — {coinResult.won ? 'WAGMI' : 'NGMI SER'}
+                <div className="text-sm opacity-70 font-bold">
+                  {coinResult.side.toUpperCase()} — {coinResult.won ? 'WAGMI SER' : 'NGMI SER'}
                 </div>
               </div>
             )}
@@ -604,15 +609,20 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
 
             {diceResult && (
               <div
-                className={`text-center ${diceResult.won ? 'text-green-400' : 'text-red-400'}`}
+                className={`text-center px-8 py-4 rounded-2xl ${diceResult.won ? 'text-green-400' : 'text-red-400'}`}
                 style={{
-                  animation: diceResult.won ? 'resultPop 0.4s ease-out' : 'loseShake 0.5s ease-out',
+                  animation: diceResult.won 
+                    ? 'resultPop 0.4s ease-out, win-glow 1.5s ease-in-out infinite' 
+                    : 'loseShake 0.5s ease-out',
+                  background: diceResult.won 
+                    ? 'rgba(34, 197, 94, 0.05)' 
+                    : 'rgba(239, 68, 68, 0.05)',
                 }}
               >
-                <div className="text-3xl font-black mb-1">
+                <div className="text-4xl font-black mb-1">
                   {diceResult.won ? `+${dicePotentialWin} $SHIT` : `-${diceBet} $SHIT`}
                 </div>
-                <div className="text-sm opacity-70">
+                <div className="text-sm opacity-70 font-bold">
                   Rolled {diceResult.roll} — needed {'<'}{diceTarget}
                 </div>
               </div>
@@ -717,8 +727,15 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
               )}
               {predResult && (
                 <div
-                  className={`text-2xl font-black ${predResult === 'win' ? 'text-green-400' : 'text-red-400'}`}
-                  style={{ animation: predResult === 'win' ? 'resultPop 0.4s ease-out' : 'loseShake 0.5s ease-out' }}
+                  className={`text-2xl font-black px-6 py-3 rounded-2xl ${predResult === 'win' ? 'text-green-400' : 'text-red-400'}`}
+                  style={{ 
+                    animation: predResult === 'win' 
+                      ? 'resultPop 0.4s ease-out, win-glow 1.5s ease-in-out infinite' 
+                      : 'loseShake 0.5s ease-out',
+                    background: predResult === 'win' 
+                      ? 'rgba(34, 197, 94, 0.08)' 
+                      : 'rgba(239, 68, 68, 0.08)',
+                  }}
                 >
                   {predResult === 'win' ? `+${predBet}` : `-${predBet}`}
                 </div>
