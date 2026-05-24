@@ -119,27 +119,27 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
 
             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black mb-6 leading-tight">
               <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                THE MEME ARMY
+                APE IN OR
               </span>
               <br />
-              <span className="text-white">THAT PAYS</span>
+              <span className="text-white">STAY POOR</span>
             </h1>
 
             <p className="text-xl sm:text-2xl text-zinc-400 max-w-3xl mx-auto mb-8">
-              Join the most degenerate army on Base. 
-              <span className="text-amber-400 font-bold">Complete offers, stake $SHIT,</span> recruit soldiers & 
-              <span className="text-amber-300 font-bold"> earn real crypto</span>. 
+              the most degen army on Base.
+              <span className="text-amber-400 font-bold"> grind offers, stake $SHIT,</span> build your squad &
+              <span className="text-amber-300 font-bold"> stack real bags</span>.
               <br />
-              <span className="text-sm text-zinc-500">No BS. Just poop & profit. 💩</span>
+              <span className="text-sm text-zinc-500">no rug. no cap. just poop & profit. 💩</span>
             </p>
 
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mb-12">
               {[
-                { value: `$${(CONFIG.PLATFORM_STATS.TOTAL_EARNED / 1_000_000).toFixed(1)}M`, label: 'Total Earned' },
-                { value: `${(CONFIG.PLATFORM_STATS.TOTAL_SOLDIERS / 1000).toFixed(0)}K`, label: 'Soldiers' },
-                { value: `${(CONFIG.PLATFORM_STATS.OFFERS_COMPLETED / 1_000_000).toFixed(1)}M`, label: 'Offers Done' },
-                { value: `${(CONFIG.PLATFORM_STATS.SHIT_STAKED / 1000).toFixed(0)}K`, label: '$SHIT Staked' }
+                { value: `$${(CONFIG.PLATFORM_STATS.TOTAL_EARNED / 1_000_000).toFixed(1)}M`, label: 'LOOTED' },
+                { value: `${(CONFIG.PLATFORM_STATS.TOTAL_SOLDIERS / 1000).toFixed(0)}K`, label: 'DEGENS' },
+                { value: `${(CONFIG.PLATFORM_STATS.OFFERS_COMPLETED / 1_000_000).toFixed(1)}M`, label: 'OFFERS CRUSHED' },
+                { value: `${(CONFIG.PLATFORM_STATS.SHIT_STAKED / 1000).toFixed(0)}K`, label: 'BAGS LOCKED' }
               ].map((stat, i) => (
                 <div key={i} className="bg-zinc-900/50 border border-white/10 rounded-2xl px-6 py-4 backdrop-blur-sm">
                   <div className="text-2xl sm:text-3xl font-black text-amber-400">{stat.value}</div>
@@ -156,7 +156,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 onClick={onConnect}
                 className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-black text-lg shadow-lg shadow-amber-500/20"
               >
-                🚀 JOIN THE ARMY
+                💩 APE IN NOW
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -164,20 +164,20 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 onClick={onGoogle}
                 className="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 border border-white/20 rounded-2xl font-bold text-lg"
               >
-                🎮 Login with Google
+                🎮 GOOGLE LOGIN (NGMI WITHOUT IT)
               </motion.button>
             </div>
 
             {/* Trust badges */}
             <div className="flex flex-wrap justify-center gap-6 text-sm text-zinc-500">
               <span className="flex items-center gap-2">
-                <span className="text-amber-400">✓</span> Instant Withdrawals
+                <span className="text-amber-400">✓</span> instant withdrawals ser
               </span>
               <span className="flex items-center gap-2">
-                <span className="text-amber-400">✓</span> No KYC under $500
+                <span className="text-amber-400">✓</span> no KYC under $500
               </span>
               <span className="flex items-center gap-2">
-                <span className="text-amber-400">✓</span> Base Chain
+                <span className="text-amber-400">✓</span> built on Base. no cap.
               </span>
             </div>
           </motion.div>
@@ -194,9 +194,9 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-black mb-4">
-              HOW TO <span className="text-amber-500">SHITPOST</span> & EARN
+              HOW TO <span className="text-amber-500">STACK $SHIT</span>
             </h2>
-            <p className="text-zinc-400 text-lg">4 steps from zero to ShitLord</p>
+            <p className="text-zinc-400 text-lg">4 steps from normie to GigaChad</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -204,29 +204,29 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               { 
                 step: '1', 
                 icon: '💩', 
-                title: 'Join the Army', 
-                desc: 'Connect wallet (MetaMask, Coinbase, or Google). No email spam.',
+                title: 'APE IN', 
+                desc: 'connect wallet or google. 2 seconds. no email spam. no KYC (yet).',
                 color: 'amber'
               },
               { 
                 step: '2', 
                 icon: '🎯', 
-                title: 'Complete Offers', 
-                desc: 'Surveys, apps, videos. 2-5 mins = 50-500 PTS. Instant credit.',
+                title: 'GRIND OFFERS', 
+                desc: 'surveys, apps, videos. 2-5 mins = 50-500 PTS. instant credit. ez money.',
                 color: 'blue'
               },
               { 
                 step: '3', 
                 icon: '🔒', 
-                title: 'Stake & Multiply', 
-                desc: 'Lock $SHIT for 50-200% APY. The longer, the bigger.',
+                title: 'LOCK YOUR BAGS', 
+                desc: 'stake $SHIT for 50-200% APY. diamond hands = bigger bags.',
                 color: 'emerald'
               },
               { 
                 step: '4', 
                 icon: '👥', 
-                title: 'Build Your Squad', 
-                desc: 'Recruit friends. Earn 10% from their offers FOREVER.',
+                title: 'BUILD YOUR ARMY', 
+                desc: 'recruit degens. earn 10% from their grind FOREVER. passive income ser.',
                 color: 'purple'
               }
             ].map((item, i) => (
@@ -262,15 +262,15 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 WHY <span className="text-amber-500">$SHIT</span>?
               </h2>
               <p className="text-zinc-400 text-lg mb-8">
-                Another meme coin? Nah. We actually built something that makes you money while you laugh.
+                another memecoin? nah ser. we built something that actually prints money while you shitpost.
               </p>
 
               <div className="space-y-4">
                 {[
-                  { icon: '💰', title: 'Real Earnings', desc: 'Not promises. Actual dollars from offers you complete.' },
-                  { icon: '🎮', title: 'Gamified AF', desc: 'Battle Pass, quests, streaks. You\'ll get addicted (in a good way).' },
-                  { icon: '🎨', title: 'Meme Culture', desc: 'Community creates the vibe. Best memes get featured & rewarded.' },
-                  { icon: '🔒', title: 'Safe & Transparent', desc: 'On-chain everything. Smart contracts audited. No rug pull BS.' }
+                  { icon: '💰', title: 'REAL BAGS', desc: 'not promises. actual money from offers you grind. withdraw anytime.' },
+                  { icon: '🎮', title: 'ADDICTIVE AF', desc: 'battle pass, raids, daily spins, mini games, gacha mints. you won\'t leave.' },
+                  { icon: '🦧', title: 'DEGEN CULTURE', desc: 'community runs the vibe. best memes get featured & rewarded with $SHIT.' },
+                  { icon: '🔒', title: 'NO RUG', desc: 'on-chain everything. smart contracts audited. we\'re here to stay ser.' }
                 ].map((feature, i) => (
                   <motion.div
                     key={i}
@@ -435,14 +435,14 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl sm:text-6xl font-black mb-6">
-              READY TO JOIN THE
+              STILL READING?
               <br />
-              <span className="text-amber-500">MOST DEGENERATE</span>
+              <span className="text-amber-500">NGMI</span>
               <br />
-              ARMY ON BASE?
+              JUST APE IN.
             </h2>
             <p className="text-xl text-zinc-400 mb-8">
-              47,000 soldiers already earning. Don&apos;t miss the flush.
+              47K degens already grinding. don&apos;t be the last one to flush.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -452,12 +452,12 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 onClick={onConnect}
                 className="px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-black text-xl shadow-xl shadow-amber-500/20"
               >
-                🚽 ENTER THE TOILET
+                💩 SEND IT
               </motion.button>
             </div>
 
             <p className="mt-6 text-sm text-zinc-500">
-              No wallet? No problem. Connect with Google in 2 seconds.
+              no wallet? no problem. google login = 2 seconds. zero excuses.
             </p>
           </motion.div>
         </div>
@@ -473,7 +473,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 <span className="font-black">SHIT.ARMY</span>
               </div>
               <p className="text-sm text-zinc-500">
-                The meme-powered earning platform on Base.
+                the degen earning machine on Base. stack $SHIT or stay poor.
               </p>
             </div>
             <div>

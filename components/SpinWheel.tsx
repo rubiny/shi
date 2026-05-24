@@ -8,24 +8,24 @@ interface SpinWheelProps {
 }
 
 const SEGMENTS = [
-  { label: '50 PTS', value: 50, color: 'from-zinc-700 to-zinc-800', chance: 25 },
-  { label: '100 PTS', value: 100, color: 'from-amber-700 to-amber-800', chance: 20 },
-  { label: '250 PTS', value: 250, color: 'from-zinc-700 to-zinc-800', chance: 15 },
-  { label: '500 PTS', value: 500, color: 'from-amber-600 to-amber-700', chance: 12 },
-  { label: '1K PTS', value: 1000, color: 'from-zinc-700 to-zinc-800', chance: 10 },
-  { label: '2x BOOST', value: 0, color: 'from-purple-600 to-purple-700', chance: 8 },
-  { label: '2.5K PTS', value: 2500, color: 'from-amber-500 to-amber-600', chance: 5 },
-  { label: '5K PTS', value: 5000, color: 'from-orange-500 to-red-500', chance: 3 },
-  { label: 'JACKPOT', value: 10000, color: 'from-yellow-400 to-amber-500', chance: 2 },
+  { label: '50 $SHIT', value: 50, color: 'from-zinc-700 to-zinc-800', chance: 25 },
+  { label: '100 $SHIT', value: 100, color: 'from-amber-700 to-amber-800', chance: 20 },
+  { label: '250 $SHIT', value: 250, color: 'from-zinc-700 to-zinc-800', chance: 15 },
+  { label: '500 $SHIT', value: 500, color: 'from-amber-600 to-amber-700', chance: 12 },
+  { label: '1K $SHIT', value: 1000, color: 'from-zinc-700 to-zinc-800', chance: 10 },
+  { label: '2x JUICE', value: 0, color: 'from-purple-600 to-purple-700', chance: 8 },
+  { label: '2.5K $SHIT', value: 2500, color: 'from-amber-500 to-amber-600', chance: 5 },
+  { label: '5K $SHIT', value: 5000, color: 'from-orange-500 to-red-500', chance: 3 },
+  { label: 'MOON BAG', value: 10000, color: 'from-yellow-400 to-amber-500', chance: 2 },
 ];
 
 const SCRATCH_PRIZES = [
-  { label: '25 PTS', value: 25, rarity: 'common' },
-  { label: '50 PTS', value: 50, rarity: 'common' },
-  { label: '100 PTS', value: 100, rarity: 'uncommon' },
-  { label: '250 PTS', value: 250, rarity: 'rare' },
-  { label: '500 PTS', value: 500, rarity: 'epic' },
-  { label: '1K PTS', value: 1000, rarity: 'legendary' },
+  { label: '25 $SHIT', value: 25, rarity: 'common' },
+  { label: '50 $SHIT', value: 50, rarity: 'common' },
+  { label: '100 $SHIT', value: 100, rarity: 'uncommon' },
+  { label: '250 $SHIT', value: 250, rarity: 'rare' },
+  { label: '500 $SHIT', value: 500, rarity: 'epic' },
+  { label: '1K $SHIT', value: 1000, rarity: 'legendary' },
 ];
 
 export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
@@ -123,7 +123,7 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
       <div className="mb-10">
         <div className="text-amber-500 text-sm font-bold tracking-[3px]">DAILY REWARDS</div>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Lucky Wheel</h2>
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">DEGEN WHEEL</h2>
       </div>
 
       {/* Game Selector */}
@@ -136,7 +136,7 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
               : 'bg-zinc-800/50 text-zinc-400 hover:text-white border border-white/10'
           }`}
         >
-          {'\u{1F3B0}'} Spin Wheel
+          {'\u{1F3B0}'} SPIN
         </button>
         <button
           onClick={() => setActiveGame('scratch')}
@@ -146,7 +146,7 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
               : 'bg-zinc-800/50 text-zinc-400 hover:text-white border border-white/10'
           }`}
         >
-          {'\u{1F3AB}'} Scratch Cards
+          {'\u{1F3AB}'} SCRATCH
         </button>
       </div>
 
@@ -212,7 +212,7 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
             disabled={spinning || spinsLeft <= 0}
             className="px-12 py-4 bg-gradient-to-r from-amber-500 to-orange-500 disabled:from-zinc-700 disabled:to-zinc-800 rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20 transition-all disabled:shadow-none"
           >
-            {spinning ? 'SPINNING...' : spinsLeft > 0 ? `SPIN (${spinsLeft} left)` : 'COME BACK TOMORROW'}
+            {spinning ? 'SPINNING...' : spinsLeft > 0 ? `SEND IT (${spinsLeft} left)` : 'COPE. COME BACK TOMORROW.'}
           </button>
 
           {nextSpinTime && spinsLeft <= 0 && (

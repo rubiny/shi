@@ -11,7 +11,7 @@ interface VIPTiersProps {
 const TIERS = [
   {
     id: 0,
-    name: 'Recruit',
+    name: 'NORMIE',
     icon: '\u{1F4A9}',
     color: 'from-zinc-600 to-zinc-700',
     borderColor: 'border-zinc-600/30',
@@ -20,13 +20,13 @@ const TIERS = [
     perks: [
       '1 daily spin',
       '3 daily scratch cards',
-      'Standard offerwall rates',
-      'Basic support',
+      'normie offerwall rates',
+      'basic support (cope)',
     ],
   },
   {
     id: 1,
-    name: 'Soldier',
+    name: 'DEGEN',
     icon: '\u{1FA96}',
     color: 'from-amber-700 to-amber-800',
     borderColor: 'border-amber-700/30',
@@ -36,15 +36,15 @@ const TIERS = [
     perks: [
       '2 daily spins',
       '5 daily scratch cards',
-      '+10% offerwall bonus',
-      'Priority withdrawals',
-      'Soldier badge',
-      'Chat access',
+      '+10% offerwall boost',
+      'faster withdrawals',
+      'DEGEN badge',
+      'chat access',
     ],
   },
   {
     id: 2,
-    name: 'General',
+    name: 'CHAD',
     icon: '\u{1F451}',
     color: 'from-amber-500 to-orange-500',
     borderColor: 'border-amber-500/30',
@@ -53,19 +53,19 @@ const TIERS = [
     duration: '30 days',
     popular: true,
     perks: [
-      '3 daily spins + better odds',
+      '3 daily spins + juiced odds',
       '8 daily scratch cards',
-      '+25% offerwall bonus',
-      'Instant withdrawals',
-      'General badge + custom frame',
-      'Exclusive offers access',
-      'Mini-games VIP tables',
-      'Priority support',
+      '+25% offerwall boost',
+      'instant withdrawals',
+      'CHAD badge + custom frame',
+      'exclusive offers (alpha)',
+      'degen games VIP tables',
+      'priority support',
     ],
   },
   {
     id: 3,
-    name: 'Commander',
+    name: 'GIGACHAD',
     icon: '\u{1F48E}',
     color: 'from-purple-500 to-pink-500',
     borderColor: 'border-purple-500/30',
@@ -73,16 +73,16 @@ const TIERS = [
     priceUsd: 49.99,
     duration: '30 days',
     perks: [
-      '5 daily spins + best odds',
+      '5 daily spins + max odds',
       '12 daily scratch cards',
-      '+50% offerwall bonus',
-      'Instant withdrawals + 0% fee',
-      'Commander badge + animated frame',
-      'First access to new offers',
-      'Mini-games VIP + higher limits',
-      'Dedicated account manager',
-      'Revenue share (1% of referrals\' earnings)',
-      'Monthly $SHIT airdrop',
+      '+50% offerwall boost',
+      'instant withdrawals + 0% fee',
+      'GIGACHAD badge + animated frame',
+      'first access to new offers (alpha leaks)',
+      'degen games VIP + no limits',
+      'dedicated account manager',
+      'revenue share (1% of army\'s loot)',
+      'monthly $SHIT airdrop',
     ],
   },
 ];
@@ -109,9 +109,9 @@ export default function VIPTiers({ currentTier, balance, onPurchase }: VIPTiersP
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <div className="mb-10 text-center">
-        <div className="text-amber-500 text-sm font-bold tracking-[3px]">UPGRADE YOUR RANK</div>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">VIP Tiers</h2>
-        <p className="text-zinc-400 mt-2">Unlock premium perks and earn more $SHIT</p>
+        <div className="text-amber-500 text-sm font-bold tracking-[3px]">LEVEL UP OR STAY POOR</div>
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">VIP PASS</h2>
+        <p className="text-zinc-400 mt-2">bigger perks. bigger bags. no cap.</p>
       </div>
 
       {/* Current Tier Banner */}

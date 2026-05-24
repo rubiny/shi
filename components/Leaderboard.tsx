@@ -41,9 +41,9 @@ const TOP_STAKERS: LeaderboardEntry[] = [
 ];
 
 const CATEGORIES = [
-  { id: 'earners', label: 'Top Earners', icon: '💰', data: TOP_EARNERS },
-  { id: 'referrals', label: 'Top Referrers', icon: '👥', data: TOP_REFERRERS },
-  { id: 'stakers', label: 'Top Stakers', icon: '🔒', data: TOP_STAKERS },
+  { id: 'earners', label: 'TOP LOOTERS', icon: '💰', data: TOP_EARNERS },
+  { id: 'referrals', label: 'ARMY BUILDERS', icon: '👥', data: TOP_REFERRERS },
+  { id: 'stakers', label: 'DIAMOND HANDS', icon: '🔒', data: TOP_STAKERS },
 ];
 
 export default function Leaderboard({ userId }: { userId: string }) {
@@ -60,9 +60,9 @@ export default function Leaderboard({ userId }: { userId: string }) {
       <div className="mb-8 text-center">
         <div className="text-6xl mb-2">🏆</div>
         <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 bg-clip-text text-transparent">
-          Leaderboards
+          HALL OF DEGENS
         </h1>
-        <p className="text-zinc-400">Compete with the best. Climb the ranks. Earn glory.</p>
+        <p className="text-zinc-400">flex on normies. climb the ranks. or stay poor.</p>
       </div>
 
       {/* Your Rank Card */}
@@ -182,14 +182,14 @@ export default function Leaderboard({ userId }: { userId: string }) {
               {/* Stats */}
               <div className="text-right">
                 <div className="text-xl font-black text-amber-400">
-                  {activeCategory === 'earners' && `${entry.earnings.toLocaleString()} $SHIT`}
-                  {activeCategory === 'referrals' && `${entry.referrals} recruits`}
-                  {activeCategory === 'stakers' && `${entry.staked.toLocaleString()} staked`}
+                  {activeCategory === 'earners' && `${entry.earnings.toLocaleString()} LOOTED`}
+                  {activeCategory === 'referrals' && `${entry.referrals} DEGENS`}
+                  {activeCategory === 'stakers' && `${entry.staked.toLocaleString()} LOCKED`}
                 </div>
                 <div className="text-xs text-zinc-500">
-                  {activeCategory === 'earners' && `${entry.referrals} refs • ${entry.staked.toLocaleString()} staked`}
-                  {activeCategory === 'referrals' && `${entry.earnings.toLocaleString()} earned`}
-                  {activeCategory === 'stakers' && `${entry.earnings.toLocaleString()} earned`}
+                  {activeCategory === 'earners' && `${entry.referrals} army • ${entry.staked.toLocaleString()} bags locked`}
+                  {activeCategory === 'referrals' && `${entry.earnings.toLocaleString()} looted`}
+                  {activeCategory === 'stakers' && `${entry.earnings.toLocaleString()} looted`}
                 </div>
               </div>
             </div>

@@ -169,8 +169,8 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
           <motion.div key="dashboard" variants={tabVariants} initial="initial" animate="animate" exit="exit" className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <div>
-                <div className="text-amber-500 text-sm font-bold tracking-[3px] uppercase">WELCOME BACK, SOLDIER {db.isGeneral && "👑"}</div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Dashboard</h1>
+                <div className="text-amber-500 text-sm font-bold tracking-[3px] uppercase">GM DEGEN {db.isGeneral && "👑"}</div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">HQ</h1>
               </div>
               <div className="flex items-center gap-3">
                 <div className="bg-zinc-950 border border-white/10 px-6 py-3 rounded-2xl text-sm flex items-center gap-3">🔥 {db.dailyStreak} day streak</div>
@@ -319,7 +319,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             {/* DAILY QUESTS MINI */}
             <div className="glass-card rounded-3xl p-7">
               <div className="flex items-center justify-between mb-5">
-                <div className="font-black text-xl">📋 TODAY&apos;S MISSIONS</div>
+                <div className="font-black text-xl">💩 TODAY&apos;S GRIND</div>
                 <button onClick={() => setCurrentTab("quests")} className="text-amber-400 text-sm font-bold">VIEW ALL →</button>
               </div>
               <div className="space-y-3">
@@ -344,35 +344,47 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             <div className="grid md:grid-cols-3 gap-4 mb-4">
               <div onClick={() => setCurrentTab("offerwall")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u26A1'}</div>
-                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Go to Offerwall</div>
-                <div className="text-zinc-400 mt-2 text-sm">8 offers {'\u2022'} Highest: 2,100 PTS {db.streakMultiplier > 0 && `(+${db.streakMultiplier}%)`}</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">GRIND OFFERS</div>
+                <div className="text-zinc-400 mt-2 text-sm">8 offers {'\u2022'} up to 2,100 PTS {db.streakMultiplier > 0 && `(+${db.streakMultiplier}% streak)`}</div>
               </div>
               <div onClick={() => setCurrentTab("spin")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3B0}'}</div>
-                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Lucky Wheel</div>
-                <div className="text-zinc-400 mt-2 text-sm">Daily spins {'\u2022'} Win up to 10K PTS</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">SPIN TO WIN</div>
+                <div className="text-zinc-400 mt-2 text-sm">daily spins {'\u2022'} up to 10K PTS jackpot</div>
               </div>
               <div onClick={() => setCurrentTab("games")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3B2}'}</div>
-                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Mini Games</div>
-                <div className="text-zinc-400 mt-2 text-sm">Coin Flip {'\u2022'} Dice {'\u2022'} Pump or Dump</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">DEGEN GAMES</div>
+                <div className="text-zinc-400 mt-2 text-sm">coin flip {'\u2022'} dice {'\u2022'} pump or dump</div>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div onClick={() => setCurrentTab("army")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group border border-amber-500/20 hover:border-amber-500/40">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F4A9}'}</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">SHIT ARMY</div>
+                <div className="text-zinc-400 mt-2 text-sm">mint degens {'\u2022'} raid sewers {'\u2022'} stack $SHIT passively</div>
+              </div>
+              <div onClick={() => setCurrentTab("market")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group border border-amber-500/20 hover:border-amber-500/40">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3EA}'}</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">SHIT BAZAAR</div>
+                <div className="text-zinc-400 mt-2 text-sm">buy juice {'\u2022'} trade degens {'\u2022'} flex drip</div>
               </div>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div onClick={() => setCurrentTab("stake")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3C6}'}</div>
-                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Stake $SHIT</div>
-                <div className="text-zinc-400 mt-2 text-sm">48% APY {'\u2022'} TVL $1.24M</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">LOCK YOUR BAGS</div>
+                <div className="text-zinc-400 mt-2 text-sm">48% APY {'\u2022'} diamond hands only</div>
               </div>
               <div onClick={() => setCurrentTab("vip")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F48E}'}</div>
-                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">VIP Tiers</div>
-                <div className="text-zinc-400 mt-2 text-sm">Up to +50% bonus {'\u2022'} 0% fees</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">VIP PASS</div>
+                <div className="text-zinc-400 mt-2 text-sm">up to +50% bonus {'\u2022'} 0% fees {'\u2022'} whale perks</div>
               </div>
               <div onClick={() => setCurrentTab("quests")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F4DC}'}</div>
-                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Quests</div>
-                <div className="text-zinc-400 mt-2 text-sm">Daily &amp; Weekly Missions</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">MISSIONS</div>
+                <div className="text-zinc-400 mt-2 text-sm">daily & weekly grinds {'\u2022'} stack rewards</div>
               </div>
             </div>
           </motion.div>

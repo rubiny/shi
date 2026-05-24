@@ -78,6 +78,18 @@ const DIFFICULTY_COLORS: Record<Difficulty, string> = {
 
 const LEVEL_UP_COST = [0, 100, 250, 500, 1000, 2000, 4000, 8000, 15000, 30000];
 const XP_PER_LEVEL = 5000;
+const RECRUIT_COOLDOWN_MS = 5000;
+
+interface RaidLogEntry {
+  id: string;
+  soldierName: string;
+  soldierEmoji: string;
+  missionName: string;
+  missionEmoji: string;
+  reward: number;
+  xp: number;
+  timestamp: number;
+}
 
 const RECRUIT_COST = 500;
 const RECRUIT_CHANCES: { rank: SoldierRank; chance: number; power: [number, number] }[] = [
@@ -108,7 +120,7 @@ const SKILLS_POOL: Record<SoldierRank, string[]> = {
 };
 
 export default function Army({ userId: _userId }: { userId: string }) {
-  const [activeTab, setActiveTab] = useState<'army' | 'missions' | 'recruit'>('army');
+  const [activeTab, setActiveTab] = useState<'army' | 'missions' | 'recruit' | 'log'>('army');
   const [soldiers, setSoldiers] = useState<Soldier[]>(INITIAL_SOLDIERS);
   const [selectedSoldier, setSelectedSoldier] = useState<Soldier | null>(null);
   const [deployModal, setDeployModal] = useState<{ soldier: Soldier; mission: Mission } | null>(null);
@@ -117,6 +129,8 @@ export default function Army({ userId: _userId }: { userId: string }) {
   const [recruitCount, setRecruitCount] = useState(1);
   const [, setTick] = useState(0);
   const [totalClaimed, setTotalClaimed] = useState(0);
+  const [raidLog, setRaidLog] = useState<RaidLogEntry[]>([]);
+  const [lastRecruitTime, setLastRecruitTime] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -164,6 +178,24 @@ export default function Army({ userId: _userId }: { userId: string }) {
   };
 
   const claimReward = (soldierId: string) => {
+    setSoldiers(prev => {
+      const soldier = prev.find(s => s.id === soldierId);
+      if (soldier && soldier.missionStatus === 'done') {
+        const reward = soldier.missionReward || 0;
+        const deployedMission = MISSIONS.find(m => m.baseReward <= reward) || MISSIONS[0];
+        setRaidLog(log => [{
+          id: `log-${Date.now()}`,
+          soldierName: soldier.name,
+          soldierEmoji: soldier.emoji,
+          missionName: deployedMission.name,
+          missionEmoji: deployedMission.emoji,
+          reward,
+          xp: 500,
+          timestamp: Date.now(),
+        }, ...log].slice(0, 50));
+      }
+      return prev;
+    });
     setSoldiers(prev => prev.map(s => {
       if (s.id !== soldierId || s.missionStatus !== 'done') return s;
       const reward = s.missionReward || 0;
@@ -199,7 +231,18 @@ export default function Army({ userId: _userId }: { userId: string }) {
     });
   };
 
+  const [canRecruit, setCanRecruit] = useState(true);
+
+  useEffect(() => {
+    if (lastRecruitTime === 0) return;
+    setCanRecruit(false);
+    const timer = setTimeout(() => setCanRecruit(true), RECRUIT_COOLDOWN_MS);
+    return () => clearTimeout(timer);
+  }, [lastRecruitTime]);
+
   const recruitSoldier = () => {
+    if (!canRecruit) return;
+    setLastRecruitTime(Date.now());
     setMinting(true);
     setTimeout(() => {
       const roll = Math.random() * 100;
@@ -291,6 +334,7 @@ export default function Army({ userId: _userId }: { userId: string }) {
           { id: 'army' as const, label: `MY DEGENS (${soldiers.length})`, icon: '💩' },
           { id: 'missions' as const, label: 'RAID', icon: '⚔️' },
           { id: 'recruit' as const, label: 'MINT NEW', icon: '🎰' },
+          { id: 'log' as const, label: `RAID LOG (${raidLog.length})`, icon: '📜' },
         ]).map((tab) => (
           <button
             key={tab.id}
@@ -556,14 +600,51 @@ export default function Army({ userId: _userId }: { userId: string }) {
 
             <button
               onClick={recruitSoldier}
-              disabled={minting}
-              className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg uppercase tracking-wider hover:scale-105 transition-transform shadow-lg shadow-amber-500/30 disabled:opacity-50"
+              disabled={minting || !canRecruit}
+              className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg uppercase tracking-wider hover:scale-105 transition-transform shadow-lg shadow-amber-500/30 disabled:opacity-50 disabled:hover:scale-100"
             >
-              {minting ? <span className="animate-pulse">🎲 SUMMONING...</span> : `APE IN ${recruitCount}x — ${(recruitCount * RECRUIT_COST).toLocaleString()} $SHIT`}
+              {minting ? <span className="animate-pulse">🎲 SUMMONING...</span> : !canRecruit ? 'COOLDOWN SER...' : `APE IN ${recruitCount}x — ${(recruitCount * RECRUIT_COST).toLocaleString()} $SHIT`}
             </button>
 
             <div className="mt-3 text-[10px] text-zinc-700 uppercase">0.1% chance of GigaChad. do you feel lucky punk?</div>
           </div>
+        </div>
+      )}
+
+      {/* RAID LOG TAB */}
+      {activeTab === 'log' && (
+        <div>
+          {raidLog.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-6xl mb-4">📜</div>
+              <div className="text-xl font-black uppercase tracking-wider text-zinc-500">NO RAIDS YET</div>
+              <div className="text-sm text-zinc-600 mt-2">send your degens on missions first. history will appear here.</div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {raidLog.map((entry) => (
+                <div key={entry.id} className="flex items-center gap-4 p-4 bg-zinc-900/50 rounded-2xl border border-white/5 hover:border-amber-500/20 transition-colors">
+                  <div className="text-3xl">{entry.soldierEmoji}</div>
+                  <div className="flex-1">
+                    <div className="font-black text-sm uppercase">{entry.soldierName}</div>
+                    <div className="text-xs text-zinc-500">{entry.missionEmoji} {entry.missionName}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-amber-400 font-black">+{entry.reward.toLocaleString()} $SHIT</div>
+                    <div className="text-xs text-purple-400">+{entry.xp} XP</div>
+                  </div>
+                  <div className="text-xs text-zinc-600 w-16 text-right">
+                    {(() => {
+                      const ago = Date.now() - entry.timestamp;
+                      if (ago < 60000) return 'just now';
+                      if (ago < 3600000) return `${Math.floor(ago / 60000)}m ago`;
+                      return `${Math.floor(ago / 3600000)}h ago`;
+                    })()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

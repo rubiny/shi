@@ -20,10 +20,10 @@ interface DashboardNavProps {
 }
 
 export const mainTabs = [
-  { id: "dashboard", label: "Home", icon: "\uD83C\uDFE0" },
-  { id: "offerwall", label: "Earn", icon: "\uD83D\uDCB0" },
-  { id: "market", label: "Market", icon: "\uD83D\uDED2" },
-  { id: "quests", label: "Quests", icon: "\uD83D\uDCDC" },
+  { id: "dashboard", label: "HQ", icon: "\uD83C\uDFE0" },
+  { id: "offerwall", label: "Grind", icon: "\uD83D\uDCB0" },
+  { id: "army", label: "Army", icon: "\uD83D\uDCA9" },
+  { id: "market", label: "Bazaar", icon: "\uD83C\uDFEA" },
 ];
 
 export default function DashboardNav({
@@ -123,7 +123,7 @@ export default function DashboardNav({
                   </div>
                   {[
                     { id: "referral", label: "Referrals", icon: "👥" },
-                    { id: "army", label: "My Army", icon: "\uD83E\uDE96" },
+                    { id: "quests", label: "Missions", icon: "\uD83D\uDCDC" },
                   ].map((item) => (
                     <button
                       key={item.id}

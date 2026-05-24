@@ -26,14 +26,14 @@ const QUESTS: Quest[] = [
   // Daily Quests
   { id: 'd1', title: 'Morning Shit', description: 'Complete 3 offers before noon', type: 'daily', category: 'offers', progress: 1, max: 3, reward: 150, xp: 50, icon: '🌅', claimed: false, completed: false, difficulty: 'easy' },
   { id: 'd2', title: 'Referral Hunter', description: 'Share your referral code with 5 friends', type: 'daily', category: 'social', progress: 2, max: 5, reward: 200, xp: 75, icon: '🎯', claimed: false, completed: false, difficulty: 'medium' },
-  { id: 'd3', title: 'Staking Check', description: 'Check your staking rewards', type: 'daily', category: 'staking', progress: 1, max: 1, reward: 50, xp: 25, icon: '🔒', claimed: true, completed: true, difficulty: 'easy' },
-  { id: 'd4', title: 'Market Scout', description: 'Browse the NFT marketplace', type: 'daily', category: 'market', progress: 0, max: 1, reward: 75, xp: 30, icon: '🛒', claimed: false, completed: false, difficulty: 'easy' },
+  { id: 'd3', title: 'Check Your Bags', description: 'Check your staking rewards', type: 'daily', category: 'staking', progress: 1, max: 1, reward: 50, xp: 25, icon: '🔒', claimed: true, completed: true, difficulty: 'easy' },
+  { id: 'd4', title: 'Scout the Bazaar', description: 'Browse the Shit Bazaar', type: 'daily', category: 'market', progress: 0, max: 1, reward: 75, xp: 30, icon: '🏪', claimed: false, completed: false, difficulty: 'easy' },
   
   // Weekly Challenges
   { id: 'w1', title: 'Weekend Warrior', description: 'Complete 20 offers this week', type: 'weekly', category: 'offers', progress: 8, max: 20, reward: 1000, xp: 300, icon: '⚔️', claimed: false, completed: false, difficulty: 'medium' },
   { id: 'w2', title: 'Recruit Master', description: 'Get 3 friends to join', type: 'weekly', category: 'referrals', progress: 1, max: 3, reward: 1500, xp: 500, icon: '👥', claimed: false, completed: false, difficulty: 'hard' },
   { id: 'w3', title: 'Shit Tycoon', description: 'Earn 5,000 $SHIT from offers', type: 'weekly', category: 'offers', progress: 2340, max: 5000, reward: 2000, xp: 750, icon: '💰', claimed: false, completed: false, difficulty: 'hard' },
-  { id: 'w4', title: 'NFT Collector', description: 'Buy or sell 3 NFTs', type: 'weekly', category: 'market', progress: 0, max: 3, reward: 800, xp: 250, icon: '🎨', claimed: false, completed: false, difficulty: 'medium' },
+  { id: 'w4', title: 'Bazaar Degen', description: 'Buy or sell 3 items in Bazaar', type: 'weekly', category: 'market', progress: 0, max: 3, reward: 800, xp: 250, icon: '🏪', claimed: false, completed: false, difficulty: 'medium' },
   
   // Milestone Quests
   { id: 'm1', title: 'First Blood', description: 'Complete your first offer', type: 'milestone', category: 'offers', progress: 1, max: 1, reward: 100, xp: 50, icon: '💩', claimed: true, completed: true, difficulty: 'easy' },
@@ -45,7 +45,7 @@ const QUESTS: Quest[] = [
   { id: 's1-1', title: 'The Flush', description: 'Complete 5 offers', type: 'story', category: 'offers', progress: 5, max: 5, reward: 500, xp: 200, icon: '🚽', claimed: true, completed: true, chainId: 'chain1', chainStep: 1, chainTotal: 5, difficulty: 'easy' },
   { id: 's1-2', title: 'Paper Trail', description: 'Refer 2 friends', type: 'story', category: 'referrals', progress: 2, max: 2, reward: 800, xp: 300, icon: '🧻', claimed: true, completed: true, chainId: 'chain1', chainStep: 2, chainTotal: 5, difficulty: 'medium' },
   { id: 's1-3', title: 'The Stakeout', description: 'Stake 1000 $SHIT', type: 'story', category: 'staking', progress: 450, max: 1000, reward: 1200, xp: 500, icon: '🔒', claimed: false, completed: false, chainId: 'chain1', chainStep: 3, chainTotal: 5, difficulty: 'medium' },
-  { id: 's1-4', title: 'Market Raid', description: 'Buy your first NFT', type: 'story', category: 'market', progress: 0, max: 1, reward: 1500, xp: 600, icon: '🛒', claimed: false, completed: false, chainId: 'chain1', chainStep: 4, chainTotal: 5, difficulty: 'medium' },
+  { id: 's1-4', title: 'Bazaar Raid', description: 'APE IN on your first item', type: 'story', category: 'market', progress: 0, max: 1, reward: 1500, xp: 600, icon: '🏪', claimed: false, completed: false, chainId: 'chain1', chainStep: 4, chainTotal: 5, difficulty: 'medium' },
   { id: 's1-5', title: 'Legend of the Throne', description: 'Reach Battle Pass level 10', type: 'story', category: 'battlepass', progress: 3, max: 10, reward: 5000, xp: 2000, icon: '👑', claimed: false, completed: false, chainId: 'chain1', chainStep: 5, chainTotal: 5, difficulty: 'epic' },
   
   // Story Chains - Chain 2: The Resistance
@@ -117,9 +117,9 @@ export default function QuestsPage({ userId }: { userId: string }) {
       <div className="mb-8 text-center">
         <div className="text-6xl mb-2 animate-bounce">📜</div>
         <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-amber-500 to-purple-500 bg-clip-text text-transparent">
-          Quests & Missions
+          GRIND LOG
         </h1>
-        <p className="text-zinc-400">Complete quests. Earn rewards. Write your legend.</p>
+        <p className="text-zinc-400">complete missions. stack rewards. or stay a normie.</p>
       </div>
 
       {/* Stats Grid */}
