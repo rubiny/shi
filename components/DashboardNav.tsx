@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 
-type TabId = "dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard";
+type TabId = "dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud";
 
 interface DashboardNavProps {
   currentTab: TabId;
@@ -43,7 +43,7 @@ export default function DashboardNav({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const moreTabIds = ['battlepass', 'achievements', 'leaderboard', 'referral', 'army', 'history', 'settings', 'admin', 'stake', 'merch'];
+  const moreTabIds = ['battlepass', 'achievements', 'leaderboard', 'referral', 'army', 'history', 'settings', 'admin', 'stake', 'merch', 'spin', 'games', 'vip', 'fiat', 'antifraud'];
 
   return (
     <>
@@ -127,6 +127,24 @@ export default function DashboardNav({
                   ))}
 
                   <div className="px-3 py-1.5 text-[10px] text-zinc-500 uppercase font-bold tracking-widest mt-1 border-t border-white/5 pt-2">
+                    Play & Earn
+                  </div>
+                  {[
+                    { id: "spin", label: "Lucky Wheel", icon: "\u{1F3B0}" },
+                    { id: "games", label: "Mini Games", icon: "\u{1F3B2}" },
+                    { id: "vip", label: "VIP Tiers", icon: "\u{1F48E}" },
+                    { id: "fiat", label: "Buy/Sell", icon: "\u{1F4B5}" },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => { setCurrentTab(item.id as TabId); setShowMoreMenu(false); }}
+                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-amber-400' : ''}`}
+                    >
+                      <span>{item.icon}</span> <span>{item.label}</span>
+                    </button>
+                  ))}
+
+                  <div className="px-3 py-1.5 text-[10px] text-zinc-500 uppercase font-bold tracking-widest mt-1 border-t border-white/5 pt-2">
                     Account
                   </div>
                   {[
@@ -149,9 +167,15 @@ export default function DashboardNav({
                       <div className="border-t border-white/10 my-1" />
                       <button
                         onClick={() => { setCurrentTab("admin"); setShowMoreMenu(false); }}
-                        className="w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm text-amber-400"
+                        className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === 'admin' ? 'text-amber-400' : 'text-amber-400/70'}`}
                       >
-                        <span>👑</span> <span>Admin Panel</span>
+                        <span>{'\u{1F451}'}</span> <span>Admin Panel</span>
+                      </button>
+                      <button
+                        onClick={() => { setCurrentTab("antifraud"); setShowMoreMenu(false); }}
+                        className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === 'antifraud' ? 'text-red-400' : 'text-red-400/70'}`}
+                      >
+                        <span>{'\u{1F6E1}\uFE0F'}</span> <span>Anti-Fraud</span>
                       </button>
                     </>
                   )}

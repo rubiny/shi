@@ -16,6 +16,11 @@ import ToastContainer from './ToastContainer';
 import StreakDisplay from './StreakDisplay';
 import QuestsPage from './QuestsPage';
 import DashboardNav from './DashboardNav';
+import SpinWheel from './SpinWheel';
+import MiniGames from './MiniGames';
+import VIPTiers from './VIPTiers';
+import FiatRamp from './FiatRamp';
+import AntiFraud from './AntiFraud';
 import { supabase, subscribeToBalance, subscribeToOffers, callEdgeFunction } from '@/lib/supabase';
 import { SkeletonDashboard, SkeletonOfferwall } from './SkeletonLoader';
 
@@ -169,7 +174,7 @@ const MERCH_PRODUCTS: MerchProduct[] = [
 ];
 
 export default function Dashboard({ onDisconnect, walletAddress, isGeneral: initialIsGeneral, generalDaysLeft, showOnboarding = false, onCompleteOnboarding }: DashboardProps) {
-  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard">("dashboard");
+  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud">("dashboard");
   
   // Refs
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -238,6 +243,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
   const [offerBoosts, setOfferBoosts] = useState<OfferBoost[]>([]);
   const [activeOffers, setActiveOffers] = useState<ActiveOffer[]>([]);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [vipTier, setVipTier] = useState(0);
 
   // ==========================================
   // SUPABASE DATA FETCHING
@@ -1008,19 +1014,36 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               </div>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-3 gap-4 mb-4">
               <div onClick={() => setCurrentTab("offerwall")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
-                <div className="text-5xl mb-6 group-hover:animate-subtle-float">⚡</div>
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u26A1'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Go to Offerwall</div>
-                <div className="text-zinc-400 mt-2 text-sm">8 offers • Highest: 2,100 PTS {streakMultiplier > 0 && `(+${streakMultiplier}%)`}</div>
+                <div className="text-zinc-400 mt-2 text-sm">8 offers {'\u2022'} Highest: 2,100 PTS {streakMultiplier > 0 && `(+${streakMultiplier}%)`}</div>
               </div>
+              <div onClick={() => setCurrentTab("spin")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3B0}'}</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Lucky Wheel</div>
+                <div className="text-zinc-400 mt-2 text-sm">Daily spins {'\u2022'} Win up to 10K PTS</div>
+              </div>
+              <div onClick={() => setCurrentTab("games")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3B2}'}</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Mini Games</div>
+                <div className="text-zinc-400 mt-2 text-sm">Coin Flip {'\u2022'} Dice {'\u2022'} Pump or Dump</div>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
               <div onClick={() => setCurrentTab("stake")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
-                <div className="text-5xl mb-6 group-hover:animate-subtle-float">🏆</div>
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3C6}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Stake $SHIT</div>
-                <div className="text-zinc-400 mt-2 text-sm">48% APY • TVL $1.24M</div>
+                <div className="text-zinc-400 mt-2 text-sm">48% APY {'\u2022'} TVL $1.24M</div>
+              </div>
+              <div onClick={() => setCurrentTab("vip")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F48E}'}</div>
+                <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">VIP Tiers</div>
+                <div className="text-zinc-400 mt-2 text-sm">Up to +50% bonus {'\u2022'} 0% fees</div>
               </div>
               <div onClick={() => setCurrentTab("quests")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
-                <div className="text-5xl mb-6 group-hover:animate-subtle-float">📜</div>
+                <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F4DC}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">Quests</div>
                 <div className="text-zinc-400 mt-2 text-sm">Daily &amp; Weekly Missions</div>
               </div>
@@ -1413,6 +1436,85 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
         {/* ADMIN PANEL - Only for General */}
         {currentTab === "admin" && isGeneral && (
           <AdminPanel adminUserId={userId || 'mock-user'} />
+        )}
+
+        {/* ANTI-FRAUD - Admin only */}
+        {currentTab === "antifraud" && isGeneral && (
+          <div className="max-w-7xl mx-auto p-4 sm:p-6">
+            <div className="mb-8">
+              <div className="text-amber-500 text-sm font-bold tracking-[3px]">SECURITY</div>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight">Anti-Fraud</h2>
+            </div>
+            <AntiFraud />
+          </div>
+        )}
+
+        {/* SPIN WHEEL */}
+        {currentTab === "spin" && (
+          <SpinWheel
+            isVip={vipTier >= 2}
+            onReward={(amount, label) => {
+              if (amount > 0) {
+                setPoints(prev => prev + amount);
+                triggerSuccess(`${label} — +${amount} PTS!`);
+                addTransaction({ type: 'daily', amount, description: `Daily reward: ${label}`, status: 'completed' });
+              } else {
+                triggerSuccess(`${label} activated!`);
+              }
+            }}
+          />
+        )}
+
+        {/* MINI GAMES */}
+        {currentTab === "games" && (
+          <MiniGames
+            balance={shitBalance}
+            onWin={(amount, game) => {
+              setShitBalance(prev => prev + amount);
+              setTotalEarned(prev => prev + amount);
+              triggerSuccess(`${game}: +${amount} $SHIT!`);
+              addTransaction({ type: 'offer', amount, description: `${game} win`, status: 'completed' });
+            }}
+            onLose={(amount, game) => {
+              setShitBalance(prev => Math.max(0, prev - amount));
+              triggerSuccess(`${game}: -${amount} $SHIT`);
+              addTransaction({ type: 'withdrawal', amount: -amount, description: `${game} loss`, status: 'completed' });
+            }}
+          />
+        )}
+
+        {/* VIP TIERS */}
+        {currentTab === "vip" && (
+          <VIPTiers
+            currentTier={vipTier}
+            balance={shitBalance}
+            onPurchase={(tier, cost) => {
+              if (cost > 0) {
+                setShitBalance(prev => prev - cost);
+              }
+              setVipTier(tier);
+              triggerSuccess(`Upgraded to VIP Tier ${tier}!`);
+              addTransaction({ type: 'withdrawal', amount: -cost, description: `VIP Tier ${tier} upgrade`, status: 'completed' });
+            }}
+          />
+        )}
+
+        {/* FIAT RAMP */}
+        {currentTab === "fiat" && (
+          <FiatRamp
+            balance={shitBalance}
+            walletAddress={walletAddress}
+            onBuy={(amount, method) => {
+              setShitBalance(prev => prev + amount);
+              triggerSuccess(`Purchased ${amount.toLocaleString()} $SHIT via ${method}!`);
+              addTransaction({ type: 'offer', amount, description: `Purchased via ${method}`, status: 'completed' });
+            }}
+            onSell={(amount, method) => {
+              setShitBalance(prev => Math.max(0, prev - amount));
+              triggerSuccess(`Sold ${amount.toLocaleString()} $SHIT via ${method}!`);
+              addTransaction({ type: 'withdrawal', amount: -amount, description: `Sold via ${method}`, status: 'completed' });
+            }}
+          />
         )}
 
         {/* LEADERBOARD */}
