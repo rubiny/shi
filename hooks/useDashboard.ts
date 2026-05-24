@@ -52,8 +52,24 @@ export function useDashboard() {
   const [offerBoosts, setOfferBoosts] = useState<OfferBoost[]>([]);
   const [activeOffers, setActiveOffers] = useState<ActiveOffer[]>([]);
 
+  // Active army missions and squad power
+  const [activeMissions, setActiveMissions] = useState(2);
+  const [squadPower, setSquadPower] = useState(450);
+  const [activeBoosts, setActiveBoosts] = useState<Array<{ name: string; effect: string; expiresAt: Date }>>([]);
+
   // Notification center
   const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const sendBrowserNotification = useCallback((title: string, body: string) => {
+    if (typeof window === 'undefined') return;
+    if (document.visibilityState === 'visible') return;
+    if (!('Notification' in window)) return;
+    if (window.Notification.permission === 'granted') {
+      new window.Notification(title, { body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png' });
+    } else if (window.Notification.permission !== 'denied') {
+      window.Notification.requestPermission();
+    }
+  }, []);
 
   const addNotification = useCallback((title: string, message: string, type: Notification['type'] = 'success') => {
     setNotifications(prev => [{
@@ -82,8 +98,9 @@ export function useDashboard() {
       message,
       message.toLowerCase().includes('fail') || message.toLowerCase().includes('not enough') ? 'error' : 'success'
     );
+    sendBrowserNotification('SHIT.ARMY', message);
     setTimeout(() => setShowSuccess(false), 2600);
-  }, [addNotification]);
+  }, [addNotification, sendBrowserNotification]);
 
   // Transaction helper
   const addTransaction = useCallback((tx: Omit<Transaction, 'id' | 'timestamp'>) => {
@@ -308,8 +325,16 @@ export function useDashboard() {
     }));
   }, []);
 
+  // Rate limit for convert
+  const [lastConvertTime, setLastConvertTime] = useState(0);
+
   // Actions
   const convertPoints = useCallback(() => {
+    const now = Date.now();
+    if (now - lastConvertTime < 30000) {
+      triggerSuccess("Slow down ser! Wait 30s between converts");
+      return;
+    }
     const exchangeRate = CONFIG.BUSINESS.OFFERWALL.EXCHANGE_RATE;
     const minConvert = CONFIG.BUSINESS.OFFERWALL.MIN_CONVERT;
     if (points < minConvert) {
@@ -320,10 +345,11 @@ export function useDashboard() {
     setShitBalance(prev => prev + shitEarned);
     setTotalEarned(prev => prev + shitEarned);
     setPoints(0);
+    setLastConvertTime(now);
     sfx.purchase();
     triggerSuccess(`Converted ${points} PTS → ${shitEarned} $SHIT!`);
     addTransaction({ type: 'offer', amount: shitEarned, description: `Converted ${points} PTS to $SHIT`, status: 'completed' });
-  }, [points, triggerSuccess, addTransaction]);
+  }, [points, lastConvertTime, triggerSuccess, addTransaction]);
 
   const stakeTokens = useCallback(() => {
     const amount = parseInt(stakeAmount);
@@ -473,7 +499,7 @@ export function useDashboard() {
   return {
     // State
     userId, isGeneral, loading, loadingOffers, shitBalance, points, totalEarned, dailyStreak,
-    lastDailyClaim, hasClaimedAirdrop, battlePassXP, claimedTiers, kycStatus, vipTier,
+    lastDailyClaim, hasClaimedAirdrop, battlePassXP, claimedTiers, kycStatus, vipTier, activeMissions, squadPower, activeBoosts,
     offers, userOffers, quests, transactions, stakedPositions, stakeAmount, stakeLock,
     marketListings, ownedNFTs, leaderboard, offerBoosts, activeOffers, showSuccess, successMessage,
     notifications, toasts,
@@ -483,7 +509,7 @@ export function useDashboard() {
 
     // Setters
     setShitBalance, setPoints, setTotalEarned, setIsGeneral, setKycStatus, setVipTier,
-    setStakeAmount, setStakeLock, setClaimedTiers, setBattlePassXP,
+    setStakeAmount, setStakeLock, setClaimedTiers, setBattlePassXP, setActiveMissions, setSquadPower, setActiveBoosts,
 
     // Actions
     triggerSuccess, addTransaction, convertPoints, stakeTokens, claimDailyBonus,

@@ -130,11 +130,58 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
     db.addTransaction({ type: 'quest', amount: shitReward, description: `Battle Pass Tier ${tier} reward`, status: 'completed' });
   };
 
-  const dailyQuests = [
-    { title: "Complete 2 offers", progress: 1, max: 2, reward: 300 },
-    { title: "Play Tank Shooter", progress: 0, max: 1, reward: 150 },
-    { title: "Stake 100 $SHIT", progress: 0, max: 1, reward: 200 },
+  const getDayOfWeek = () => new Date().getDay();
+  const dayQuests = [
+    [
+      { title: "Complete 2 offers", progress: 1, max: 2, reward: 300, emoji: '\u{1F3AF}' },
+      { title: "Send a soldier on a raid", progress: 0, max: 1, reward: 200, emoji: '\u2694\uFE0F' },
+      { title: "Stake 100 $SHIT", progress: 0, max: 1, reward: 200, emoji: '\u{1F512}' },
+    ],
+    [
+      { title: "Win a coin flip", progress: 0, max: 1, reward: 250, emoji: '\u{1FA99}' },
+      { title: "Complete 3 offers", progress: 1, max: 3, reward: 450, emoji: '\u{1F3AF}' },
+      { title: "Check the Bazaar", progress: 0, max: 1, reward: 100, emoji: '\u{1F6D2}' },
+    ],
+    [
+      { title: "Spin the wheel", progress: 0, max: 1, reward: 150, emoji: '\u{1F3B0}' },
+      { title: "Level up a soldier", progress: 0, max: 1, reward: 300, emoji: '\u2B06\uFE0F' },
+      { title: "Complete 2 offers", progress: 0, max: 2, reward: 300, emoji: '\u{1F3AF}' },
+    ],
+    [
+      { title: "Play Pump or Dump", progress: 0, max: 1, reward: 200, emoji: '\u{1F4C8}' },
+      { title: "Recruit a soldier", progress: 0, max: 1, reward: 250, emoji: '\u{1F4A9}' },
+      { title: "Complete 3 offers", progress: 1, max: 3, reward: 450, emoji: '\u{1F3AF}' },
+    ],
+    [
+      { title: "Roll dice 3 times", progress: 0, max: 3, reward: 350, emoji: '\u{1F3B2}' },
+      { title: "Stake 500 $SHIT", progress: 0, max: 1, reward: 400, emoji: '\u{1F512}' },
+      { title: "Complete 2 offers", progress: 1, max: 2, reward: 300, emoji: '\u{1F3AF}' },
+    ],
+    [
+      { title: "Complete 5 offers", progress: 2, max: 5, reward: 750, emoji: '\u{1F3AF}' },
+      { title: "Win 3 games", progress: 0, max: 3, reward: 500, emoji: '\u{1F3AE}' },
+      { title: "Send 2 soldiers on raids", progress: 0, max: 2, reward: 400, emoji: '\u2694\uFE0F' },
+    ],
+    [
+      { title: "Complete 4 offers", progress: 1, max: 4, reward: 600, emoji: '\u{1F3AF}' },
+      { title: "Buy something on Bazaar", progress: 0, max: 1, reward: 200, emoji: '\u{1F6D2}' },
+      { title: "Claim all mission rewards", progress: 0, max: 1, reward: 300, emoji: '\u{1F4B0}' },
+    ],
   ];
+  const dailyQuests = dayQuests[getDayOfWeek()];
+
+  const nextBPReward = BATTLE_PASS_REWARDS.find(r => r.tier > db.currentTier);
+
+  const getStreakTimeLeft = () => {
+    if (!db.lastDailyClaim) return null;
+    const lastClaim = new Date(db.lastDailyClaim).getTime();
+    const deadline = lastClaim + 48 * 60 * 60 * 1000;
+    const diff = deadline - Date.now();
+    if (diff <= 0) return 'EXPIRED';
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    return `${h}h ${m}m`;
+  };
 
   const filteredTransactions = txFilter === 'all'
     ? db.transactions
@@ -173,7 +220,10 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">HQ</h1>
               </div>
               <div className="flex items-center gap-3">
-                <div className="bg-zinc-950 border border-white/10 px-6 py-3 rounded-2xl text-sm flex items-center gap-3">🔥 {db.dailyStreak} day streak</div>
+                <div className="bg-zinc-950 border border-white/10 px-6 py-3 rounded-2xl text-sm flex items-center gap-3">
+                  🔥 {db.dailyStreak} day streak
+                  {getStreakTimeLeft() && <span className="text-red-400 text-xs font-mono">{'\u23F1\uFE0F'} {getStreakTimeLeft()}</span>}
+                </div>
                 <button onClick={() => { sfx.click(); db.claimDailyBonus(); }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-black px-8 py-3 rounded-2xl text-sm font-black active:scale-[0.985] shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-shadow">CLAIM DAILY BONUS</button>
               </div>
             </div>
@@ -278,6 +328,54 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
               </div>
             </div>
 
+            {/* NEXT BP REWARD + MISSIONS WIDGET */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {nextBPReward && (
+                <div onClick={() => setShowBattlePass(true)} className="glass-card rounded-2xl p-6 cursor-pointer hover:border-amber-500/40 transition-all active:scale-[0.985] border border-amber-500/20">
+                  <div className="text-xs text-zinc-500 mb-2">NEXT BATTLE PASS REWARD</div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-4xl">{nextBPReward.free.icon}</div>
+                    <div>
+                      <div className="font-bold text-amber-400">Tier {nextBPReward.tier}</div>
+                      <div className="text-sm text-zinc-400">{db.isGeneral ? nextBPReward.premium.description : nextBPReward.free.description}</div>
+                      <div className="text-xs text-amber-400 mt-1 font-bold">+{db.isGeneral ? nextBPReward.premium.amount : nextBPReward.free.amount} $SHIT</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div onClick={() => setCurrentTab("army")} className="glass-card rounded-2xl p-6 cursor-pointer hover:border-amber-500/40 transition-all active:scale-[0.985] border border-amber-500/20">
+                <div className="text-xs text-zinc-500 mb-2">{'\u2694\uFE0F'} ACTIVE MISSIONS</div>
+                <div className="text-2xl font-black text-amber-400 mb-1">
+                  {db.activeMissions ?? 0} raids in progress
+                </div>
+                <div className="text-sm text-zinc-400">
+                  {(db.activeMissions ?? 0) > 0 ? 'tap to check rewards' : 'deploy your soldiers ser'}
+                </div>
+              </div>
+            </div>
+
+            {/* WEEKLY REWARDS CALENDAR */}
+            <div className="glass-card rounded-3xl p-6">
+              <div className="font-black text-lg mb-4">{'\u{1F4C5}'} WEEKLY REWARD CALENDAR</div>
+              <div className="grid grid-cols-7 gap-2">
+                {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, i) => {
+                  const rewards = [100, 150, 200, 250, 300, 500, 1000];
+                  const today = (new Date().getDay() + 6) % 7;
+                  const claimed = i < today || (i === today && db.dailyStreak > 0);
+                  return (
+                    <div key={day} className={`text-center p-3 rounded-xl border ${i === today ? 'border-amber-500/50 bg-amber-500/10' : claimed ? 'border-white/10 bg-white/5' : 'border-white/5'}`}>
+                      <div className="text-[10px] text-zinc-500 mb-1">{day}</div>
+                      <div className={`text-sm font-bold ${claimed ? 'text-amber-400' : 'text-zinc-500'}`}>{claimed ? '\u2713' : rewards[i]}</div>
+                      <div className="text-[10px] text-zinc-600">{claimed ? 'claimed' : '$SHIT'}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-center mt-3 text-xs text-zinc-500">
+                {'\ud83d\udd25'} 7-day streak bonus: <span className="text-amber-400 font-bold">1,000 $SHIT</span>
+              </div>
+            </div>
+
             {/* AIRDROP PROGRESS */}
             <div className="glass-card rounded-3xl p-9">
               <div className="flex items-center justify-between mb-6">
@@ -326,14 +424,14 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 {dailyQuests.map((q, i) => (
                   <div key={i} className="flex items-center justify-between bg-black/60 rounded-2xl px-6 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="text-2xl">🎯</div>
+                      <div className="text-2xl">{q.emoji}</div>
                       <div>
                         <div>{q.title}</div>
                         <div className="text-xs text-zinc-500">{q.progress}/{q.max} completed</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-amber-400 font-mono font-bold">+{q.reward} PTS</div>
+                      <div className="text-amber-400 font-mono font-bold">+{q.reward} $SHIT</div>
                       <div className="w-28 h-1.5 bg-white/10 rounded-full mt-2"><div className="h-1.5 bg-gradient-to-r from-amber-500 to-orange-400 rounded-full" style={{width: `${(q.progress/q.max)*100}%`}}></div></div>
                     </div>
                   </div>
@@ -363,6 +461,11 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F4A9}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">SHIT ARMY</div>
                 <div className="text-zinc-400 mt-2 text-sm">mint degens {'\u2022'} raid sewers {'\u2022'} stack $SHIT passively</div>
+                <div className="mt-3 flex items-center gap-2 text-xs">
+                  <span className="text-amber-400 font-bold">{'\u2694\uFE0F'} Squad Power: {db.squadPower ?? 450}</span>
+                  <span className="text-zinc-500">|</span>
+                  <span className="text-green-400">+{Math.floor((db.squadPower ?? 450) / 100)}% offerwall bonus</span>
+                </div>
               </div>
               <div onClick={() => setCurrentTab("market")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group border border-amber-500/20 hover:border-amber-500/40">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3EA}'}</div>
@@ -374,7 +477,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
               <div onClick={() => setCurrentTab("stake")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F3C6}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">LOCK YOUR BAGS</div>
-                <div className="text-zinc-400 mt-2 text-sm">48% APY {'\u2022'} diamond hands only</div>
+                <div className="text-zinc-400 mt-2 text-sm">32-67% APY {'\u2022'} diamond hands only</div>
               </div>
               <div onClick={() => setCurrentTab("vip")} className="cursor-pointer glass-card glass-card-hover rounded-3xl p-8 active:scale-[0.985] transition-all group">
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F48E}'}</div>
@@ -394,7 +497,10 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {currentTab === "offerwall" && (
           <motion.div key="offerwall" variants={tabVariants} initial="initial" animate="animate" exit="exit">
             <div className="mb-10">
-              <div className="text-amber-500 text-sm font-bold tracking-[3px]">EARN REAL $SHIT {db.streakMultiplier > 0 && `(+${db.streakMultiplier}% STREAK)`}</div>
+              <div className="text-amber-500 text-sm font-bold tracking-[3px]">
+                EARN REAL $SHIT {db.streakMultiplier > 0 && `(+${db.streakMultiplier}% STREAK)`}
+                {(db.squadPower ?? 0) > 0 && ` (+${Math.floor((db.squadPower ?? 0) / 100)}% ARMY)`}
+              </div>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Offerwall</h2>
             </div>
 

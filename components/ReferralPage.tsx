@@ -44,11 +44,11 @@ interface LeaderboardEntry {
 }
 
 const SHIT_TIERS = [
-  { name: 'Recruit', emoji: '🪖', color: 'from-zinc-600 to-zinc-500' },
-  { name: 'Sergeant', emoji: '⭐', color: 'from-blue-600 to-blue-500' },
-  { name: 'Lieutenant', emoji: '🎖️', color: 'from-amber-600 to-amber-500' },
-  { name: 'Commander', emoji: '👑', color: 'from-purple-600 to-purple-500' },
-  { name: 'General', emoji: '⭐', color: 'from-amber-500 to-orange-500' },
+  { name: 'Normie', emoji: '💩', color: 'from-zinc-600 to-zinc-500' },
+  { name: 'Degen', emoji: '🧴', color: 'from-green-600 to-green-500' },
+  { name: 'Ape', emoji: '🚽', color: 'from-blue-600 to-blue-500' },
+  { name: 'Chad', emoji: '🥷', color: 'from-purple-600 to-purple-500' },
+  { name: 'GigaChad', emoji: '🏆', color: 'from-amber-500 to-orange-500' },
 ];
 
 const FUNNY_REFERRAL_MESSAGES = [

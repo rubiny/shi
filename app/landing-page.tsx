@@ -10,36 +10,59 @@ interface LandingPageProps {
 }
 
 const RANKS = [
-  { name: 'Recruit', emoji: '🪖', color: '#8B7355' },
-  { name: 'Private', emoji: '🎖️', color: '#4A7C4E' },
-  { name: 'Corporal', emoji: '⭐', color: '#5D4E6D' },
-  { name: 'Sergeant', emoji: '🎯', color: '#D4A574' },
-  { name: 'Lieutenant', emoji: '⚔️', color: '#4A6FA5' },
-  { name: 'Captain', emoji: '🛡️', color: '#8B6914' },
-  { name: 'Major', emoji: '🏅', color: '#CD7F32' },
-  { name: 'Colonel', emoji: '💎', color: '#A0B2C6' },
-  { name: 'General', emoji: '👑', color: '#FFD700' },
-  { name: 'ShitLord', emoji: '🚽👑', color: '#E5E4E2' }
+  { name: 'Normie', emoji: '💩', color: '#71717a' },
+  { name: 'Degen', emoji: '🧴', color: '#22c55e' },
+  { name: 'Ape', emoji: '🚽', color: '#3b82f6' },
+  { name: 'Chad', emoji: '🥷', color: '#a855f7' },
+  { name: 'Whale', emoji: '👑', color: '#f59e0b' },
+  { name: 'GigaChad', emoji: '🏆', color: '#ec4899' },
 ];
 
-const MEME_IMAGES = [
-  { src: '/memes/shit-coin-pepe.png', alt: 'Pepe with $SHIT', likes: '12.4K' },
-  { src: '/memes/toilet-moon.png', alt: 'Toilet to the moon', likes: '8.9K' },
-  { src: '/memes/poop-rocket.png', alt: 'Poop rocket', likes: '23.1K' },
-  { src: '/memes/shit-hodl.png', alt: 'HODL SHIT', likes: '15.6K' },
-  { src: '/memes/crap-currency.png', alt: 'Crap Currency', likes: '9.2K' },
-  { src: '/memes/toilet-finance.png', alt: 'Toilet Finance', likes: '18.7K' }
+const LIVE_FEED_NAMES = ['0xChad', 'ShitKing420', 'DegenApe', 'ToiletWhale', 'FlushMaster', 'SewerRat69', 'PumpIt', 'PoopLord', 'CryptoTurd', 'DiamondCheeks'];
+const LIVE_FEED_ACTIONS = [
+  { action: 'just earned', amounts: [250, 500, 800, 1200, 2100], suffix: '$SHIT from offers' },
+  { action: 'staked', amounts: [1000, 2500, 5000, 10000], suffix: '$SHIT' },
+  { action: 'minted a', amounts: [0], suffix: '' },
+  { action: 'claimed', amounts: [150, 300, 500], suffix: '$SHIT from missions' },
+];
+
+const MEME_GALLERY = [
+  { emoji: '💩', title: 'when $SHIT moons', caption: 'i told you ser', likes: '12.4K', bg: 'from-amber-900/40 to-orange-900/40' },
+  { emoji: '🚀', title: 'toilet to the moon', caption: 'we\'re all gonna make it', likes: '8.9K', bg: 'from-blue-900/40 to-purple-900/40' },
+  { emoji: '🧴', title: 'paper hands be like', caption: 'sold at the bottom lmao', likes: '23.1K', bg: 'from-red-900/40 to-pink-900/40' },
+  { emoji: '💎', title: 'diamond hands only', caption: 'never selling. NGMI if you sell', likes: '15.6K', bg: 'from-cyan-900/40 to-blue-900/40' },
+  { emoji: '🚽', title: 'flush the bears', caption: 'bears r fuk', likes: '9.2K', bg: 'from-green-900/40 to-emerald-900/40' },
+  { emoji: '🦍', title: 'apes together strong', caption: 'buy the dip. always.', likes: '18.7K', bg: 'from-purple-900/40 to-pink-900/40' },
 ];
 
 export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
   const [currentEmoji, setCurrentEmoji] = useState(0);
-  const [activeRank, setActiveRank] = useState(4);
+  const [activeRank, setActiveRank] = useState(3);
+  const [liveFeed, setLiveFeed] = useState<Array<{ id: number; text: string }>>([]);
+  const [calcOffers, setCalcOffers] = useState(5);
 
   useEffect(() => {
     const emojiInterval = setInterval(() => {
       setCurrentEmoji(prev => (prev + 1) % 6);
     }, 2000);
     return () => clearInterval(emojiInterval);
+  }, []);
+
+  useEffect(() => {
+    const generateFeedItem = () => {
+      const name = LIVE_FEED_NAMES[Math.floor(Math.random() * LIVE_FEED_NAMES.length)];
+      const actionData = LIVE_FEED_ACTIONS[Math.floor(Math.random() * LIVE_FEED_ACTIONS.length)];
+      const amount = actionData.amounts[Math.floor(Math.random() * actionData.amounts.length)];
+      const text = amount > 0
+        ? `🔥 ${name} ${actionData.action} ${amount.toLocaleString()} ${actionData.suffix}`
+        : `🔥 ${name} ${actionData.action} ${RANKS[Math.floor(Math.random() * RANKS.length)].name} soldier`;
+      return { id: Date.now() + Math.random(), text };
+    };
+    setLiveFeed([generateFeedItem(), generateFeedItem()]);
+    const feedInterval = setInterval(() => {
+      setLiveFeed(prev => [generateFeedItem(), ...prev].slice(0, 3));
+    }, 4000);
+    return () => clearInterval(feedInterval);
   }, []);
 
   const emojis = ['💩', '🚽', '🧻', '💰', '🔥', '🚀'];
@@ -180,6 +203,20 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 <span className="text-amber-400">✓</span> built on Base. no cap.
               </span>
             </div>
+
+            {/* Live Earnings Feed */}
+            <div className="mt-8 max-w-md mx-auto space-y-2">
+              {liveFeed.map((item) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-zinc-900/80 border border-amber-500/20 rounded-xl px-4 py-2 text-sm text-zinc-300 backdrop-blur-sm"
+                >
+                  {item.text}
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         </div>
 
@@ -219,7 +256,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 step: '3', 
                 icon: '🔒', 
                 title: 'LOCK YOUR BAGS', 
-                desc: 'stake $SHIT for 50-200% APY. diamond hands = bigger bags.',
+                desc: 'stake $SHIT for 32-67% APY. diamond hands = bigger bags.',
                 color: 'emerald'
               },
               { 
@@ -247,6 +284,52 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 <p className="text-sm text-zinc-400">{item.desc}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Earning Calculator */}
+      <section className="py-20 bg-zinc-900/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-black mb-3">
+              HOW MUCH CAN YOU <span className="text-amber-500">STACK</span>?
+            </h2>
+            <p className="text-zinc-400">slide to see your potential bags ser</p>
+          </div>
+          <div className="bg-zinc-900/80 border border-amber-500/20 rounded-3xl p-8">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm text-zinc-400">Offers per day:</span>
+              <span className="text-2xl font-black text-amber-400">{calcOffers}</span>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={20}
+              value={calcOffers}
+              onChange={(e) => setCalcOffers(Number(e.target.value))}
+              className="w-full h-2 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-amber-500 mb-8"
+            />
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-zinc-800/80 rounded-2xl p-5">
+                <div className="text-xs text-zinc-500 mb-1">DAILY</div>
+                <div className="text-2xl font-black text-amber-400">{(calcOffers * 150).toLocaleString()}</div>
+                <div className="text-xs text-zinc-500">$SHIT</div>
+              </div>
+              <div className="bg-zinc-800/80 rounded-2xl p-5">
+                <div className="text-xs text-zinc-500 mb-1">MONTHLY</div>
+                <div className="text-2xl font-black text-amber-400">{(calcOffers * 150 * 30).toLocaleString()}</div>
+                <div className="text-xs text-zinc-500">$SHIT</div>
+              </div>
+              <div className="bg-zinc-800/80 rounded-2xl p-5 border border-amber-500/20">
+                <div className="text-xs text-zinc-500 mb-1">≈ USD/MONTH</div>
+                <div className="text-2xl font-black text-green-400">${(calcOffers * 150 * 30 * 0.01).toFixed(0)}</div>
+                <div className="text-xs text-zinc-500">at $0.01/$SHIT</div>
+              </div>
+            </div>
+            <div className="text-center mt-6">
+              <p className="text-xs text-zinc-500">+ staking rewards, referrals, army missions, battle pass, daily spin. actual bags will be bigger ser.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -319,7 +402,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                         {rank.name}
                       </div>
                       <div className="text-xs text-zinc-500">
-                        {i === 0 ? 'Start here' : `${(i * 1000).toLocaleString()} PTS to next`}
+                        {i === 0 ? 'start here normie' : `${(i * 5000).toLocaleString()} $SHIT to rank up`}
                       </div>
                     </div>
                     {activeRank === i && (
@@ -395,7 +478,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {MEME_IMAGES.map((meme, i) => (
+            {MEME_GALLERY.map((meme, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -403,24 +486,28 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ scale: 1.02 }}
-                className="group relative aspect-square bg-zinc-900 rounded-2xl overflow-hidden border border-white/10 cursor-pointer"
+                className="group relative aspect-square rounded-2xl overflow-hidden border border-white/10 cursor-pointer"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                  <span className="text-sm text-zinc-300">{meme.alt}</span>
-                  <span className="text-sm text-amber-400">❤️ {meme.likes}</span>
+                <div className={`absolute inset-0 bg-gradient-to-br ${meme.bg}`} />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-8xl group-hover:scale-125 transition-transform duration-300">{meme.emoji}</span>
                 </div>
-                {/* Placeholder for meme image */}
-                <div className="w-full h-full flex items-center justify-center text-7xl group-hover:scale-110 transition-transform opacity-60 group-hover:opacity-100">
-                  {['💩', '🚀', '🌙', '💎', '🚽', '🎮'][i]}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <div className="font-bold text-sm mb-0.5">{meme.title}</div>
+                  <div className="text-xs text-zinc-400 mb-2">{meme.caption}</div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-amber-400">❤️ {meme.likes}</span>
+                    <span className="text-xs text-zinc-500">💩 community post</span>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
 
           <div className="text-center mt-8">
-            <button className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold border border-white/10">
-              📤 Submit Your Meme
+            <button onClick={onConnect} className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold border border-white/10">
+              📤 Submit Your Meme (login first ser)
             </button>
           </div>
         </div>
@@ -488,18 +575,18 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             <div>
               <h4 className="font-bold mb-4">Community</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
-                <li className="hover:text-white cursor-pointer">Discord</li>
-                <li className="hover:text-white cursor-pointer">Twitter/X</li>
-                <li className="hover:text-white cursor-pointer">Telegram</li>
+                <li><a href="https://discord.gg/shitarmy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Discord</a></li>
+                <li><a href="https://x.com/shitarmy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Twitter/X</a></li>
+                <li><a href="https://t.me/shitarmy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Telegram</a></li>
                 <li onClick={() => scrollToSection('memes')} className="hover:text-white cursor-pointer transition-colors">Meme Contest</li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
-                <li className="hover:text-white cursor-pointer">Terms</li>
-                <li className="hover:text-white cursor-pointer">Privacy</li>
-                <li className="hover:text-white cursor-pointer">KYC Policy</li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="/kyc-policy" className="hover:text-white transition-colors">KYC Policy</a></li>
               </ul>
             </div>
           </div>

@@ -26,8 +26,31 @@ const TOKENS = [
   { name: '$FLOKI', icon: '\u{1F43A}', volatility: 0.10 },
 ];
 
+const MAX_PLAYS_PER_HOUR = 30;
+
 export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
   const [activeGame, setActiveGame] = useState<GameType>('coinflip');
+  const [playCount, setPlayCount] = useState(0);
+  const [lastResetTime, setLastResetTime] = useState(Date.now());
+  const [cooldownEnd, setCooldownEnd] = useState(0);
+
+  const checkRateLimit = useCallback(() => {
+    const now = Date.now();
+    if (now - lastResetTime > 3600000) {
+      setPlayCount(0);
+      setLastResetTime(now);
+      return true;
+    }
+    if (playCount >= MAX_PLAYS_PER_HOUR) {
+      setCooldownEnd(lastResetTime + 3600000);
+      return false;
+    }
+    return true;
+  }, [playCount, lastResetTime]);
+
+  const recordPlay = useCallback(() => {
+    setPlayCount(prev => prev + 1);
+  }, []);
 
   // Coin Flip state
   const [coinBet, setCoinBet] = useState(100);
@@ -54,11 +77,13 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
 
   const flipCoin = useCallback(() => {
     if (coinFlipping || coinBet > balance || coinBet <= 0) return;
+    if (!checkRateLimit()) return;
     setCoinFlipping(true);
     setCoinResult(null);
+    recordPlay();
 
     setTimeout(() => {
-      const result = Math.random() < 0.49 ? 'heads' : 'tails'; // Slight house edge
+      const result = Math.random() < 0.49 ? 'heads' : 'tails';
       const won = result === coinChoice;
       setCoinResult({ side: result, won });
       setCoinFlipping(false);
@@ -69,17 +94,19 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
         onLose(coinBet, 'Coin Flip');
       }
     }, 1500);
-  }, [coinFlipping, coinBet, coinChoice, balance, onWin, onLose]);
+  }, [coinFlipping, coinBet, coinChoice, balance, onWin, onLose, checkRateLimit, recordPlay]);
 
   const rollDice = useCallback(() => {
     if (diceRolling || diceBet > balance || diceBet <= 0) return;
+    if (!checkRateLimit()) return;
     setDiceRolling(true);
     setDiceResult(null);
+    recordPlay();
 
     setTimeout(() => {
       const roll = Math.floor(Math.random() * 100) + 1;
       const won = roll <= diceTarget;
-      const multiplier = (98 / diceTarget); // House edge built in
+      const multiplier = (98 / diceTarget);
       setDiceResult({ roll, won });
       setDiceRolling(false);
 
@@ -89,10 +116,12 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
         onLose(diceBet, 'Dice Roll');
       }
     }, 1200);
-  }, [diceRolling, diceBet, diceTarget, balance, onWin, onLose]);
+  }, [diceRolling, diceBet, diceTarget, balance, onWin, onLose, checkRateLimit, recordPlay]);
 
   const makePrediction = useCallback((direction: 'pump' | 'dump') => {
     if (predicting || prediction.betAmount > balance || prediction.betAmount <= 0) return;
+    if (!checkRateLimit()) return;
+    recordPlay();
     setPredicting(true);
     setPrediction(prev => ({ ...prev, direction }));
 
@@ -132,7 +161,7 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
         }, 3000);
       }
     }, 1000);
-  }, [predicting, prediction.betAmount, prediction.token, balance, onWin, onLose]);
+  }, [predicting, prediction.betAmount, prediction.token, balance, onWin, onLose, checkRateLimit, recordPlay]);
 
   const betPresets = [50, 100, 250, 500, 1000];
 
@@ -141,6 +170,12 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
       <div className="mb-10">
         <div className="text-amber-500 text-sm font-bold tracking-[3px]">PLAY TO EARN</div>
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Mini Games</h2>
+        <div className="mt-2 text-sm text-zinc-400">
+          {playCount}/{MAX_PLAYS_PER_HOUR} plays this hour
+          {cooldownEnd > Date.now() && (
+            <span className="text-red-400 ml-2">Rate limited — try again later</span>
+          )}
+        </div>
       </div>
 
       {/* Balance */}

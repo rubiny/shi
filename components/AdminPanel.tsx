@@ -87,6 +87,28 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
+  const [withdrawFilter, setWithdrawFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [withdrawNetworkFilter, setWithdrawNetworkFilter] = useState('all');
+  const [selectedWithdrawals, setSelectedWithdrawals] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [configSaved, setConfigSaved] = useState(false);
+  const [userEditBalance, setUserEditBalance] = useState('');
+  const [userEditNote, setUserEditNote] = useState('');
+
+  // Config values
+  const [exchangeRate, setExchangeRate] = useState(12);
+  const [minConvert, setMinConvert] = useState(100);
+  const [maxOffersPerHour, setMaxOffersPerHour] = useState(10);
+  const [referralCommission, setReferralCommission] = useState(15);
+  const [minWithdrawal, setMinWithdrawal] = useState(25);
+  const [withdrawalFee, setWithdrawalFee] = useState(0.5);
+
+  // Alerts
+  const alerts = [
+    ...(stats && stats.pendingWithdrawals > 10 ? [{ type: 'warning' as const, msg: `${stats.pendingWithdrawals} pending withdrawals need review` }] : []),
+    ...(stats && stats.dailyActiveUsers < stats.totalUsers * 0.3 ? [{ type: 'info' as const, msg: `DAU dropped below 30% (${stats.dailyActiveUsers}/${stats.totalUsers})` }] : []),
+    { type: 'warning' as const, msg: 'Fraud rate at 7.1% — above 5% threshold' },
+  ];
 
   // Config state
   const [providers, setProviders] = useState<OfferProvider[]>([
@@ -264,10 +286,67 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
     );
   }
 
+  const exportCSV = (data: Record<string, unknown>[], filename: string) => {
+    if (data.length === 0) return;
+    const headers = Object.keys(data[0]);
+    const csv = [headers.join(','), ...data.map(row => headers.map(h => JSON.stringify(row[h] ?? '')).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${filename}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleBulkApprove = () => {
+    setWithdrawals(withdrawals.map(w => selectedWithdrawals.includes(w.id) ? { ...w, status: 'approved' } : w));
+    setSelectedWithdrawals([]);
+  };
+
+  const handleBulkReject = () => {
+    setWithdrawals(withdrawals.map(w => selectedWithdrawals.includes(w.id) ? { ...w, status: 'rejected' } : w));
+    setSelectedWithdrawals([]);
+  };
+
+  const handleBulkBan = () => {
+    setUsers(users.map(u => selectedUsers.includes(u.id) ? { ...u, is_banned: true } : u));
+    setSelectedUsers([]);
+  };
+
+  const handleSaveConfig = () => {
+    setConfigSaved(true);
+    setTimeout(() => setConfigSaved(false), 2000);
+  };
+
+  const handleAdjustBalance = (userId: string, amount: number) => {
+    setUsers(users.map(u => u.id === userId ? { ...u, total_earned: u.total_earned + amount } : u));
+    setUserEditBalance('');
+  };
+
+  const filteredWithdrawals = withdrawals.filter(w => {
+    if (withdrawFilter !== 'all' && w.status !== withdrawFilter) return false;
+    if (withdrawNetworkFilter !== 'all' && w.network !== withdrawNetworkFilter) return false;
+    return true;
+  });
+
   const totalProviderRevenue = providers.reduce((sum, p) => sum + p.revenue, 0);
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      {/* Alerts */}
+      {alerts.length > 0 && (
+        <div className="space-y-2 mb-6">
+          {alerts.map((alert, i) => (
+            <div key={i} className={`rounded-xl p-4 border flex items-center gap-3 text-sm ${
+              alert.type === 'warning' ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+            }`}>
+              <span>{alert.type === 'warning' ? '\u26A0\uFE0F' : '\u{1F4CA}'}</span>
+              {alert.msg}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8 relative">
         <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 via-amber-500/20 to-red-500/20 blur-2xl rounded-full"></div>
@@ -275,9 +354,9 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
           <span className="text-4xl animate-pulse">{ADMIN_EMOJIS[currentEmoji]}</span>
           <div>
             <h1 className="text-4xl font-black bg-gradient-to-r from-purple-400 via-amber-400 to-red-400 bg-clip-text text-transparent">
-              Supreme Commander
+              SHIT CONTROL CENTER
             </h1>
-            <p className="text-zinc-400">Control the shit army empire {'\u{1F3AE}'}</p>
+            <p className="text-zinc-400">manage your degens, distribute loot, control the chaos {'\u{1F4A9}'}</p>
           </div>
         </div>
       </div>
@@ -491,28 +570,39 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
       {/* Users Tab */}
       {activeTab === 'users' && (
         <div className="bg-zinc-900/50 rounded-2xl border border-white/5 overflow-hidden">
-          <div className="p-4 border-b border-white/5 flex items-center gap-4">
+          <div className="p-4 border-b border-white/5 flex items-center gap-4 flex-wrap">
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder="Search degens..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 px-4 py-2 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none"
+              className="flex-1 min-w-[200px] px-4 py-2 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none"
             />
             <select className="px-4 py-2 bg-zinc-800 rounded-xl border border-white/10">
-              <option>All Users</option>
-              <option>General</option>
+              <option>All Degens</option>
+              <option>Generals</option>
               <option>Banned</option>
               <option>New (7 days)</option>
             </select>
+            {selectedUsers.length > 0 && (
+              <button onClick={handleBulkBan} className="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold">
+                Ban {selectedUsers.length} selected
+              </button>
+            )}
+            <button onClick={() => exportCSV(users as unknown as Record<string, unknown>[], 'users')} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-semibold">
+              {'\u{1F4E5}'} Export CSV
+            </button>
           </div>
           
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-zinc-800/50">
                 <tr>
-                  <th className="text-left p-4 text-sm font-medium text-zinc-400">User</th>
-                  <th className="text-right p-4 text-sm font-medium text-zinc-400">Earned</th>
+                  <th className="text-center p-4 w-12">
+                    <input type="checkbox" className="accent-amber-500" onChange={(e) => setSelectedUsers(e.target.checked ? users.map(u => u.id) : [])} checked={selectedUsers.length === users.length && users.length > 0} />
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-zinc-400">Degen</th>
+                  <th className="text-right p-4 text-sm font-medium text-zinc-400">Loot</th>
                   <th className="text-center p-4 text-sm font-medium text-zinc-400">Status</th>
                   <th className="text-right p-4 text-sm font-medium text-zinc-400">Joined</th>
                   <th className="text-center p-4 text-sm font-medium text-zinc-400">Actions</th>
@@ -521,6 +611,9 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
               <tbody className="divide-y divide-white/5">
                 {users.filter(u => u.username.toLowerCase().includes(searchQuery.toLowerCase())).map((user) => (
                   <tr key={user.id} className="hover:bg-white/5">
+                    <td className="p-4 text-center">
+                      <input type="checkbox" className="accent-amber-500" checked={selectedUsers.includes(user.id)} onChange={(e) => setSelectedUsers(e.target.checked ? [...selectedUsers, user.id] : selectedUsers.filter(id => id !== user.id))} />
+                    </td>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
@@ -615,50 +708,60 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
       {/* Withdrawals Tab */}
       {activeTab === 'withdrawals' && (
         <div className="space-y-4">
-          <div className="bg-red-500/10 rounded-2xl p-6 border border-red-500/30">
-            <h3 className="font-bold text-red-400 mb-4">{'\u26A0\uFE0F'} Pending Withdrawals ({withdrawals.filter(w => w.status === 'pending').length})</h3>
-            {withdrawals.filter(w => w.status === 'pending').map((withdrawal) => (
-              <div key={withdrawal.id} className="bg-zinc-900/50 rounded-xl p-4 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <div className="font-bold">{withdrawal.username}</div>
-                  <div className="text-sm text-zinc-400">{withdrawal.amount.toLocaleString()} $SHIT {'\u2192'} {withdrawal.network}</div>
-                  <div className="text-xs text-zinc-500 font-mono">{withdrawal.address}</div>
+          <div className="flex flex-wrap gap-3 items-center">
+            <select value={withdrawFilter} onChange={(e) => setWithdrawFilter(e.target.value as typeof withdrawFilter)} className="px-4 py-2 bg-zinc-800 rounded-xl border border-white/10">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <select value={withdrawNetworkFilter} onChange={(e) => setWithdrawNetworkFilter(e.target.value)} className="px-4 py-2 bg-zinc-800 rounded-xl border border-white/10">
+              <option value="all">All Networks</option>
+              <option value="Base">Base</option>
+              <option value="Ethereum">Ethereum</option>
+              <option value="Polygon">Polygon</option>
+            </select>
+            {selectedWithdrawals.length > 0 && (
+              <>
+                <button onClick={handleBulkApprove} className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-black rounded-xl text-sm font-semibold">
+                  {'\u2713'} Approve {selectedWithdrawals.length}
+                </button>
+                <button onClick={handleBulkReject} className="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold">
+                  {'\u2717'} Reject {selectedWithdrawals.length}
+                </button>
+              </>
+            )}
+            <button onClick={() => exportCSV(withdrawals as unknown as Record<string, unknown>[], 'withdrawals')} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-semibold ml-auto">
+              {'\u{1F4E5}'} Export CSV
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {filteredWithdrawals.map((withdrawal) => (
+              <div key={withdrawal.id} className="bg-zinc-900/50 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-white/5">
+                <div className="flex items-center gap-3">
+                  <input type="checkbox" className="accent-amber-500" checked={selectedWithdrawals.includes(withdrawal.id)} onChange={(e) => setSelectedWithdrawals(e.target.checked ? [...selectedWithdrawals, withdrawal.id] : selectedWithdrawals.filter(id => id !== withdrawal.id))} />
+                  <div>
+                    <div className="font-bold">{withdrawal.username}</div>
+                    <div className="text-sm text-zinc-400">{withdrawal.amount.toLocaleString()} $SHIT {'\u2192'} {withdrawal.network}</div>
+                    <div className="text-xs text-zinc-500 font-mono">{withdrawal.address}</div>
+                    <div className="text-xs text-zinc-600 mt-1">{new Date(withdrawal.requested_at).toLocaleString()}</div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => handleApproveWithdrawal(withdrawal.id)}
-                    className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black rounded-xl text-sm font-semibold"
-                  >
-                    {'\u2713'} Approve
-                  </button>
-                  <button 
-                    onClick={() => handleRejectWithdrawal(withdrawal.id)}
-                    className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl text-sm font-semibold"
-                  >
-                    {'\u2717'} Reject
-                  </button>
+                  {withdrawal.status === 'pending' ? (
+                    <>
+                      <button onClick={() => handleApproveWithdrawal(withdrawal.id)} className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black rounded-xl text-sm font-semibold">{'\u2713'} Approve</button>
+                      <button onClick={() => handleRejectWithdrawal(withdrawal.id)} className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl text-sm font-semibold">{'\u2717'} Reject</button>
+                    </>
+                  ) : (
+                    <span className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${withdrawal.status === 'approved' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'}`}>
+                      {withdrawal.status === 'approved' ? '\u2713 Approved' : '\u2717 Rejected'}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
-            <h3 className="font-bold mb-4">{'\u{1F4DC}'} Withdrawal History</h3>
-            <div className="space-y-2">
-              {withdrawals.filter(w => w.status !== 'pending').map((withdrawal) => (
-                <div key={withdrawal.id} className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-lg">
-                  <div>
-                    <span className="font-medium">{withdrawal.username}</span>
-                    <span className="text-sm text-zinc-400 ml-2">{withdrawal.amount.toLocaleString()} $SHIT</span>
-                  </div>
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    withdrawal.status === 'approved' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'
-                  }`}>
-                    {withdrawal.status === 'approved' ? '\u2713 Approved' : '\u2717 Rejected'}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       )}
@@ -666,7 +769,12 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
       {/* Audit Log Tab */}
       {activeTab === 'audit' && (
         <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
-          <h3 className="font-bold mb-4">{'\u{1F4DC}'} Audit Log</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold">{'\u{1F4DC}'} Audit Log</h3>
+            <button onClick={() => exportCSV(auditLogs as unknown as Record<string, unknown>[], 'audit-log')} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-semibold">
+              {'\u{1F4E5}'} Export CSV
+            </button>
+          </div>
           <div className="space-y-2">
             {auditLogs.map((log) => (
               <div key={log.id} className="flex items-start gap-4 p-4 bg-zinc-800/30 rounded-xl">
@@ -795,31 +903,31 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Exchange Rate (PTS per $SHIT)</label>
-                <input type="number" defaultValue={12} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+                <input type="number" value={exchangeRate} onChange={(e) => setExchangeRate(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Min Convert Amount (PTS)</label>
-                <input type="number" defaultValue={100} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+                <input type="number" value={minConvert} onChange={(e) => setMinConvert(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Max Offers Per Hour</label>
-                <input type="number" defaultValue={10} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+                <input type="number" value={maxOffersPerHour} onChange={(e) => setMaxOffersPerHour(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Referral Commission (%)</label>
-                <input type="number" defaultValue={15} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+                <input type="number" value={referralCommission} onChange={(e) => setReferralCommission(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Min Withdrawal ($SHIT)</label>
-                <input type="number" defaultValue={25} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+                <input type="number" value={minWithdrawal} onChange={(e) => setMinWithdrawal(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
               </div>
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Withdrawal Fee (%)</label>
-                <input type="number" defaultValue={0.5} step={0.1} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+                <input type="number" value={withdrawalFee} onChange={(e) => setWithdrawalFee(Number(e.target.value))} step={0.1} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
               </div>
             </div>
-            <button className="mt-6 px-6 py-3 bg-amber-600 hover:bg-amber-500 rounded-xl font-semibold transition-all">
-              Save Config
+            <button onClick={handleSaveConfig} className={`mt-6 px-6 py-3 rounded-xl font-semibold transition-all ${configSaved ? 'bg-green-600' : 'bg-amber-600 hover:bg-amber-500'}`}>
+              {configSaved ? '\u2713 Config Saved!' : 'Save Config'}
             </button>
           </div>
 
@@ -870,15 +978,34 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 bg-zinc-800 rounded-xl">
-                  <div className="text-sm text-zinc-400">Total Earned</div>
+                  <div className="text-sm text-zinc-400">Total Loot</div>
                   <div className="text-xl font-bold text-amber-400">{selectedUser.total_earned.toLocaleString()} $SHIT</div>
                 </div>
                 <div className="p-3 bg-zinc-800 rounded-xl">
-                  <div className="text-sm text-zinc-400">Member Since</div>
+                  <div className="text-sm text-zinc-400">Recruited</div>
                   <div className="text-xl font-bold">{new Date(selectedUser.created_at).toLocaleDateString()}</div>
                 </div>
+                <div className="p-3 bg-zinc-800 rounded-xl">
+                  <div className="text-sm text-zinc-400">Last Active</div>
+                  <div className="text-xl font-bold">{new Date(selectedUser.last_active).toLocaleDateString()}</div>
+                </div>
+                <div className="p-3 bg-zinc-800 rounded-xl">
+                  <div className="text-sm text-zinc-400">Status</div>
+                  <div className="text-xl font-bold">{selectedUser.is_banned ? '\u{1F6AB} BANNED' : selectedUser.is_general ? '\u{1F451} GENERAL' : '\u2713 Active'}</div>
+                </div>
               </div>
-              <div className="flex gap-3 mt-6">
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Adjust Balance ($SHIT)</label>
+                <div className="flex gap-2">
+                  <input type="number" value={userEditBalance} onChange={(e) => setUserEditBalance(e.target.value)} placeholder="+500 or -200" className="flex-1 px-4 py-2 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+                  <button onClick={() => { if (userEditBalance) handleAdjustBalance(selectedUser.id, Number(userEditBalance)); }} className="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-xl font-semibold text-sm">Apply</button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Admin Note</label>
+                <textarea value={userEditNote} onChange={(e) => setUserEditNote(e.target.value)} placeholder="Internal notes..." className="w-full px-4 py-2 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none resize-none" rows={2} />
+              </div>
+              <div className="flex gap-3 mt-4">
                 <button 
                   onClick={() => { handleBanUser(selectedUser.id, !selectedUser.is_banned); setShowUserModal(false); }}
                   className={`flex-1 py-3 rounded-xl font-semibold ${
@@ -887,7 +1014,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                       : 'bg-red-500/20 text-red-400'
                   }`}
                 >
-                  {selectedUser.is_banned ? 'Unban User' : 'Ban User'}
+                  {selectedUser.is_banned ? 'Unban Degen' : 'Ban Degen'}
                 </button>
                 <button 
                   onClick={() => setShowUserModal(false)}
