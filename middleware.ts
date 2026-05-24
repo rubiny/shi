@@ -5,6 +5,9 @@ const ADMIN_PATHS = ['/admin', '/api/admin'];
 
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX = 100; // max requests per window
+const RATE_LIMIT_MAP_SIZE = 10_000; // max tracked IPs
+
+// Bounded LRU-like rate limit map — evicts oldest entries when full
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function getClientIp(request: NextRequest): string {
@@ -18,11 +21,29 @@ function isRateLimited(ip: string): boolean {
   const entry = rateLimitMap.get(ip);
 
   if (!entry || now > entry.resetAt) {
+    // Evict expired entries when map gets large
+    if (rateLimitMap.size >= RATE_LIMIT_MAP_SIZE) {
+      const keysToDelete: string[] = [];
+      for (const [key, val] of rateLimitMap) {
+        if (now > val.resetAt) keysToDelete.push(key);
+        if (keysToDelete.length >= RATE_LIMIT_MAP_SIZE / 2) break;
+      }
+      for (const key of keysToDelete) rateLimitMap.delete(key);
+      // If still too large, evict oldest (first in Map iteration order)
+      if (rateLimitMap.size >= RATE_LIMIT_MAP_SIZE) {
+        const oldest = rateLimitMap.keys().next().value;
+        if (oldest) rateLimitMap.delete(oldest);
+      }
+    }
+
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
     return false;
   }
 
+  // Re-insert to refresh LRU position
+  rateLimitMap.delete(ip);
   entry.count++;
+  rateLimitMap.set(ip, entry);
   return entry.count > RATE_LIMIT_MAX;
 }
 
@@ -65,12 +86,12 @@ export function middleware(request: NextRequest) {
       'Content-Security-Policy',
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.onesignal.com",
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.onesignal.com https://hcaptcha.com https://*.hcaptcha.com",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
         "img-src 'self' data: blob: https:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.offertoro.com https://api.adgem.com https://adscendmedia.com https://*.sentry.io https://*.onesignal.com https://*.google-analytics.com https://*.posthog.com https://*.mixpanel.com",
-        "frame-src 'self' https://www.offertoro.com https://wall.adgem.com https://adscendmedia.com",
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.offertoro.com https://api.adgem.com https://adscendmedia.com https://*.sentry.io https://*.onesignal.com https://*.google-analytics.com https://*.posthog.com https://*.mixpanel.com https://hcaptcha.com https://*.hcaptcha.com",
+        "frame-src 'self' https://www.offertoro.com https://wall.adgem.com https://adscendmedia.com https://hcaptcha.com https://*.hcaptcha.com",
         "worker-src 'self' blob:",
       ].join('; ')
     );

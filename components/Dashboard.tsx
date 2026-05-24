@@ -1,32 +1,34 @@
 ﻿"use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
 import KYCModal from './KYCModal';
-import ReferralPage from './ReferralPage';
-import SettingsPage from './SettingsPage';
-import AdminPanel from './AdminPanel';
-import BattlePass from './BattlePass';
-import Achievements from './Achievements';
-import Army from './Army';
-import Market from './Market';
 import OnboardingModal from './OnboardingModal';
-import Leaderboard from './Leaderboard';
 import ToastContainer from './ToastContainer';
-
 import DashboardNav from './DashboardNav';
-import SpinWheel from './SpinWheel';
-import MiniGames from './MiniGames';
-import VIPTiers from './VIPTiers';
-import FiatRamp from './FiatRamp';
-import AntiFraud from './AntiFraud';
-import MemeFeed from './MemeFeed';
-import Guilds from './Guilds';
-import SeasonalEvents from './SeasonalEvents';
 import Tooltip from './ui/Tooltip';
 import EmptyState from './ui/EmptyState';
-import { SkeletonDashboard, SkeletonOfferwall } from './SkeletonLoader';
 import ErrorBoundary from './ErrorBoundary';
+
+// Heavy components loaded dynamically
+const TabLoader = () => <div className="flex items-center justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" /></div>;
+const AdminPanel = dynamic(() => import('./AdminPanel'), { loading: TabLoader });
+const Army = dynamic(() => import('./Army'), { loading: TabLoader });
+const Market = dynamic(() => import('./Market'), { loading: TabLoader });
+const SpinWheel = dynamic(() => import('./SpinWheel'), { loading: TabLoader });
+const MiniGames = dynamic(() => import('./MiniGames'), { loading: TabLoader });
+const BattlePass = dynamic(() => import('./BattlePass'), { loading: TabLoader });
+const Achievements = dynamic(() => import('./Achievements'), { loading: TabLoader });
+const ReferralPage = dynamic(() => import('./ReferralPage'), { loading: TabLoader });
+const SettingsPage = dynamic(() => import('./SettingsPage'), { loading: TabLoader });
+const VIPTiers = dynamic(() => import('./VIPTiers'), { loading: TabLoader });
+const FiatRamp = dynamic(() => import('./FiatRamp'), { loading: TabLoader });
+const AntiFraud = dynamic(() => import('./AntiFraud'), { loading: TabLoader });
+const MemeFeed = dynamic(() => import('./MemeFeed'), { loading: TabLoader });
+const Guilds = dynamic(() => import('./Guilds'), { loading: TabLoader });
+const SeasonalEvents = dynamic(() => import('./SeasonalEvents'), { loading: TabLoader });
+const Leaderboard = dynamic(() => import('./Leaderboard'), { loading: TabLoader });
 
 import { useDashboard } from '@/hooks/useDashboard';
 import { getRank } from '@/lib/types';

@@ -3,116 +3,73 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, subscribeToBalance, subscribeToOffers, callEdgeFunction } from '@/lib/supabase';
 import { CONFIG } from '@/lib/config';
-import type { StakedPosition, Transaction, Quest, OfferBoost, ActiveOffer, Offer, OwnedNFT, MarketplaceListing, Notification } from '@/lib/types';
+import type { StakedPosition, Transaction, Quest, OfferBoost, ActiveOffer, Offer, OwnedNFT, MarketplaceListing } from '@/lib/types';
 import { MARKETPLACE_LISTINGS, LEADERBOARD } from '@/lib/constants';
 import { sfx } from '@/lib/sounds';
 import { fireWinConfetti, firePurchaseConfetti } from '@/lib/confetti';
 
+// Composed hooks
+import { useBalance } from './useBalance';
+import { useNotifications } from './useNotifications';
+import { useTransactions } from './useTransactions';
+import { useBattlePass } from './useBattlePass';
+import { useStaking } from './useStaking';
+
 export function useDashboard() {
-  // User & Auth State
+  // Composed hooks
+  const balance = useBalance();
+  const notif = useNotifications();
+  const txs = useTransactions();
+  const bp = useBattlePass(notif.triggerSuccess);
+
+  // User & Auth
   const [userId, setUserId] = useState<string | null>(null);
   const [isGeneral, setIsGeneral] = useState(true);
-
-  // Toast System
-  const [toasts] = useState<Array<{ id: string; message: string }>>([]);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-
-  // Loading States
   const [loading, setLoading] = useState(true);
   const [loadingOffers] = useState(false);
-
-  // Data States
-  const [shitBalance, setShitBalance] = useState(0);
-  const [points, setPoints] = useState(0);
-  const [totalEarned, setTotalEarned] = useState(0);
-  const [dailyStreak, setDailyStreak] = useState(0);
-  const [lastDailyClaim, setLastDailyClaim] = useState<string | null>(null);
-  const [hasClaimedAirdrop, setHasClaimedAirdrop] = useState(false);
-  const [battlePassXP, setBattlePassXP] = useState(0);
-  const [claimedTiers, setClaimedTiers] = useState<number[]>([]);
   const [kycStatus, setKycStatus] = useState<'none' | 'pending' | 'verified' | 'rejected'>('none');
-  const [vipTier, setVipTier] = useState(0);
 
-  // Data from Supabase
+  // Offers
   const [offers, setOffers] = useState<Offer[]>([]);
   const [userOffers, setUserOffers] = useState<Array<Record<string, unknown>>>([]);
   const [quests, setQuests] = useState<Quest[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [stakedPositions, setStakedPositions] = useState<StakedPosition[]>([]);
+  const [offerBoosts, setOfferBoosts] = useState<OfferBoost[]>([]);
+  const [activeOffers, setActiveOffers] = useState<ActiveOffer[]>([]);
 
-  // Local UI States
-  const [stakeAmount, setStakeAmount] = useState("");
-  const [stakeLock, setStakeLock] = useState(30);
+  // Army & Market
+  const [activeMissions, setActiveMissions] = useState(2);
+  const [squadPower, setSquadPower] = useState(450);
+  const [activeBoosts, setActiveBoosts] = useState<Array<{ name: string; effect: string; expiresAt: Date }>>([]);
   const [marketListings, setMarketListings] = useState(MARKETPLACE_LISTINGS);
   const [ownedNFTs, setOwnedNFTs] = useState<OwnedNFT[]>([]);
   const [leaderboard] = useState(LEADERBOARD);
 
-  // Offer Boosts
-  const [offerBoosts, setOfferBoosts] = useState<OfferBoost[]>([]);
-  const [activeOffers, setActiveOffers] = useState<ActiveOffer[]>([]);
-
-  // Active army missions and squad power
-  const [activeMissions, setActiveMissions] = useState(2);
-  const [squadPower, setSquadPower] = useState(450);
-  const [activeBoosts, setActiveBoosts] = useState<Array<{ name: string; effect: string; expiresAt: Date }>>([]);
-
-  // Notification center
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-
-  const sendBrowserNotification = useCallback((title: string, body: string) => {
-    if (typeof window === 'undefined') return;
-    if (document.visibilityState === 'visible') return;
-    if (!('Notification' in window)) return;
-    if (window.Notification.permission === 'granted') {
-      new window.Notification(title, { body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png' });
-    } else if (window.Notification.permission !== 'denied') {
-      window.Notification.requestPermission();
-    }
+  // Quest progress
+  const updateQuestProgress = useCallback((type: 'offer' | 'stake' | 'market' | 'referral', increment: number = 1) => {
+    setQuests(prev => prev.map(q => {
+      if (q.claimed) return q;
+      let shouldIncrement = false;
+      if (type === 'offer' && q.title.toLowerCase().includes('offer')) shouldIncrement = true;
+      if (type === 'stake' && q.title.toLowerCase().includes('stake')) shouldIncrement = true;
+      if (type === 'market' && q.title.toLowerCase().includes('marketplace')) shouldIncrement = true;
+      if (type === 'referral' && q.title.toLowerCase().includes('refer')) shouldIncrement = true;
+      if (q.category === 'milestone' && q.title.toLowerCase().includes('shit general') && type === 'offer') shouldIncrement = true;
+      if (!shouldIncrement) return q;
+      return { ...q, progress: Math.min(q.max, q.progress + increment) };
+    }));
   }, []);
 
-  const addNotification = useCallback((title: string, message: string, type: Notification['type'] = 'success') => {
-    setNotifications(prev => [{
-      id: `n-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      title, message, type,
-      timestamp: new Date(),
-      read: false,
-    }, ...prev].slice(0, 50));
-  }, []);
+  // Staking (composed)
+  const staking = useStaking({
+    shitBalance: balance.shitBalance,
+    setShitBalance: balance.setShitBalance,
+    triggerSuccess: notif.triggerSuccess,
+    addTransaction: txs.addTransaction,
+    gainBattlePassXP: bp.gainBattlePassXP,
+    updateQuestProgress,
+  });
 
-  const markNotificationRead = useCallback((id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  }, []);
-
-  const clearAllNotifications = useCallback(() => {
-    setNotifications([]);
-  }, []);
-
-  // Toast helper
-  const triggerSuccess = useCallback((message: string) => {
-    setSuccessMessage(message);
-    setShowSuccess(true);
-    sfx.notification();
-    addNotification(
-      message.length > 40 ? message.slice(0, 40) + '…' : message,
-      message,
-      message.toLowerCase().includes('fail') || message.toLowerCase().includes('not enough') ? 'error' : 'success'
-    );
-    sendBrowserNotification('SHIT.ARMY', message);
-    setTimeout(() => setShowSuccess(false), 2600);
-  }, [addNotification, sendBrowserNotification]);
-
-  // Transaction helper
-  const addTransaction = useCallback((tx: Omit<Transaction, 'id' | 'timestamp'>) => {
-    const newTx: Transaction = {
-      ...tx,
-      id: `tx-${Date.now()}`,
-      timestamp: new Date(),
-    };
-    setTransactions(prev => [newTx, ...prev]);
-  }, []);
-
-  // Fetch user data
+  // Fetch user data from Supabase
   const fetchUserData = useCallback(async (uid: string) => {
     try {
       setLoading(true);
@@ -133,11 +90,7 @@ export function useDashboard() {
         setIsGeneral(profileRes.data.is_general && (!profileRes.data.general_expires_at || new Date(profileRes.data.general_expires_at) > new Date()));
       }
       if (balanceRes.data) {
-        setShitBalance(Number(balanceRes.data.shit_balance) || 0);
-        setPoints(balanceRes.data.points || 0);
-        setTotalEarned(Number(balanceRes.data.total_earned) || 0);
-        setDailyStreak(balanceRes.data.daily_streak || 0);
-        setLastDailyClaim(balanceRes.data.last_daily_claim);
+        balance.loadBalanceData(balanceRes.data);
       }
       if (kycRes.data) setKycStatus(kycRes.data.status || 'none');
       if (offersRes.data) setOffers(offersRes.data);
@@ -157,68 +110,79 @@ export function useDashboard() {
         setQuests(questsRes.data.map((uq: Record<string, unknown>) => {
           const q = uq.quests as Record<string, unknown>;
           return {
-            id: q.id as number, title: q.title as string, description: q.description as string,
-            category: q.category as Quest['category'], progress: uq.progress as number,
-            max: q.max_progress as number, reward: q.reward as number, icon: q.icon as string,
-            claimed: uq.is_claimed as boolean, completed: uq.is_completed as boolean,
+            id: q.id as number,
+            title: q.title as string,
+            description: q.description as string,
+            category: q.category as Quest['category'],
+            progress: uq.progress as number,
+            max: q.max_progress as number,
+            reward: q.reward as number,
+            icon: q.icon as string,
+            claimed: uq.is_claimed as boolean,
+            completed: (uq.progress as number) >= (q.max_progress as number),
           };
         }));
       }
       if (transactionsRes.data) {
-        setTransactions(transactionsRes.data.map((t: Record<string, unknown>) => ({
-          id: t.id as string, type: t.type as Transaction['type'], amount: Number(t.amount),
-          description: t.description as string, timestamp: new Date(t.created_at as string), status: t.status as Transaction['status'],
+        txs.loadTransactions(transactionsRes.data.map((t: Record<string, unknown>) => ({
+          id: t.id as string,
+          type: t.type as Transaction['type'],
+          amount: t.amount as number,
+          description: t.description as string,
+          timestamp: new Date(t.created_at as string),
+          status: t.status as Transaction['status'],
         })));
       }
       if (bpRes.data) {
-        setBattlePassXP(bpRes.data.xp || 0);
-        setClaimedTiers(bpRes.data.claimed_tiers || []);
+        bp.setBattlePassXP(bpRes.data.xp || 0);
+        bp.setClaimedTiers(bpRes.data.claimed_tiers || []);
       }
       if (stakingRes.data) {
-        setStakedPositions(stakingRes.data.map((s: Record<string, unknown>) => ({
-          id: s.id as number, amount: Number(s.amount), lockDays: s.lock_days as number,
-          apy: s.apy as number, unlockDate: new Date(s.unlocks_at as string).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
-          rewards: Number(s.rewards),
+        staking.loadStakedPositions(stakingRes.data.map((s: Record<string, unknown>) => ({
+          id: s.id as number,
+          amount: Number(s.amount),
+          lockDays: s.lock_days as number,
+          apy: s.apy as number,
+          unlockDate: new Date(s.unlock_at as string).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+          rewards: Number(s.estimated_reward) || 0,
         })));
       }
       if (boostsRes.data) {
         setOfferBoosts(boostsRes.data.map((b: Record<string, unknown>) => ({
-          id: b.id as string, offerId: (b.offers as Record<string, unknown>)?.id as number || b.offer_id as number,
-          multiplier: b.multiplier as 2 | 3, expiresAt: new Date(b.expires_at as string),
+          id: b.id as string,
+          offerId: (b.offers as Record<string, unknown>)?.id as number,
+          multiplier: b.multiplier as 2 | 3,
+          expiresAt: new Date(b.expires_at as string),
         })));
       }
     } catch (error) {
-      console.error('Fetch user data error:', error);
+      if (process.env.NODE_ENV === 'development') console.error('Fetch error:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [balance, txs, bp, staking]);
 
-  // Mock data loader
+  // Mock data for development
   const loadMockData = useCallback(() => {
-    setShitBalance(1240);
-    setPoints(8740);
-    setTotalEarned(3240);
-    setDailyStreak(7);
-    setLastDailyClaim(new Date(Date.now() - 86400000).toISOString());
-    setBattlePassXP(1850);
-    setClaimedTiers([1, 2]);
+    balance.loadBalanceData({ shit_balance: 1247, points: 8740, total_earned: 3240, daily_streak: 7, last_daily_claim: new Date(Date.now() - 86400000).toISOString() });
+    bp.setBattlePassXP(1850);
+    bp.setClaimedTiers([1, 2]);
     setKycStatus('none');
 
     setQuests([
-      { id: 1, title: "Complete 2 Offers", description: "Finish any 2 offers from the offerwall", category: "daily", progress: 1, max: 2, reward: 300, icon: "⚡", claimed: false },
-      { id: 2, title: "Stake 100 $SHIT", description: "Lock 100 $SHIT in any staking pool", category: "daily", progress: 0, max: 1, reward: 200, icon: "🏆", claimed: false },
-      { id: 3, title: "Visit Marketplace", description: "Browse the NFT marketplace", category: "daily", progress: 1, max: 1, reward: 50, icon: "🛒", claimed: true, completed: true },
-      { id: 4, title: "Complete 10 Offers", description: "Finish 10 offers this week", category: "weekly", progress: 4, max: 10, reward: 1500, icon: "🔥", claimed: false },
-      { id: 5, title: "Earn 5,000 $SHIT", description: "Reach 5,000 total earned this week", category: "weekly", progress: 3240, max: 5000, reward: 2000, icon: "💰", claimed: false },
-      { id: 6, title: "Refer 5 Friends", description: "Get 5 friends to join Shit Army", category: "weekly", progress: 3, max: 5, reward: 2500, icon: "👥", claimed: false },
-      { id: 7, title: "First Shit", description: "Complete your first offer ever", category: "milestone", progress: 1, max: 1, reward: 500, icon: "💩", claimed: true, completed: true },
-      { id: 8, title: "Offerwall Legend", description: "Complete 50 offers total", category: "milestone", progress: 12, max: 50, reward: 5000, icon: "🏆", claimed: false },
-      { id: 9, title: "Diamond Hands", description: "Stake $SHIT for 90 days total", category: "milestone", progress: 30, max: 90, reward: 10000, icon: "💎", claimed: false },
-      { id: 10, title: "Shit General", description: "Reach 100,000 $SHIT earned", category: "milestone", progress: 3240, max: 100000, reward: 25000, icon: "⭐", claimed: false },
+      { id: 1, title: 'Complete 2 Offers', description: 'Finish any 2 offers from the offerwall', category: 'daily', progress: 1, max: 2, reward: 300, icon: '\u26A1', claimed: false },
+      { id: 2, title: 'Stake 100 $SHIT', description: 'Lock 100 $SHIT in any staking pool', category: 'daily', progress: 0, max: 1, reward: 200, icon: '\u{1F3C6}', claimed: false },
+      { id: 3, title: 'Visit Marketplace', description: 'Browse the NFT marketplace', category: 'daily', progress: 1, max: 1, reward: 50, icon: '\u{1F6D2}', claimed: true, completed: true },
+      { id: 4, title: 'Complete 10 Offers', description: 'Finish 10 offers this week', category: 'weekly', progress: 4, max: 10, reward: 1500, icon: '\u{1F525}', claimed: false },
+      { id: 5, title: 'Earn 5,000 $SHIT', description: 'Reach 5,000 total earned this week', category: 'weekly', progress: 3240, max: 5000, reward: 2000, icon: '\u{1F4B0}', claimed: false },
+      { id: 6, title: 'Refer 5 Friends', description: 'Get 5 friends to join Shit Army', category: 'weekly', progress: 3, max: 5, reward: 2500, icon: '\u{1F465}', claimed: false },
+      { id: 7, title: 'First Shit', description: 'Complete your first offer ever', category: 'milestone', progress: 1, max: 1, reward: 500, icon: '\u{1F4A9}', claimed: true, completed: true },
+      { id: 8, title: 'Offerwall Legend', description: 'Complete 50 offers total', category: 'milestone', progress: 12, max: 50, reward: 5000, icon: '\u{1F3C6}', claimed: false },
+      { id: 9, title: 'Diamond Hands', description: 'Stake $SHIT for 90 days total', category: 'milestone', progress: 30, max: 90, reward: 10000, icon: '\u{1F48E}', claimed: false },
+      { id: 10, title: 'Shit General', description: 'Reach 100,000 $SHIT earned', category: 'milestone', progress: 3240, max: 100000, reward: 25000, icon: '\u2B50', claimed: false },
     ]);
 
-    setTransactions([
+    txs.loadTransactions([
       { id: 'tx-1', type: 'offer', amount: 175, description: 'Crypto Habits Survey 2026', timestamp: new Date(Date.now() - 1000 * 60 * 30), status: 'completed' },
       { id: 'tx-2', type: 'daily', amount: 290, description: 'Daily bonus (Streak: 7)', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4), status: 'completed' },
       { id: 'tx-3', type: 'stake', amount: -450, description: 'Staked 450 $SHIT (30 days)', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), status: 'completed' },
@@ -234,23 +198,20 @@ export function useDashboard() {
       { id: 'ao-1', offerId: 2, progress: 35, status: 'in_progress', startedAt: new Date(Date.now() - 1000 * 60 * 5), estimatedReward: 2100 },
     ]);
 
-    setStakedPositions([
+    staking.loadStakedPositions([
       { id: 1, amount: 450, lockDays: 30, apy: 48, unlockDate: new Date(Date.now() + 30 * 86400000).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }), rewards: 18.4 },
     ]);
 
     setOwnedNFTs([
-      { id: 1, name: "Poop Soldier #1001", rank: "Rare", power: 52 },
-      { id: 2, name: "Poop Soldier #1002", rank: "Epic", power: 78 },
+      { id: 1, name: 'Poop Soldier #1001', rank: 'Rare', power: 52 },
+      { id: 2, name: 'Poop Soldier #1002', rank: 'Epic', power: 78 },
     ]);
 
-    // Seed some initial notifications
-    setNotifications([
-      { id: 'n-1', title: 'Welcome back!', message: 'Your 7-day streak continues 🔥', type: 'info', timestamp: new Date(Date.now() - 60000), read: false },
-      { id: 'n-2', title: 'Offer completed', message: 'Crypto Habits Survey 2026 — +175 $SHIT', type: 'success', timestamp: new Date(Date.now() - 1800000), read: true },
-    ]);
-  }, []);
+    notif.addNotification('Welcome back!', 'Your 7-day streak continues', 'info');
+    notif.addNotification('Offer completed', 'Crypto Habits Survey 2026 — +175 $SHIT', 'success');
+  }, [balance, bp, txs, staking, notif]);
 
-  // Initialize user
+  // Init
   useEffect(() => {
     const initUser = async () => {
       try {
@@ -259,71 +220,34 @@ export function useDashboard() {
           setUserId(user.id);
           await fetchUserData(user.id);
         } else {
-          process.env.NODE_ENV === 'development' && console.log('Development mode: Loading mock data');
-          loadMockData();
+          if (process.env.NODE_ENV === 'development') {
+            loadMockData();
+          }
           setLoading(false);
         }
       } catch (error) {
-        console.error('Auth error:', error);
+        if (process.env.NODE_ENV === 'development') console.error('Auth error:', error);
         setLoading(false);
       }
     };
     initUser();
   }, [fetchUserData, loadMockData]);
 
-  // Real-time subscriptions
+  // Realtime subscriptions
   useEffect(() => {
     if (!userId) return;
     const balanceSubscription = subscribeToBalance(userId, (newBalance) => {
-      setShitBalance(Number(newBalance.shit_balance) || 0);
-      setPoints(newBalance.points || 0);
-      setTotalEarned(Number(newBalance.total_earned) || 0);
-      setDailyStreak(newBalance.daily_streak || 0);
+      balance.loadBalanceData(newBalance);
     });
-    const offerSubscription = subscribeToOffers(userId, (payload) => {
-      triggerSuccess(`Offer completed! +${payload.reward} points`);
+    const offerSubscription = subscribeToOffers(userId, () => {
+      notif.triggerSuccess('Offer completed! Points credited.');
       fetchUserData(userId);
     });
     return () => {
       balanceSubscription?.unsubscribe();
       offerSubscription?.unsubscribe();
     };
-  }, [userId, fetchUserData, triggerSuccess]);
-
-  // Battle Pass
-  const XP_PER_TIER = CONFIG.BUSINESS.BATTLE_PASS.XP_PER_TIER || 500;
-  const MAX_TIER = CONFIG.BUSINESS.BATTLE_PASS.MAX_TIER || 20;
-  const currentTier = Math.min(Math.floor(battlePassXP / XP_PER_TIER) + 1, MAX_TIER);
-  const tierProgress = ((battlePassXP % XP_PER_TIER) / XP_PER_TIER) * 100;
-  const streakMultiplier = Math.min(Math.floor(dailyStreak / 2) * 5, 35);
-
-  const gainBattlePassXP = useCallback((amount: number) => {
-    setBattlePassXP(prev => {
-      const newXP = prev + amount;
-      const newTier = Math.min(Math.floor(newXP / XP_PER_TIER) + 1, MAX_TIER);
-      const oldTier = Math.min(Math.floor(prev / XP_PER_TIER) + 1, MAX_TIER);
-      if (newTier > oldTier) {
-        sfx.levelUp();
-        fireWinConfetti();
-        setTimeout(() => triggerSuccess(`Battle Pass Tier ${newTier} unlocked! 🎉`), 200);
-      }
-      return newXP;
-    });
-  }, [XP_PER_TIER, MAX_TIER, triggerSuccess]);
-
-  const updateQuestProgress = useCallback((type: 'offer' | 'stake' | 'market' | 'referral', increment: number = 1) => {
-    setQuests(prev => prev.map(q => {
-      if (q.claimed) return q;
-      let shouldIncrement = false;
-      if (type === 'offer' && q.title.toLowerCase().includes('offer')) shouldIncrement = true;
-      if (type === 'stake' && q.title.toLowerCase().includes('stake')) shouldIncrement = true;
-      if (type === 'market' && q.title.toLowerCase().includes('marketplace')) shouldIncrement = true;
-      if (type === 'referral' && q.title.toLowerCase().includes('refer')) shouldIncrement = true;
-      if (q.category === 'milestone' && q.title.toLowerCase().includes('shit general') && type === 'offer') shouldIncrement = true;
-      if (!shouldIncrement) return q;
-      return { ...q, progress: Math.min(q.max, q.progress + increment) };
-    }));
-  }, []);
+  }, [userId, fetchUserData, notif, balance]);
 
   // Rate limit for convert
   const [lastConvertTime, setLastConvertTime] = useState(0);
@@ -332,75 +256,46 @@ export function useDashboard() {
   const convertPoints = useCallback(() => {
     const now = Date.now();
     if (now - lastConvertTime < 30000) {
-      triggerSuccess("Slow down ser! Wait 30s between converts");
+      notif.triggerSuccess('Slow down ser! Wait 30s between converts');
       return;
     }
     const exchangeRate = CONFIG.BUSINESS.OFFERWALL.EXCHANGE_RATE;
     const minConvert = CONFIG.BUSINESS.OFFERWALL.MIN_CONVERT;
-    if (points < minConvert) {
-      triggerSuccess(`Need at least ${minConvert} PTS to convert!`);
+    if (balance.points < minConvert) {
+      notif.triggerSuccess(`Need at least ${minConvert} PTS to convert!`);
       return;
     }
-    const shitEarned = Math.floor(points / exchangeRate);
-    setShitBalance(prev => prev + shitEarned);
-    setTotalEarned(prev => prev + shitEarned);
-    setPoints(0);
+    const shitEarned = Math.floor(balance.points / exchangeRate);
+    balance.setShitBalance(prev => prev + shitEarned);
+    balance.setTotalEarned(prev => prev + shitEarned);
+    balance.setPoints(0);
     setLastConvertTime(now);
     sfx.purchase();
-    triggerSuccess(`Converted ${points} PTS → ${shitEarned} $SHIT!`);
-    addTransaction({ type: 'offer', amount: shitEarned, description: `Converted ${points} PTS to $SHIT`, status: 'completed' });
-  }, [points, lastConvertTime, triggerSuccess, addTransaction]);
-
-  const stakeTokens = useCallback(() => {
-    const amount = parseInt(stakeAmount);
-    if (!amount || amount <= 0) {
-      triggerSuccess("Enter a valid amount to stake");
-      return;
-    }
-    if (amount > shitBalance) {
-      triggerSuccess("Not enough $SHIT to stake!");
-      return;
-    }
-    const apy = stakeLock === 7 ? 32 : stakeLock === 30 ? 48 : 67;
-    const newPosition: StakedPosition = {
-      id: Date.now(), amount, lockDays: stakeLock, apy,
-      unlockDate: new Date(Date.now() + stakeLock * 86400000).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
-      rewards: Math.floor(amount * apy / 1200),
-    };
-    setStakedPositions(prev => [...prev, newPosition]);
-    setShitBalance(prev => prev - amount);
-    setStakeAmount("");
-    sfx.purchase();
-    triggerSuccess(`Staked ${amount} $SHIT for ${stakeLock} days! ${apy}% APY 🔥`);
-    addTransaction({ type: 'stake', amount: -amount, description: `Staked ${amount} $SHIT (${stakeLock} days, ${apy}% APY)`, status: 'completed' });
-    gainBattlePassXP(30);
-    updateQuestProgress('stake');
-  }, [stakeAmount, shitBalance, stakeLock, triggerSuccess, addTransaction, gainBattlePassXP, updateQuestProgress]);
+    notif.triggerSuccess(`Converted ${balance.points} PTS \u2192 ${shitEarned} $SHIT!`);
+    txs.addTransaction({ type: 'offer', amount: shitEarned, description: `Converted ${balance.points} PTS to $SHIT`, status: 'completed' });
+  }, [balance, lastConvertTime, notif, txs]);
 
   const claimDailyBonus = useCallback(async () => {
     if (!userId) {
-      // Mock mode
-      if (lastDailyClaim && new Date(lastDailyClaim).toDateString() === new Date().toDateString()) {
-        triggerSuccess("Daily bonus already claimed today!");
+      if (balance.lastDailyClaim && new Date(balance.lastDailyClaim).toDateString() === new Date().toDateString()) {
+        notif.triggerSuccess('Daily bonus already claimed today!');
         return;
       }
       const baseAmount = CONFIG.BUSINESS.DAILY_BONUS.BASE_AMOUNT;
-      const streakBonus = Math.floor(baseAmount * streakMultiplier / 100);
+      const streakBonus = Math.floor(baseAmount * balance.streakMultiplier / 100);
       const total = baseAmount + streakBonus;
-      setShitBalance(prev => prev + total);
-      setTotalEarned(prev => prev + total);
-      setDailyStreak(prev => prev + 1);
-      setLastDailyClaim(new Date().toISOString());
+      balance.setShitBalance(prev => prev + total);
+      balance.setTotalEarned(prev => prev + total);
       sfx.win();
       fireWinConfetti();
-      triggerSuccess(`Daily bonus! +${total} $SHIT (Streak: ${dailyStreak + 1} days) 🔥`);
-      addTransaction({ type: 'daily', amount: total, description: `Daily bonus (Streak: ${dailyStreak + 1})`, status: 'completed' });
-      gainBattlePassXP(20);
+      notif.triggerSuccess(`Daily bonus! +${total} $SHIT (Streak: ${balance.dailyStreak + 1} days)`);
+      txs.addTransaction({ type: 'daily', amount: total, description: `Daily bonus (Streak: ${balance.dailyStreak + 1})`, status: 'completed' });
+      bp.gainBattlePassXP(20);
       return;
     }
     try {
-      if (lastDailyClaim && new Date(lastDailyClaim).toDateString() === new Date().toDateString()) {
-        triggerSuccess("Daily bonus already claimed today!");
+      if (balance.lastDailyClaim && new Date(balance.lastDailyClaim).toDateString() === new Date().toDateString()) {
+        notif.triggerSuccess('Daily bonus already claimed today!');
         return;
       }
       const { data, error } = await supabase.rpc('claim_daily_bonus', { p_user_id: userId });
@@ -408,44 +303,44 @@ export function useDashboard() {
       if (data.success) {
         sfx.win();
         fireWinConfetti();
-        triggerSuccess(`Daily bonus claimed! +${data.shit_earned} $SHIT (Streak: ${data.new_streak} days) 🔥`);
+        notif.triggerSuccess(`Daily bonus claimed! +${data.shit_earned} $SHIT (Streak: ${data.new_streak} days)`);
         await fetchUserData(userId);
       } else {
-        triggerSuccess("Failed to claim daily bonus");
+        notif.triggerSuccess('Failed to claim daily bonus');
       }
     } catch (error) {
-      console.error('Daily bonus error:', error);
-      triggerSuccess("Failed to claim daily bonus");
+      if (process.env.NODE_ENV === 'development') console.error('Daily bonus error:', error);
+      notif.triggerSuccess('Failed to claim daily bonus');
     }
-  }, [userId, lastDailyClaim, streakMultiplier, dailyStreak, triggerSuccess, addTransaction, gainBattlePassXP, fetchUserData]);
+  }, [userId, balance, notif, txs, bp, fetchUserData]);
 
   const claimAirdrop = useCallback(() => {
-    if (totalEarned < 5000 || hasClaimedAirdrop) return;
-    const airdropAmount = totalEarned >= 25000 ? 1500 : totalEarned >= 10000 ? 600 : 250;
-    setShitBalance(prev => prev + airdropAmount);
-    setTotalEarned(prev => prev + airdropAmount);
-    setHasClaimedAirdrop(true);
+    if (balance.totalEarned < 5000 || balance.hasClaimedAirdrop) return;
+    const airdropAmount = balance.totalEarned >= 25000 ? 1500 : balance.totalEarned >= 10000 ? 600 : 250;
+    balance.setShitBalance(prev => prev + airdropAmount);
+    balance.setTotalEarned(prev => prev + airdropAmount);
+    balance.setHasClaimedAirdrop(true);
     sfx.levelUp();
     fireWinConfetti();
-    triggerSuccess(`Airdrop claimed! +${airdropAmount} $SHIT 🪂`);
-    addTransaction({ type: 'airdrop', amount: airdropAmount, description: `Airdrop claim (${totalEarned >= 25000 ? 'Legendary' : totalEarned >= 10000 ? 'Epic' : 'Rare'} tier)`, status: 'completed' });
-  }, [totalEarned, hasClaimedAirdrop, triggerSuccess, addTransaction]);
+    notif.triggerSuccess(`Airdrop claimed! +${airdropAmount} $SHIT`);
+    txs.addTransaction({ type: 'airdrop', amount: airdropAmount, description: `Airdrop claim (${balance.totalEarned >= 25000 ? 'Legendary' : balance.totalEarned >= 10000 ? 'Epic' : 'Rare'} tier)`, status: 'completed' });
+  }, [balance, notif, txs]);
 
   const startOffer = useCallback(async (offer: Offer) => {
     if (!userId) return;
     const existing = userOffers.find((a: Record<string, unknown>) => a.offer_id === offer.id);
-    if (existing) { triggerSuccess("Offer already in progress!"); return; }
+    if (existing) { notif.triggerSuccess('Offer already in progress!'); return; }
     try {
       const { data, error } = await supabase.rpc('start_offer', { p_offer_id: offer.id, p_user_id: userId });
       if (error) throw error;
-      if (data.status === 'already_started') { triggerSuccess("Offer already in progress!"); return; }
+      if (data.status === 'already_started') { notif.triggerSuccess('Offer already in progress!'); return; }
       await fetchUserData(userId);
-      triggerSuccess(`Started: ${offer.title} — track progress live! 🚀`);
+      notif.triggerSuccess(`Started: ${offer.title}`);
     } catch (error) {
-      console.error('Start offer error:', error);
-      triggerSuccess("Failed to start offer");
+      if (process.env.NODE_ENV === 'development') console.error('Start offer error:', error);
+      notif.triggerSuccess('Failed to start offer');
     }
-  }, [userId, userOffers, fetchUserData, triggerSuccess]);
+  }, [userId, userOffers, fetchUserData, notif]);
 
   const completeOffer = useCallback(async (offer: Offer, userOfferId: string) => {
     if (!userId) return;
@@ -454,16 +349,16 @@ export function useDashboard() {
       if (result.success) {
         sfx.win();
         fireWinConfetti();
-        triggerSuccess(`+${result.points_earned} PTS | +${result.shit_earned} $SHIT earned! 🪖`);
+        notif.triggerSuccess(`+${result.points_earned} PTS | +${result.shit_earned} $SHIT earned!`);
         await fetchUserData(userId);
       } else {
-        triggerSuccess("Failed to claim reward");
+        notif.triggerSuccess('Failed to claim reward');
       }
     } catch (error) {
-      console.error('Claim error:', error);
-      triggerSuccess("Failed to claim reward");
+      if (process.env.NODE_ENV === 'development') console.error('Claim error:', error);
+      notif.triggerSuccess('Failed to claim reward');
     }
-  }, [userId, fetchUserData, triggerSuccess]);
+  }, [userId, fetchUserData, notif]);
 
   const claimQuest = useCallback(async (questId: number) => {
     if (!userId) return;
@@ -475,46 +370,75 @@ export function useDashboard() {
       const { error: balanceError } = await supabase.rpc('claim_quest_reward', { p_user_id: userId, p_quest_id: questId, p_reward: quest.reward });
       if (balanceError) throw balanceError;
       sfx.win();
-      triggerSuccess(`Quest completed! +${quest.reward} $SHIT 🎯`);
+      notif.triggerSuccess(`Quest completed! +${quest.reward} $SHIT`);
       await fetchUserData(userId);
     } catch (error) {
-      console.error('Claim quest error:', error);
-      triggerSuccess("Failed to claim quest");
+      if (process.env.NODE_ENV === 'development') console.error('Claim quest error:', error);
+      notif.triggerSuccess('Failed to claim quest');
     }
-  }, [userId, quests, fetchUserData, triggerSuccess]);
+  }, [userId, quests, fetchUserData, notif]);
 
   const buyNFT = useCallback((listing: MarketplaceListing) => {
-    if (shitBalance < listing.price) { triggerSuccess("Not enough $SHIT!"); sfx.error(); return; }
+    if (balance.shitBalance < listing.price) { notif.triggerSuccess('Not enough $SHIT!'); sfx.error(); return; }
     const newNFT: OwnedNFT = { id: Date.now(), name: listing.name, rank: listing.rank, power: listing.power };
     setOwnedNFTs(prev => [...prev, newNFT]);
-    setShitBalance(prev => prev - listing.price);
+    balance.setShitBalance(prev => prev - listing.price);
     setMarketListings(prev => prev.filter(l => l.id !== listing.id));
     sfx.purchase();
     firePurchaseConfetti();
-    triggerSuccess(`Bought ${listing.name} for ${listing.price} $SHIT!`);
-    addTransaction({ type: 'nft', amount: -listing.price, description: `Bought ${listing.name}`, status: 'completed' });
+    notif.triggerSuccess(`Bought ${listing.name} for ${listing.price} $SHIT!`);
+    txs.addTransaction({ type: 'nft', amount: -listing.price, description: `Bought ${listing.name}`, status: 'completed' });
     updateQuestProgress('market');
-  }, [shitBalance, triggerSuccess, addTransaction, updateQuestProgress]);
+  }, [balance, notif, txs, updateQuestProgress]);
 
+  // Return flat API (backward compatible)
   return {
     // State
-    userId, isGeneral, loading, loadingOffers, shitBalance, points, totalEarned, dailyStreak,
-    lastDailyClaim, hasClaimedAirdrop, battlePassXP, claimedTiers, kycStatus, vipTier, activeMissions, squadPower, activeBoosts,
-    offers, userOffers, quests, transactions, stakedPositions, stakeAmount, stakeLock,
-    marketListings, ownedNFTs, leaderboard, offerBoosts, activeOffers, showSuccess, successMessage,
-    notifications, toasts,
+    userId, isGeneral, loading, loadingOffers, kycStatus, activeMissions, squadPower, activeBoosts,
+    offers, userOffers, quests, offerBoosts, activeOffers,
+    marketListings, ownedNFTs, leaderboard,
 
-    // Computed
-    currentTier, tierProgress, streakMultiplier, XP_PER_TIER, MAX_TIER,
+    // From useBalance
+    shitBalance: balance.shitBalance, setShitBalance: balance.setShitBalance,
+    points: balance.points, setPoints: balance.setPoints,
+    totalEarned: balance.totalEarned, setTotalEarned: balance.setTotalEarned,
+    dailyStreak: balance.dailyStreak,
+    lastDailyClaim: balance.lastDailyClaim,
+    hasClaimedAirdrop: balance.hasClaimedAirdrop,
+    vipTier: balance.vipTier, setVipTier: balance.setVipTier,
+    streakMultiplier: balance.streakMultiplier,
+    setIsGeneral, setKycStatus,
 
-    // Setters
-    setShitBalance, setPoints, setTotalEarned, setIsGeneral, setKycStatus, setVipTier,
-    setStakeAmount, setStakeLock, setClaimedTiers, setBattlePassXP, setActiveMissions, setSquadPower, setActiveBoosts,
+    // From useBattlePass
+    battlePassXP: bp.battlePassXP, setBattlePassXP: bp.setBattlePassXP,
+    claimedTiers: bp.claimedTiers, setClaimedTiers: bp.setClaimedTiers,
+    currentTier: bp.currentTier, tierProgress: bp.tierProgress,
+    XP_PER_TIER: bp.XP_PER_TIER, MAX_TIER: bp.MAX_TIER,
+    gainBattlePassXP: bp.gainBattlePassXP,
+
+    // From useStaking
+    stakedPositions: staking.stakedPositions, setStakedPositions: staking.setStakedPositions,
+    stakeAmount: staking.stakeAmount, setStakeAmount: staking.setStakeAmount,
+    stakeLock: staking.stakeLock, setStakeLock: staking.setStakeLock,
+    stakeTokens: staking.stakeTokens,
+
+    // From useNotifications
+    showSuccess: notif.showSuccess, successMessage: notif.successMessage,
+    notifications: notif.notifications, toasts: notif.toasts,
+    triggerSuccess: notif.triggerSuccess,
+    addNotification: notif.addNotification,
+    markNotificationRead: notif.markNotificationRead,
+    clearAllNotifications: notif.clearAllNotifications,
+
+    // From useTransactions
+    transactions: txs.transactions, addTransaction: txs.addTransaction,
+
+    // Army
+    setActiveMissions, setSquadPower, setActiveBoosts,
 
     // Actions
-    triggerSuccess, addTransaction, convertPoints, stakeTokens, claimDailyBonus,
-    claimAirdrop, startOffer, completeOffer, claimQuest, buyNFT,
-    gainBattlePassXP, updateQuestProgress, fetchUserData,
-    addNotification, markNotificationRead, clearAllNotifications,
+    convertPoints, claimDailyBonus, claimAirdrop,
+    startOffer, completeOffer, claimQuest, buyNFT,
+    updateQuestProgress, fetchUserData,
   };
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Cookie Policy | SHIT.ARMY',
@@ -116,7 +117,7 @@ export default function CookiePage() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10">
-          <a href="/" className="text-amber-400 hover:text-amber-300 font-bold">&larr; BACK TO SHIT.ARMY</a>
+          <Link href="/" className="text-amber-400 hover:text-amber-300 font-bold">&larr; BACK TO SHIT.ARMY</Link>
         </div>
       </div>
     </div>
