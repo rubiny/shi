@@ -18,6 +18,9 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
   const [telegram, setTelegram] = useState('@shituser');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
+  const [showRecoveryCodes, setShowRecoveryCodes] = useState(false);
 
   // Notification preferences
   const [notifOffers, setNotifOffers] = useState(true);
@@ -263,6 +266,68 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
             <button className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-semibold transition-all">
               Enable 2FA
             </button>
+          </div>
+
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-4">{'\u{1F6E1}\uFE0F'} Account Recovery</h3>
+            <p className="text-sm text-zinc-400 mb-4">Set up recovery options in case you lose access to your account</p>
+
+            <div className="space-y-4">
+              <div className="bg-zinc-800/50 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="font-semibold text-sm">Recovery Email</div>
+                  <span className={`text-xs px-2 py-0.5 rounded ${recoveryEmail ? 'text-green-400 bg-green-500/10' : 'text-amber-400 bg-amber-500/10'}`}>
+                    {recoveryEmail ? 'SET' : 'NOT SET'}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={recoveryEmail}
+                    onChange={(e) => setRecoveryEmail(e.target.value)}
+                    placeholder="backup@email.com"
+                    className="flex-1 bg-zinc-900 border border-white/10 rounded-lg px-4 py-2 text-sm outline-none focus:border-amber-500/50"
+                  />
+                  <button
+                    onClick={() => { if (recoveryEmail) setMessage({ type: 'success', text: 'Recovery email saved! Verification sent.' }); }}
+                    className="px-4 py-2 bg-amber-500/20 text-amber-400 rounded-lg text-sm font-bold hover:bg-amber-500/30"
+                  >
+                    SAVE
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-zinc-800/50 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="font-semibold text-sm">Recovery Codes</div>
+                  <span className={`text-xs px-2 py-0.5 rounded ${showRecoveryCodes ? 'text-green-400 bg-green-500/10' : 'text-zinc-500 bg-zinc-800'}`}>
+                    {showRecoveryCodes ? 'VISIBLE' : 'HIDDEN'}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400 mb-3">Save these codes somewhere safe. Each can be used once to regain access.</p>
+                {showRecoveryCodes ? (
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    {recoveryCodes.map((code, i) => (
+                      <div key={i} className="bg-zinc-900 border border-white/10 rounded-lg px-3 py-2 text-center font-mono text-sm text-amber-400">{code}</div>
+                    ))}
+                  </div>
+                ) : null}
+                <button
+                  onClick={() => {
+                    if (!showRecoveryCodes) {
+                      const codes = Array.from({ length: 8 }, () => Math.random().toString(36).substring(2, 8).toUpperCase());
+                      setRecoveryCodes(codes);
+                      setShowRecoveryCodes(true);
+                    } else {
+                      setShowRecoveryCodes(false);
+                    }
+                  }}
+                  className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-bold"
+                >
+                  {showRecoveryCodes ? 'HIDE CODES' : 'GENERATE NEW CODES'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

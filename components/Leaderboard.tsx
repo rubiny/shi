@@ -46,12 +46,45 @@ const CATEGORIES = [
   { id: 'stakers', label: 'DIAMOND HANDS', icon: '🔒', data: TOP_STAKERS },
 ];
 
-export default function Leaderboard({ userId }: { userId: string }) {
+interface LeaderboardProps {
+  userId: string;
+  userEarnings?: number;
+  userReferrals?: number;
+  userStaked?: number;
+  username?: string;
+}
+
+function getLeaderboardWithUser(
+  baseData: LeaderboardEntry[],
+  userEarnings: number,
+  userReferrals: number,
+  userStaked: number,
+  username: string,
+  sortKey: 'earnings' | 'referrals' | 'staked'
+): LeaderboardEntry[] {
+  const nonUserData = baseData.filter(e => !e.isCurrentUser);
+  const userData: LeaderboardEntry = {
+    rank: 0,
+    username,
+    avatar: '\u{1F4A9}',
+    earnings: userEarnings,
+    referrals: userReferrals,
+    staked: userStaked,
+    country: '',
+    isCurrentUser: true,
+  };
+  const all = [...nonUserData, userData].sort((a, b) => (b[sortKey] as number) - (a[sortKey] as number));
+  return all.map((entry, i) => ({ ...entry, rank: i + 1 }));
+}
+
+export default function Leaderboard({ userId, userEarnings = 0, userReferrals = 0, userStaked = 0, username = 'You' }: LeaderboardProps) {
   const [activeCategory, setActiveCategory] = useState('earners');
   const [timeFrame, setTimeFrame] = useState<'week' | 'month' | 'all'>('week');
   const [showShareModal, setShowShareModal] = useState(false);
 
-  const currentData = CATEGORIES.find(c => c.id === activeCategory)?.data || TOP_EARNERS;
+  const sortKeys: Record<string, 'earnings' | 'referrals' | 'staked'> = { earners: 'earnings', referrals: 'referrals', stakers: 'staked' };
+  const baseData = CATEGORIES.find(c => c.id === activeCategory)?.data || TOP_EARNERS;
+  const currentData = getLeaderboardWithUser(baseData, userEarnings, userReferrals, userStaked, username, sortKeys[activeCategory] || 'earnings');
   const userRank = currentData.find(u => u.isCurrentUser);
 
   return (

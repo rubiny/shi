@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import NotificationCenter from './NotificationCenter';
 import type { Notification } from '@/lib/types';
 
-type TabId = "dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "events";
+type TabId = "dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "events" | "help";
 
 interface DashboardNavProps {
   currentTab: TabId;
@@ -60,6 +60,7 @@ const MENU_SECTIONS = [
       { id: "stake", label: "Staking", icon: "\u{1F512}" },
       { id: "merch", label: "Merch", icon: "\u{1F455}" },
       { id: "history", label: "History", icon: "\u{1F4CB}" },
+      { id: "help", label: "Help Center", icon: "\u2753" },
       { id: "settings", label: "Settings", icon: "\u2699\uFE0F" },
     ],
   },

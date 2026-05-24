@@ -56,7 +56,7 @@ function isValidEthAddress(addr: string): boolean {
 }
 
 export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _initialIsGeneral, generalDaysLeft, showOnboarding = false, onCompleteOnboarding }: DashboardProps) {
-  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "events">("dashboard");
+  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "events" | "help">("dashboard");
 
   const db = useDashboard();
 
@@ -74,8 +74,16 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
   const [selectedMerch, setSelectedMerch] = useState<MerchProduct | null>(null);
 
   const [txFilter, setTxFilter] = useState<string>('all');
+  const [convertCooldown, setConvertCooldown] = useState(0);
+  const [openHelpFaq, setOpenHelpFaq] = useState<number | null>(null);
 
-
+  useEffect(() => {
+    if (convertCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setConvertCooldown(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [convertCooldown]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -107,7 +115,9 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
     return `${mins}m ${secs}s`;
   }, []);
 
+  const [withdrawing, setWithdrawing] = useState(false);
   const submitWithdrawal = () => {
+    if (withdrawing) return;
     const amount = parseFloat(withdrawAmount);
     if (!amount || amount <= 0 || amount > db.shitBalance || amount < selectedNetwork.minWithdraw) {
       db.triggerSuccess("Invalid withdrawal amount");
@@ -117,6 +127,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
       db.triggerSuccess("Invalid wallet address — must be 0x followed by 40 hex characters");
       return;
     }
+    setWithdrawing(true);
     const fee = selectedNetwork.fee;
     const netAmount = amount - fee;
     db.setShitBalance(prev => prev - amount);
@@ -124,6 +135,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
     db.addTransaction({ type: 'withdrawal', amount: -amount, description: `Withdraw ${netAmount.toFixed(2)} $SHIT to ${selectedNetwork.name} (${withdrawAddress.slice(0, 8)}...)`, status: 'pending' });
     sfx.purchase();
     db.triggerSuccess(`Withdrawal initiated! ${netAmount.toFixed(2)} $SHIT → ${selectedNetwork.name}`);
+    setTimeout(() => setWithdrawing(false), 3000);
   };
 
   const buyMerch = (product: MerchProduct) => {
@@ -513,6 +525,37 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 <div className="text-zinc-400 mt-2 text-sm">daily & weekly grinds {'\u2022'} stack rewards</div>
               </div>
             </div>
+            {/* RECENTLY PAID FEED */}
+            <div className="glass-card rounded-3xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="font-black text-lg">{'\u{1F4B8}'} DEGENS GETTING PAID</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-xs text-green-400">LIVE</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {[
+                  { user: '0xChad...3A', amount: 247, network: 'Base', time: '2m ago' },
+                  { user: 'ShitKing', amount: 89, network: 'Polygon', time: '8m ago' },
+                  { user: '0xApe...7F', amount: 520, network: 'Ethereum', time: '15m ago' },
+                  { user: 'ToiletWhale', amount: 1200, network: 'Base', time: '23m ago' },
+                ].map((tx, i) => (
+                  <div key={i} className="flex items-center justify-between bg-black/40 rounded-xl px-4 py-3 text-sm">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-400">{'\u2713'}</span>
+                      <span className="text-zinc-300">{tx.user}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-green-400">${tx.amount}</span>
+                      <span className="text-xs text-zinc-500">{tx.network}</span>
+                      <span className="text-xs text-zinc-600">{tx.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="grid md:grid-cols-4 gap-4 mt-4">
               <div onClick={() => setCurrentTab("memes")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
                 <div className="text-3xl mb-3">{'\u{1F92A}'}</div>
@@ -589,7 +632,11 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                   <div className="font-mono text-3xl">1 $SHIT = {CONFIG.BUSINESS.OFFERWALL.EXCHANGE_RATE} PTS</div>
                 </div>
               </Tooltip>
-              <button onClick={() => { sfx.click(); db.convertPoints(); }} disabled={db.points < CONFIG.BUSINESS.OFFERWALL.MIN_CONVERT} className="bg-gradient-to-r from-amber-500 to-orange-500 disabled:bg-zinc-800 disabled:from-zinc-800 disabled:to-zinc-800 px-12 py-4 rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">CONVERT TO $SHIT</button>
+              <div className="text-center">
+                <button onClick={() => { sfx.click(); db.convertPoints(); setConvertCooldown(30); }} disabled={db.points < CONFIG.BUSINESS.OFFERWALL.MIN_CONVERT || convertCooldown > 0} className="bg-gradient-to-r from-amber-500 to-orange-500 disabled:bg-zinc-800 disabled:from-zinc-800 disabled:to-zinc-800 px-12 py-4 rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">
+                  {convertCooldown > 0 ? `WAIT ${convertCooldown}s` : 'CONVERT TO $SHIT'}
+                </button>
+              </div>
             </div>
 
             {/* BOOST BANNER */}
@@ -693,6 +740,15 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                     </button>
                   ))}
                 </div>
+                {db.stakeAmount && parseInt(db.stakeAmount) > 0 && (
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 mb-4 text-center">
+                    <div className="text-xs text-zinc-400 mb-1">ESTIMATED EARNINGS</div>
+                    <div className="text-xl font-black text-green-400">
+                      +{((parseInt(db.stakeAmount) * (db.stakeLock === 7 ? 32 : db.stakeLock === 30 ? 48 : 67) * db.stakeLock) / (365 * 100)).toFixed(0)} $SHIT
+                    </div>
+                    <div className="text-xs text-zinc-500">over {db.stakeLock} days at {db.stakeLock === 7 ? 32 : db.stakeLock === 30 ? 48 : 67}% APY</div>
+                  </div>
+                )}
                 <button onClick={() => { sfx.click(); db.stakeTokens(); }} disabled={!db.stakeAmount || parseInt(db.stakeAmount) <= 0 || parseInt(db.stakeAmount) > db.shitBalance} className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] disabled:bg-zinc-800 disabled:from-zinc-800 disabled:to-zinc-800 disabled:text-zinc-500 shadow-lg shadow-amber-500/20">STAKE NOW</button>
               </div>
             </div>
@@ -852,6 +908,75 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
           </motion.div>
         )}
 
+        {/* HELP CENTER */}
+        {currentTab === "help" && (
+          <motion.div key="help" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="text-6xl md:text-8xl mb-6">{'\u2753'}</div>
+                <h2 className="text-4xl md:text-5xl font-black">HELP <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">CENTER</span></h2>
+                <p className="text-zinc-400 mt-2">answers for smooth brains</p>
+              </div>
+
+              <div className="space-y-4 mb-12">
+                <h3 className="text-xl font-black text-amber-400">HOW-TO GUIDES</h3>
+                {[
+                  { title: 'How to earn $SHIT', steps: ['Go to Offerwall tab', 'Browse available offers (surveys, installs, videos)', 'Click START on any offer', 'Complete the offer requirements', 'Points are credited automatically (usually within 5 min)', 'Convert Points to $SHIT in the Offerwall section'] },
+                  { title: 'How to withdraw', steps: ['Go to Dashboard → click WITHDRAW', 'Enter amount (min 25 $SHIT)', 'Choose network (Base = lowest fees)', 'Paste your wallet address', 'Confirm withdrawal', 'Processing takes 1-24 hours', 'Over $100? Complete KYC first'] },
+                  { title: 'How to stake', steps: ['Go to Staking tab', 'Enter amount to stake', 'Choose lock period (7/30/90 days)', 'Longer lock = higher APY (32-67%)', 'Click STAKE NOW', 'Rewards accumulate daily', 'Claim rewards or wait until unlock'] },
+                  { title: 'How to build your Army', steps: ['Go to Army tab', 'Recruit soldiers (costs $SHIT)', 'Deploy soldiers on missions (raids)', 'Higher level soldiers = better missions', 'Collect raid rewards', 'Level up soldiers with XP', 'Build streak for bonus multiplier'] },
+                ].map((guide, i) => (
+                  <div key={i} className="glass-card rounded-2xl p-6 border border-white/10">
+                    <div className="font-bold text-lg mb-3">{guide.title}</div>
+                    <ol className="space-y-2">
+                      {guide.steps.map((step, j) => (
+                        <li key={j} className="flex items-start gap-3 text-sm text-zinc-400">
+                          <span className="bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">{j + 1}</span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3 mb-12">
+                <h3 className="text-xl font-black text-amber-400">FAQ</h3>
+                {[
+                  { q: 'Is SHIT.ARMY legit?', a: 'Yes. We use real offerwall providers (OfferToro, AdGem, AdScend) that pay us for completed offers. You earn a share of that revenue in $SHIT tokens.' },
+                  { q: 'How long do withdrawals take?', a: 'Most withdrawals process within 1-24 hours. Base network is fastest (under 1 hour usually). Large amounts may require manual review.' },
+                  { q: 'Why didn\'t I get credit for an offer?', a: 'Some offers take up to 24 hours to credit. Make sure you completed all requirements. If still missing after 24h, contact support with the offer name and completion time.' },
+                  { q: 'What is KYC and when is it required?', a: 'Know Your Customer verification. Required when your balance exceeds $100 USD. Quick 2-minute process: upload ID + selfie. We use SumSub for secure verification.' },
+                  { q: 'Can I use a VPN?', a: 'Using a VPN may cause offers to not credit properly and can trigger fraud detection. We recommend completing offers without VPN for best results.' },
+                  { q: 'What happens if I get banned?', a: 'Bans are for fraud only (multi-accounting, bot farming, fake completions). If banned in error, contact support with your username for review.' },
+                  { q: 'How does staking APY work?', a: 'APY = Annual Percentage Yield. 32% APY on 7-day lock means if you stake 1000 $SHIT for a full year, you\'d earn ~320 $SHIT. Actual earnings are prorated to your lock period.' },
+                  { q: 'How do referrals work?', a: 'Share your referral link. When someone signs up and earns, you get a percentage commission (5-18% depending on your tier) on their earnings. Forever.' },
+                ].map((faq, i) => (
+                  <div key={i} className="glass-card rounded-2xl border border-white/10 overflow-hidden">
+                    <button onClick={() => setOpenHelpFaq(openHelpFaq === i ? null : i)} className="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors">
+                      <span className="font-bold text-sm">{faq.q}</span>
+                      <span className={`text-amber-400 text-xl transition-transform ${openHelpFaq === i ? 'rotate-45' : ''}`}>+</span>
+                    </button>
+                    {openHelpFaq === i && (
+                      <div className="px-5 pb-5 text-sm text-zinc-400 leading-relaxed">{faq.a}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="glass-card rounded-3xl p-8 text-center border border-amber-500/20">
+                <div className="text-4xl mb-4">{'\u{1F4E7}'}</div>
+                <h3 className="text-xl font-black mb-2">STILL NEED HELP?</h3>
+                <p className="text-zinc-400 text-sm mb-4">dm us on Discord or send an email. we usually reply within 24h.</p>
+                <div className="flex gap-4 justify-center">
+                  <a href="https://discord.gg/shitarmy" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-[#5865F2] rounded-xl font-bold text-sm hover:brightness-110 transition-all">DISCORD</a>
+                  <a href="mailto:support@shit.army" className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold text-sm border border-white/10">EMAIL</a>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* ADMIN PANEL */}
         {currentTab === "admin" && db.isGeneral && (
           <motion.div key="admin" variants={tabVariants} initial="initial" animate="animate" exit="exit">
@@ -1007,7 +1132,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {/* LEADERBOARD */}
         {currentTab === "leaderboard" && (
           <motion.div key="leaderboard" variants={tabVariants} initial="initial" animate="animate" exit="exit">
-            <Leaderboard userId={db.userId || 'mock-user'} />
+            <Leaderboard userId={db.userId || 'mock-user'} userEarnings={db.totalEarned} userReferrals={0} userStaked={db.stakedPositions.reduce((sum, p) => sum + p.amount, 0)} />
           </motion.div>
         )}
 
@@ -1251,7 +1376,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 </div>
                 <div className="flex gap-4">
                   <button onClick={() => setWithdrawStep(1)} className="flex-1 py-4 rounded-2xl border border-white/30">BACK</button>
-                  <button onClick={submitWithdrawal} className="flex-1 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black active:scale-[0.985]">CONFIRM</button>
+                  <button onClick={submitWithdrawal} disabled={withdrawing} className="flex-1 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black active:scale-[0.985] disabled:opacity-50 disabled:cursor-not-allowed">{withdrawing ? 'PROCESSING...' : 'CONFIRM'}</button>
                 </div>
               </>
             )}

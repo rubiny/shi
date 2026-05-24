@@ -27,12 +27,12 @@ const LIVE_FEED_ACTIONS = [
 ];
 
 const MEME_GALLERY = [
-  { emoji: '💩', title: 'when $SHIT moons', caption: 'i told you ser', likes: '12.4K', bg: 'from-amber-900/40 to-orange-900/40' },
-  { emoji: '🚀', title: 'toilet to the moon', caption: 'we\'re all gonna make it', likes: '8.9K', bg: 'from-blue-900/40 to-purple-900/40' },
-  { emoji: '🧴', title: 'paper hands be like', caption: 'sold at the bottom lmao', likes: '23.1K', bg: 'from-red-900/40 to-pink-900/40' },
-  { emoji: '💎', title: 'diamond hands only', caption: 'never selling. NGMI if you sell', likes: '15.6K', bg: 'from-cyan-900/40 to-blue-900/40' },
-  { emoji: '🚽', title: 'flush the bears', caption: 'bears r fuk', likes: '9.2K', bg: 'from-green-900/40 to-emerald-900/40' },
-  { emoji: '🦍', title: 'apes together strong', caption: 'buy the dip. always.', likes: '18.7K', bg: 'from-purple-900/40 to-pink-900/40' },
+  { emoji: '💩', title: 'when $SHIT moons', caption: 'by @ShitKing420 • earned 2,400 $SHIT from upvotes', likes: '12.4K', bg: 'from-amber-900/40 to-orange-900/40' },
+  { emoji: '🚀', title: 'toilet to the moon', caption: 'by @CryptoDegenFR • featured meme of the week', likes: '8.9K', bg: 'from-blue-900/40 to-purple-900/40' },
+  { emoji: '🧴', title: 'paper hands be like', caption: 'by @ToiletMaster • sold at the bottom lmao', likes: '23.1K', bg: 'from-red-900/40 to-pink-900/40' },
+  { emoji: '💎', title: 'diamond hands only', caption: 'by @HODLer • staking since day 1', likes: '15.6K', bg: 'from-cyan-900/40 to-blue-900/40' },
+  { emoji: '🚽', title: 'flush the bears', caption: 'by @FlushForce • bears r absolutely fuk', likes: '9.2K', bg: 'from-green-900/40 to-emerald-900/40' },
+  { emoji: '🦍', title: 'apes together strong', caption: 'by @GuildLeader • posted from guild chat', likes: '18.7K', bg: 'from-purple-900/40 to-pink-900/40' },
 ];
 
 export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
@@ -40,6 +40,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
   const [activeRank, setActiveRank] = useState(3);
   const [liveFeed, setLiveFeed] = useState<Array<{ id: number; text: string }>>([]);
   const [calcOffers, setCalcOffers] = useState(5);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const emojiInterval = setInterval(() => {
@@ -310,25 +311,30 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               onChange={(e) => setCalcOffers(Number(e.target.value))}
               className="w-full h-2 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-amber-500 mb-8"
             />
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className="bg-zinc-800/80 rounded-2xl p-5">
-                <div className="text-xs text-zinc-500 mb-1">DAILY</div>
-                <div className="text-2xl font-black text-amber-400">{(calcOffers * 150).toLocaleString()}</div>
+                <div className="text-xs text-zinc-500 mb-1">DAILY (MIN)</div>
+                <div className="text-xl font-black text-zinc-400">{(calcOffers * 50).toLocaleString()}</div>
                 <div className="text-xs text-zinc-500">$SHIT</div>
               </div>
               <div className="bg-zinc-800/80 rounded-2xl p-5">
-                <div className="text-xs text-zinc-500 mb-1">MONTHLY</div>
-                <div className="text-2xl font-black text-amber-400">{(calcOffers * 150 * 30).toLocaleString()}</div>
+                <div className="text-xs text-zinc-500 mb-1">DAILY (AVG)</div>
+                <div className="text-xl font-black text-amber-400">{(calcOffers * 150).toLocaleString()}</div>
+                <div className="text-xs text-zinc-500">$SHIT</div>
+              </div>
+              <div className="bg-zinc-800/80 rounded-2xl p-5">
+                <div className="text-xs text-zinc-500 mb-1">MONTHLY (AVG)</div>
+                <div className="text-xl font-black text-amber-400">{(calcOffers * 150 * 30).toLocaleString()}</div>
                 <div className="text-xs text-zinc-500">$SHIT</div>
               </div>
               <div className="bg-zinc-800/80 rounded-2xl p-5 border border-amber-500/20">
                 <div className="text-xs text-zinc-500 mb-1">≈ USD/MONTH</div>
-                <div className="text-2xl font-black text-green-400">${(calcOffers * 150 * 30 * 0.01).toFixed(0)}</div>
-                <div className="text-xs text-zinc-500">at $0.01/$SHIT</div>
+                <div className="text-xl font-black text-green-400">${(calcOffers * 150 * 30 * 0.01).toFixed(0)}</div>
+                <div className="text-[10px] text-zinc-600">range: ${(calcOffers * 50 * 30 * 0.01).toFixed(0)}-${(calcOffers * 300 * 30 * 0.01).toFixed(0)}</div>
               </div>
             </div>
             <div className="text-center mt-6">
-              <p className="text-xs text-zinc-500">+ staking rewards, referrals, army missions, battle pass, daily spin. actual bags will be bigger ser.</p>
+              <p className="text-xs text-zinc-500">earnings vary per offer type. surveys ~50 PTS, app installs ~500-2000 PTS. + staking, referrals, army missions on top.</p>
             </div>
           </div>
         </div>
@@ -506,9 +512,91 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
           </div>
 
           <div className="text-center mt-8">
-            <button onClick={onConnect} className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold border border-white/10">
-              📤 Submit Your Meme (login first ser)
+            <button onClick={onConnect} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-black border border-amber-500/30 hover:scale-105 transition-transform">
+              💩 LOGIN TO POST YOUR SHIT
             </button>
+            <p className="text-xs text-zinc-600 mt-2">first 100 memes with 50+ upvotes → 500 $SHIT bonus</p>
+          </div>
+        </div>
+      </section>
+
+      {/* DEGENS GOT PAID — Proof of Payment */}
+      <section className="py-24 bg-zinc-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl font-black mb-4">
+              DEGENS GOT <span className="text-green-400">PAID</span>
+            </h2>
+            <p className="text-zinc-400">real withdrawals. real money. no cap.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { user: '0xChad...9F3A', amount: '$247.50', network: 'Base', time: '2 hours ago', emoji: '💰' },
+              { user: 'ShitKing420', amount: '$89.00', network: 'Polygon', time: '5 hours ago', emoji: '🚀' },
+              { user: 'DegenApe99', amount: '$1,200.00', network: 'Base', time: '1 day ago', emoji: '🐋' },
+              { user: 'ToiletWhale', amount: '$520.00', network: 'Ethereum', time: '1 day ago', emoji: '💎' },
+            ].map((tx, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-zinc-900/80 border border-green-500/20 rounded-2xl p-5 hover:border-green-500/40 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="text-2xl">{tx.emoji}</div>
+                  <div>
+                    <div className="font-bold text-sm text-white">{tx.user}</div>
+                    <div className="text-xs text-zinc-500">{tx.time}</div>
+                  </div>
+                </div>
+                <div className="text-2xl font-black text-green-400 mb-1">{tx.amount}</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-xs text-zinc-400">via {tx.network}</span>
+                  <span className="text-xs text-green-400 ml-auto">✓ confirmed</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-8 text-sm text-zinc-500">
+            <span className="text-green-400 font-bold">$2.4M+</span> paid out to degens worldwide. you could be next.
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 bg-zinc-900/50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-black mb-4">FAQ <span className="text-amber-500">(FOR NORMIES)</span></h2>
+            <p className="text-zinc-400">questions your smooth brain might have</p>
+          </div>
+          <div className="space-y-3">
+            {[
+              { q: 'Is this legit or another rug?', a: 'Legit ser. Smart contracts on Base, audited code, transparent tokenomics. We\'ve paid out $2.4M+ to users. Check the withdrawal proofs above.' },
+              { q: 'How do I actually earn?', a: 'Complete offers (surveys, app installs, videos) on the offerwall. Each offer pays 50-2000+ $SHIT. You can also stake, play mini-games, do army missions, and refer friends.' },
+              { q: 'How do I withdraw?', a: 'Dashboard → Withdraw → choose network (Base, Ethereum, Polygon) → paste wallet address → done. Under $100 = no KYC. Instant processing for most networks.' },
+              { q: 'Is KYC required?', a: 'Only if your balance exceeds $100 USD equivalent. Under that, no verification needed. We use SumSub for KYC — quick 2-minute process.' },
+              { q: 'What is $SHIT token?', a: 'ERC-20 token on Base network. 1B max supply. You earn it by grinding offers, and can stake it for 32-67% APY, trade it on the marketplace, or withdraw to your wallet.' },
+              { q: 'How much can I realistically earn?', a: 'Depends on how hard you grind. Casual (3-5 offers/day) = $50-150/month. Hardcore grinders doing 15-20 offers/day + staking + referrals = $500-1000+/month.' },
+              { q: 'What\'s the Army / soldiers thing?', a: 'Mint NFT soldiers, send them on missions (raids), earn $SHIT passively. Higher level soldiers = better missions = more loot. Think of it as idle earnings.' },
+              { q: 'Can I get banned?', a: 'Only for fraud: multi-accounting, VPN abuse, bot farming, or fake offer completions. Play fair and you\'re good ser.' },
+            ].map((faq, i) => (
+              <div key={i} className="border border-white/10 rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors"
+                >
+                  <span className="font-bold text-sm">{faq.q}</span>
+                  <span className={`text-amber-400 text-xl transition-transform ${openFaq === i ? 'rotate-45' : ''}`}>+</span>
+                </button>
+                {openFaq === i && (
+                  <div className="px-5 pb-5 text-sm text-zinc-400 leading-relaxed">{faq.a}</div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>

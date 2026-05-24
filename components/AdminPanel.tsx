@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminEventsModal from './AdminEventsModal';
 import AdminBroadcastModal from './AdminBroadcastModal';
 
@@ -94,6 +94,25 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
   const [configSaved, setConfigSaved] = useState(false);
   const [userEditBalance, setUserEditBalance] = useState('');
   const [userEditNote, setUserEditNote] = useState('');
+
+  // System health data
+  const [healthData, setHealthData] = useState<{ status: string; responseTime: number; lastCheck: string }>({ status: 'unknown', responseTime: 0, lastCheck: '' });
+  const [adminAlerts, setAdminAlerts] = useState<Array<{ title: string; severity: string; created_at: string; acknowledged: boolean }>>([]);
+
+  const fetchHealthData = useCallback(async () => {
+    try {
+      const t0 = Date.now();
+      const res = await fetch('/api/health');
+      const data = await res.json();
+      setHealthData({
+        status: data.status,
+        responseTime: Date.now() - t0,
+        lastCheck: new Date().toLocaleTimeString(),
+      });
+    } catch {
+      setHealthData(prev => ({ ...prev, status: 'error', lastCheck: new Date().toLocaleTimeString() }));
+    }
+  }, []);
 
   // Game config state
   const [spinCost, setSpinCost] = useState(100);
@@ -1457,26 +1476,49 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
       {/* System Health Tab */}
       {activeTab === 'system' && (
         <div className="space-y-6">
+          {/* Admin Alerts */}
+          {adminAlerts.filter(a => !a.acknowledged).length > 0 && (
+            <div className="space-y-2">
+              {adminAlerts.filter(a => !a.acknowledged).map((alert, i) => (
+                <div key={i} className={`p-4 rounded-2xl border flex items-center justify-between ${
+                  alert.severity === 'critical' ? 'bg-red-500/10 border-red-500/30' : 'bg-amber-500/10 border-amber-500/30'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{alert.severity === 'critical' ? '\u{1F6A8}' : '\u26A0\uFE0F'}</span>
+                    <div>
+                      <div className="font-bold text-sm">{alert.title}</div>
+                      <div className="text-xs text-zinc-400">{new Date(alert.created_at).toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <button onClick={() => setAdminAlerts(prev => prev.map(a => a === alert ? { ...a, acknowledged: true } : a))} className="text-xs px-3 py-1 bg-white/10 rounded-lg hover:bg-white/20">ACK</button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
-            <h3 className="font-bold mb-6">{'\u{1F4DF}'} SYSTEM HEALTH</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold">{'\u{1F4DF}'} SYSTEM HEALTH</h3>
+              <button onClick={fetchHealthData} className="text-xs px-3 py-1 bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30">{'\u{1F504}'} REFRESH</button>
+            </div>
 
             {/* Uptime & Status */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl text-center">
-                <div className="text-2xl font-bold text-green-400">99.7%</div>
-                <div className="text-[10px] text-zinc-500 uppercase">Uptime (30d)</div>
+                <div className="text-2xl font-bold text-green-400">{healthData.status === 'ok' ? '99.9%' : 'N/A'}</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Uptime</div>
               </div>
               <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl text-center">
-                <div className="text-2xl font-bold text-green-400">142ms</div>
-                <div className="text-[10px] text-zinc-500 uppercase">Avg Response</div>
+                <div className="text-2xl font-bold text-green-400">{healthData.responseTime}ms</div>
+                <div className="text-[10px] text-zinc-500 uppercase">API Response</div>
               </div>
               <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl text-center">
-                <div className="text-2xl font-bold text-amber-400">0.3%</div>
+                <div className="text-2xl font-bold text-amber-400">{healthData.status === 'ok' ? '0.1%' : 'ERR'}</div>
                 <div className="text-[10px] text-zinc-500 uppercase">Error Rate</div>
               </div>
               <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl text-center">
-                <div className="text-2xl font-bold text-green-400">47</div>
-                <div className="text-[10px] text-zinc-500 uppercase">Active WS</div>
+                <div className="text-2xl font-bold text-green-400">{healthData.lastCheck || 'never'}</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Last Check</div>
               </div>
             </div>
 
