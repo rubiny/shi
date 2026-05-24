@@ -35,6 +35,10 @@ export default function ShitArmy() {
     setShowLoginModal(true);
   };
 
+  const handleGoogle = () => {
+    setShowLoginModal(true);
+  };
+
   const handleDisconnect = async () => {
     if (user) {
       await signOut();
@@ -58,7 +62,7 @@ export default function ShitArmy() {
   if (!isUserConnected) {
     return (
       <>
-        <LandingPage onConnect={handleConnect} />
+        <LandingPage onConnect={handleConnect} onGoogle={handleGoogle} />
         <LoginModal 
           isOpen={showLoginModal} 
           onClose={() => setShowLoginModal(false)} 

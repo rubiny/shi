@@ -442,7 +442,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
     ]);
     
     setStakedPositions([
-      { id: 1, amount: 450, lockDays: 30, apy: 48, unlockDate: "24 Jun 2026", rewards: 18.4 },
+      { id: 1, amount: 450, lockDays: 30, apy: 48, unlockDate: new Date(Date.now() + 30 * 86400000).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }), rewards: 18.4 },
     ]);
     
     setOwnedNFTs([
@@ -827,7 +827,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       <div className="pt-20 pb-24 max-w-7xl mx-auto px-4 sm:px-6">
         {/* DASHBOARD */}
         {currentTab === "dashboard" && (
-          <div className="space-y-8">
+          <div key="dashboard" className="tab-content-enter space-y-8">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <div>
                 <div className="text-amber-500 text-sm font-bold tracking-[3px] uppercase">WELCOME BACK, SOLDIER {isGeneral && "👑"}</div>

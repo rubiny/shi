@@ -175,7 +175,7 @@ export default function DashboardNav({
                 onClick={() => setShowKYCModal(true)}
                 className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                   kycStatus === 'none'
-                    ? 'bg-red-500/20 border-red-500/40 text-red-400 hover:bg-red-500/30 animate-pulse'
+                    ? 'bg-red-500/20 border-red-500/40 text-red-400 hover:bg-red-500/30'
                     : kycStatus === 'pending'
                     ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
                     : 'bg-green-500/20 border-green-500/40 text-green-400'

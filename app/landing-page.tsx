@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { CONFIG } from '@/lib/config';
 
@@ -44,7 +44,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
 
   const emojis = ['💩', '🚽', '🧻', '💰', '🔥', '🚀'];
 
-  const getSeasonCountdown = () => {
+  const getSeasonCountdown = useCallback(() => {
     const end = new Date(CONFIG.BUSINESS.BATTLE_PASS.SEASON_END_DATE).getTime();
     const now = Date.now();
     const diff = end - now;
@@ -53,6 +53,19 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
     const hours = Math.floor((diff % 86400000) / 3600000);
     const mins = Math.floor((diff % 3600000) / 60000);
     return `${days}d ${String(hours).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m`;
+  }, []);
+
+  const [countdown, setCountdown] = useState(getSeasonCountdown);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(getSeasonCountdown());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, [getSeasonCountdown]);
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -68,10 +81,10 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <button className="hidden sm:block text-zinc-400 hover:text-white text-sm">
+              <button onClick={() => scrollToSection('how-it-works')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors">
                 How it Works
               </button>
-              <button className="hidden sm:block text-zinc-400 hover:text-white text-sm">
+              <button onClick={() => scrollToSection('rank-system')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors">
                 Leaderboard
               </button>
               <button 
@@ -177,7 +190,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 bg-zinc-950">
+      <section id="how-it-works" className="py-24 bg-zinc-950 scroll-mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-black mb-4">
@@ -239,7 +252,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
       </section>
 
       {/* Why $SHIT Section */}
-      <section className="py-24 relative overflow-hidden">
+      <section id="rank-system" className="py-24 relative overflow-hidden scroll-mt-16">
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -327,7 +340,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
       </section>
 
       {/* Battle Pass Preview */}
-      <section className="py-24 bg-zinc-950">
+      <section id="battle-pass" className="py-24 bg-zinc-950 scroll-mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-black mb-4">
@@ -366,7 +379,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             <div className="mt-8 text-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 rounded-full text-sm text-zinc-400">
                 <span className="text-amber-400">⚠️</span>
-                Season ends in: <span className="text-white font-mono">{getSeasonCountdown()}</span>
+                Season ends in: <span className="text-white font-mono">{countdown}</span>
               </div>
             </div>
           </div>
@@ -374,7 +387,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
       </section>
 
       {/* Meme Gallery */}
-      <section className="py-24">
+      <section id="memes" className="py-24 scroll-mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-black mb-4">COMMUNITY <span className="text-amber-500">MEMES</span></h2>
@@ -429,7 +442,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               ARMY ON BASE?
             </h2>
             <p className="text-xl text-zinc-400 mb-8">
-              47,000 soldiers already earning. Don't miss the flush.
+              47,000 soldiers already earning. Don&apos;t miss the flush.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -466,10 +479,10 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             <div>
               <h4 className="font-bold mb-4">Earn</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
-                <li className="hover:text-white cursor-pointer">Offerwall</li>
-                <li className="hover:text-white cursor-pointer">Staking</li>
-                <li className="hover:text-white cursor-pointer">Referrals</li>
-                <li className="hover:text-white cursor-pointer">Battle Pass</li>
+                <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Offerwall</li>
+                <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Staking</li>
+                <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Referrals</li>
+                <li onClick={() => scrollToSection('battle-pass')} className="hover:text-white cursor-pointer transition-colors">Battle Pass</li>
               </ul>
             </div>
             <div>
@@ -478,7 +491,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 <li className="hover:text-white cursor-pointer">Discord</li>
                 <li className="hover:text-white cursor-pointer">Twitter/X</li>
                 <li className="hover:text-white cursor-pointer">Telegram</li>
-                <li className="hover:text-white cursor-pointer">Meme Contest</li>
+                <li onClick={() => scrollToSection('memes')} className="hover:text-white cursor-pointer transition-colors">Meme Contest</li>
               </ul>
             </div>
             <div>

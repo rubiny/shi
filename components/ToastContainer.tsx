@@ -13,19 +13,22 @@ interface Toast {
 export default function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  // Demo toasts for onboarding
+  // Demo toasts — only show once per session
   useEffect(() => {
-    const demoToasts = [
-      { id: `demo-1`, type: 'success', title: 'Offer Completed!', message: '+150 $SHIT earned from Survey', icon: '💰' },
-      { id: `demo-2`, type: 'info', title: 'Staking Reward', message: '+12 $SHIT from your stake', icon: '🔒' },
-      { id: `demo-3`, type: 'achievement', title: 'Quest Completed!', message: '"Morning Shit" - +50 XP', icon: '🏆' },
-    ] as Toast[];
+    if (typeof window === 'undefined') return;
+    const key = 'shit-demo-toasts-shown';
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
 
-    // Show demo toasts with delay
+    const demoToasts = [
+      { type: 'success' as const, title: 'Offer Completed!', message: '+150 $SHIT earned from Survey', icon: '💰' },
+      { type: 'info' as const, title: 'Staking Reward', message: '+12 $SHIT from your stake', icon: '🔒' },
+    ];
+
     demoToasts.forEach((toast, index) => {
       setTimeout(() => {
         addToast(toast);
-      }, 2000 + index * 3000);
+      }, 3000 + index * 4000);
     });
   }, []);
 
