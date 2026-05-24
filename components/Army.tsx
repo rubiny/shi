@@ -35,6 +35,8 @@ interface Mission {
   emoji: string;
   xpReward: number;
   flavorText: string;
+  jackpotChance: number;
+  jackpotMultiplier: number;
 }
 
 const INITIAL_SOLDIERS: Soldier[] = [
@@ -45,10 +47,10 @@ const INITIAL_SOLDIERS: Soldier[] = [
 ];
 
 const MISSIONS: Mission[] = [
-  { id: 'sewer', name: 'Sewer Rug Pull', difficulty: 'EZ', baseReward: 50, duration: 60, durationLabel: '1 min', requirements: { minPower: 10, minLevel: 1 }, emoji: '🕳️', xpReward: 100, flavorText: 'snipe some normie liquidity from the sewers' },
-  { id: 'restroom', name: 'Public Toilet Raid', difficulty: 'Sweaty', baseReward: 200, duration: 300, durationLabel: '5 min', requirements: { minPower: 40, minLevel: 2 }, emoji: '🚻', xpReward: 250, flavorText: 'hostile takeover of a public restroom. ape in.' },
-  { id: 'septic', name: 'Septic Tank MEV', difficulty: 'Brutal', baseReward: 800, duration: 900, durationLabel: '15 min', requirements: { minPower: 80, minLevel: 4 }, emoji: '🏭', xpReward: 600, flavorText: 'front-run the septic tank. massive loot potential.' },
-  { id: 'flush', name: 'THE GREAT FLUSH', difficulty: 'Suicidal', baseReward: 3000, duration: 3600, durationLabel: '1 hour', requirements: { minPower: 150, minLevel: 6 }, emoji: '🌊', xpReward: 1500, flavorText: 'all-in kamikaze flush. either you moon or you get rekt.' },
+  { id: 'sewer', name: 'Sewer Rug Pull', difficulty: 'EZ', baseReward: 50, duration: 60, durationLabel: '1 min', requirements: { minPower: 10, minLevel: 1 }, emoji: '🕳️', xpReward: 100, flavorText: 'snipe some normie liquidity from the sewers', jackpotChance: 5, jackpotMultiplier: 3 },
+  { id: 'restroom', name: 'Public Toilet Raid', difficulty: 'Sweaty', baseReward: 200, duration: 300, durationLabel: '5 min', requirements: { minPower: 40, minLevel: 2 }, emoji: '🚻', xpReward: 250, flavorText: 'hostile takeover of a public restroom. ape in.', jackpotChance: 8, jackpotMultiplier: 5 },
+  { id: 'septic', name: 'Septic Tank MEV', difficulty: 'Brutal', baseReward: 800, duration: 900, durationLabel: '15 min', requirements: { minPower: 80, minLevel: 4 }, emoji: '🏭', xpReward: 600, flavorText: 'front-run the septic tank. massive loot potential.', jackpotChance: 10, jackpotMultiplier: 7 },
+  { id: 'flush', name: 'THE GREAT FLUSH', difficulty: 'Suicidal', baseReward: 3000, duration: 3600, durationLabel: '1 hour', requirements: { minPower: 150, minLevel: 6 }, emoji: '🌊', xpReward: 1500, flavorText: 'all-in kamikaze flush. either you moon or you get rekt.', jackpotChance: 15, jackpotMultiplier: 10 },
 ];
 
 const RANK_COLORS: Record<SoldierRank, string> = {
@@ -89,6 +91,7 @@ interface RaidLogEntry {
   reward: number;
   xp: number;
   timestamp: number;
+  isJackpot?: boolean;
 }
 
 const RECRUIT_COST = 500;
@@ -131,6 +134,10 @@ export default function Army({ userId: _userId }: { userId: string }) {
   const [totalClaimed, setTotalClaimed] = useState(0);
   const [raidLog, setRaidLog] = useState<RaidLogEntry[]>([]);
   const [lastRecruitTime, setLastRecruitTime] = useState(0);
+  const [raidStreak, setRaidStreak] = useState(0);
+  const streakMultiplier = raidStreak >= 10 ? 2.0 : raidStreak >= 7 ? 1.7 : raidStreak >= 5 ? 1.5 : raidStreak >= 3 ? 1.2 : 1.0;
+  const nextStreakAt = raidStreak < 3 ? 3 : raidStreak < 5 ? 5 : raidStreak < 7 ? 7 : raidStreak < 10 ? 10 : null;
+  const nextStreakMult = raidStreak < 3 ? 1.2 : raidStreak < 5 ? 1.5 : raidStreak < 7 ? 1.7 : raidStreak < 10 ? 2.0 : null;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -166,9 +173,21 @@ export default function Army({ userId: _userId }: { userId: string }) {
     return `${s}s`;
   }, []);
 
+  const dailyEstimate = (() => {
+    const equipped = soldiers.filter(s => s.equipped);
+    if (equipped.length === 0) return 0;
+    const avgPowerLevel = equipped.reduce((sum, s) => sum + s.power * s.level, 0) / equipped.length;
+    const bestMission = [...MISSIONS].reverse().find(m => avgPowerLevel >= m.requirements.minPower * m.requirements.minLevel) || MISSIONS[0];
+    const runsPerDay = Math.floor(86400 / bestMission.duration);
+    const avgReward = bestMission.baseReward * (1 + avgPowerLevel / 500);
+    return Math.floor(avgReward * runsPerDay * equipped.length * 0.6);
+  })();
+
   const deployOnMission = (soldier: Soldier, mission: Mission) => {
     const powerMultiplier = 1 + (soldier.power * soldier.level) / 500;
-    const reward = Math.floor(mission.baseReward * powerMultiplier);
+    const isJackpot = Math.random() * 100 < mission.jackpotChance;
+    const jackpotMult = isJackpot ? mission.jackpotMultiplier : 1;
+    const reward = Math.floor(mission.baseReward * powerMultiplier * streakMultiplier * jackpotMult);
     setSoldiers(prev => prev.map(s =>
       s.id === soldier.id
         ? { ...s, missionStatus: 'grinding' as MissionStatus, missionEndTime: Date.now() + mission.duration * 1000, missionReward: reward }
@@ -196,6 +215,7 @@ export default function Army({ userId: _userId }: { userId: string }) {
       }
       return prev;
     });
+    setRaidStreak(prev => prev + 1);
     setSoldiers(prev => prev.map(s => {
       if (s.id !== soldierId || s.missionStatus !== 'done') return s;
       const reward = s.missionReward || 0;
@@ -293,7 +313,7 @@ export default function Army({ userId: _userId }: { userId: string }) {
           </h1>
           <p className="text-zinc-500 text-sm uppercase tracking-widest">build your squad. raid the sewers. stack $SHIT or get rekt.</p>
 
-          {/* Stats */}
+          {/* Stats Row */}
           <div className="mt-5 inline-flex flex-wrap items-center gap-3 sm:gap-5 px-5 sm:px-8 py-4 bg-zinc-900/70 rounded-2xl border border-amber-500/20">
             <div className="text-left">
               <div className="text-[10px] text-amber-500/60 uppercase font-bold tracking-wider">DEGEN POWER</div>
@@ -317,6 +337,29 @@ export default function Army({ userId: _userId }: { userId: string }) {
                   <div className="text-xl sm:text-2xl font-black text-amber-400 animate-pulse">{completedCount} 💰</div>
                 </div>
               </>
+            )}
+          </div>
+
+          {/* Earning Projections + Streak */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            {dailyEstimate > 0 && (
+              <div className="px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-xl">
+                <span className="text-[10px] text-green-500/70 uppercase font-bold tracking-wider">EST. DAILY LOOT </span>
+                <span className="text-green-400 font-black">~{dailyEstimate.toLocaleString()} $SHIT</span>
+                <span className="text-[10px] text-zinc-600 ml-1">(~{(dailyEstimate * 7).toLocaleString()}/week)</span>
+              </div>
+            )}
+
+            {raidStreak > 0 && (
+              <div className="px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <span className="text-amber-400 font-black">🔥 {raidStreak} RAID STREAK</span>
+                {streakMultiplier > 1 && (
+                  <span className="text-amber-300 font-black ml-2">{streakMultiplier}x BONUS</span>
+                )}
+                {nextStreakAt && (
+                  <span className="text-[10px] text-zinc-500 ml-2">next: {nextStreakAt} raids → {nextStreakMult}x</span>
+                )}
+              </div>
             )}
           </div>
 
@@ -392,19 +435,23 @@ export default function Army({ userId: _userId }: { userId: string }) {
                     <span className="text-zinc-600">{s.raidsCompleted} raids</span>
                   </div>
 
-                  {/* XP */}
+                  {/* XP + Next Level */}
                   <div className="mb-2">
                     <div className="flex justify-between text-[10px] mb-0.5">
-                      <span className="text-zinc-600 uppercase">XP</span>
-                      <span className="text-zinc-500">{s.xp}/{XP_PER_LEVEL}</span>
+                      <span className="text-zinc-600 uppercase">LVL {s.level} → {s.level + 1}</span>
+                      <span className="text-zinc-500">{s.xp}/{XP_PER_LEVEL} XP</span>
                     </div>
-                    <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                      <div className={`h-full bg-gradient-to-r ${RANK_COLORS[s.rank]} rounded-full`} style={{ width: `${Math.min(100, (s.xp / XP_PER_LEVEL) * 100)}%` }} />
+                    <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className={`h-full bg-gradient-to-r ${RANK_COLORS[s.rank]} rounded-full transition-all duration-500`} style={{ width: `${Math.min(100, (s.xp / XP_PER_LEVEL) * 100)}%` }} />
+                    </div>
+                    <div className="text-[10px] text-zinc-600 mt-0.5">
+                      next level: +{Math.floor(s.power * 0.15)} PWR · better missions
                     </div>
                   </div>
 
-                  <div className="text-[10px] text-zinc-600 mb-2">
-                    total looted: <span className="text-amber-400 font-bold">{s.totalLooted.toLocaleString()} $SHIT</span>
+                  <div className="flex items-center justify-between text-[10px] text-zinc-600 mb-2">
+                    <span>looted: <span className="text-amber-400 font-bold">{s.totalLooted.toLocaleString()} $SHIT</span></span>
+                    <span>{s.raidsCompleted} raids</span>
                   </div>
 
                   {/* Skills */}
@@ -517,7 +564,11 @@ export default function Army({ userId: _userId }: { userId: string }) {
             const soldier = selectedSoldier;
             const meetsReqs = soldier ? soldier.power >= mission.requirements.minPower && soldier.level >= mission.requirements.minLevel : false;
             const powerMultiplier = soldier ? 1 + (soldier.power * soldier.level) / 500 : 1;
-            const estimatedReward = Math.floor(mission.baseReward * powerMultiplier);
+            const estimatedReward = Math.floor(mission.baseReward * powerMultiplier * streakMultiplier);
+            const jackpotReward = Math.floor(estimatedReward * mission.jackpotMultiplier);
+            const isLocked = soldier && !meetsReqs;
+            const needsPower = soldier && soldier.power < mission.requirements.minPower;
+            const needsLevel = soldier && soldier.level < mission.requirements.minLevel;
 
             return (
               <div
@@ -525,32 +576,51 @@ export default function Army({ userId: _userId }: { userId: string }) {
                 className={`p-5 rounded-2xl border transition-all ${
                   meetsReqs && soldier
                     ? 'bg-zinc-900/50 border-amber-500/30 hover:border-amber-500/60'
-                    : 'bg-zinc-900/20 border-white/5 opacity-40'
+                    : isLocked
+                    ? 'bg-zinc-900/30 border-white/5'
+                    : 'bg-zinc-900/20 border-white/5 opacity-60'
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-zinc-800 flex items-center justify-center text-3xl flex-shrink-0">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 ${
+                    meetsReqs && soldier ? 'bg-zinc-800' : 'bg-zinc-800/50'
+                  }`}>
                     {mission.emoji}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-black uppercase tracking-wide">{mission.name}</h3>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h3 className={`font-black uppercase tracking-wide ${isLocked ? 'text-zinc-500' : ''}`}>{mission.name}</h3>
                       <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase ${DIFFICULTY_COLORS[mission.difficulty]}`}>
                         {mission.difficulty}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase text-yellow-400 bg-yellow-500/10">
+                        🎰 {mission.jackpotChance}% JACKPOT
                       </span>
                     </div>
                     <div className="text-[11px] text-zinc-600 italic mb-2">&quot;{mission.flavorText}&quot;</div>
                     <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
                       <span>⏱️ {mission.durationLabel}</span>
                       <span className="text-amber-400 font-bold">💰 {soldier ? `~${estimatedReward.toLocaleString()}` : `${mission.baseReward}+`} $SHIT</span>
+                      {soldier && meetsReqs && (
+                        <span className="text-yellow-400 font-bold">🎰 up to {jackpotReward.toLocaleString()}</span>
+                      )}
                       <span>⚡ {mission.requirements.minPower}+ PWR</span>
                       <span>LVL {mission.requirements.minLevel}+</span>
                     </div>
-                    {soldier && !meetsReqs && (
-                      <div className="text-[10px] text-red-400 mt-1 font-bold uppercase">
-                        {soldier.power < mission.requirements.minPower && `too weak (need ${mission.requirements.minPower} PWR)`}
-                        {soldier.level < mission.requirements.minLevel && ` too low lvl (need ${mission.requirements.minLevel})`}
+
+                    {/* Locked: show what to do + what you'll earn */}
+                    {isLocked && (
+                      <div className="mt-2 p-2 bg-zinc-800/30 rounded-lg border border-white/5">
+                        <div className="text-[10px] text-red-400 font-bold uppercase mb-1">
+                          {needsPower && `need ${mission.requirements.minPower} PWR (you have ${soldier.power})`}
+                          {needsPower && needsLevel && ' · '}
+                          {needsLevel && `need LVL ${mission.requirements.minLevel} (you're ${soldier.level})`}
+                        </div>
+                        <div className="text-[10px] text-zinc-500">
+                          unlock this to earn <span className="text-amber-400 font-bold">~{Math.floor(mission.baseReward * 1.5).toLocaleString()}-{Math.floor(mission.baseReward * 3).toLocaleString()} $SHIT</span> per run
+                          {mission.jackpotChance >= 10 && <span className="text-yellow-400"> · high jackpot chance!</span>}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -623,14 +693,21 @@ export default function Army({ userId: _userId }: { userId: string }) {
           ) : (
             <div className="space-y-3">
               {raidLog.map((entry) => (
-                <div key={entry.id} className="flex items-center gap-4 p-4 bg-zinc-900/50 rounded-2xl border border-white/5 hover:border-amber-500/20 transition-colors">
+                <div key={entry.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-colors ${
+                  entry.isJackpot
+                    ? 'bg-yellow-500/5 border-yellow-500/30'
+                    : 'bg-zinc-900/50 border-white/5 hover:border-amber-500/20'
+                }`}>
                   <div className="text-3xl">{entry.soldierEmoji}</div>
                   <div className="flex-1">
-                    <div className="font-black text-sm uppercase">{entry.soldierName}</div>
+                    <div className="font-black text-sm uppercase">
+                      {entry.soldierName}
+                      {entry.isJackpot && <span className="text-yellow-400 ml-2">🎰 JACKPOT!</span>}
+                    </div>
                     <div className="text-xs text-zinc-500">{entry.missionEmoji} {entry.missionName}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-amber-400 font-black">+{entry.reward.toLocaleString()} $SHIT</div>
+                    <div className={`font-black ${entry.isJackpot ? 'text-yellow-400' : 'text-amber-400'}`}>+{entry.reward.toLocaleString()} $SHIT</div>
                     <div className="text-xs text-purple-400">+{entry.xp} XP</div>
                   </div>
                   <div className="text-xs text-zinc-600 w-16 text-right">
@@ -676,12 +753,29 @@ export default function Army({ userId: _userId }: { userId: string }) {
               <div className="flex justify-between text-sm">
                 <span className="text-zinc-500">Est. Loot</span>
                 <span className="font-black text-amber-400">
-                  ~{Math.floor(deployModal.mission.baseReward * (1 + (deployModal.soldier.power * deployModal.soldier.level) / 500)).toLocaleString()} $SHIT
+                  ~{Math.floor(deployModal.mission.baseReward * (1 + (deployModal.soldier.power * deployModal.soldier.level) / 500) * streakMultiplier).toLocaleString()} $SHIT
                 </span>
+              </div>
+              {streakMultiplier > 1 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-500">Streak Bonus</span>
+                  <span className="font-black text-amber-300">🔥 {streakMultiplier}x</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-500">Jackpot Chance</span>
+                <span className="font-black text-yellow-400">🎰 {deployModal.mission.jackpotChance}% ({deployModal.mission.jackpotMultiplier}x loot)</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-zinc-500">XP</span>
                 <span className="font-bold text-purple-400">+{deployModal.mission.xpReward}</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-yellow-500/5 border border-yellow-500/10 rounded-xl mb-4 text-center">
+              <div className="text-[10px] text-yellow-400 font-bold uppercase">🎰 JACKPOT POTENTIAL</div>
+              <div className="text-lg font-black text-yellow-400">
+                up to {Math.floor(deployModal.mission.baseReward * (1 + (deployModal.soldier.power * deployModal.soldier.level) / 500) * streakMultiplier * deployModal.mission.jackpotMultiplier).toLocaleString()} $SHIT
               </div>
             </div>
 
