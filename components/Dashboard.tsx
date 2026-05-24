@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import KYCModal from './KYCModal';
 import ReferralPage from './ReferralPage';
@@ -20,8 +20,13 @@ import MiniGames from './MiniGames';
 import VIPTiers from './VIPTiers';
 import FiatRamp from './FiatRamp';
 import AntiFraud from './AntiFraud';
+import MemeFeed from './MemeFeed';
+import Guilds from './Guilds';
+import AmbassadorPanel from './AmbassadorPanel';
+import SeasonalEvents from './SeasonalEvents';
 import Tooltip from './ui/Tooltip';
 import EmptyState from './ui/EmptyState';
+import { SkeletonDashboard, SkeletonOfferwall } from './SkeletonLoader';
 
 import { useDashboard } from '@/hooks/useDashboard';
 import { getRank } from '@/lib/types';
@@ -51,7 +56,7 @@ function isValidEthAddress(addr: string): boolean {
 }
 
 export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _initialIsGeneral, generalDaysLeft, showOnboarding = false, onCompleteOnboarding }: DashboardProps) {
-  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud">("dashboard");
+  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "ambassador" | "events">("dashboard");
 
   const db = useDashboard();
 
@@ -72,6 +77,26 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
   const [txFilter, setTxFilter] = useState<string>('all');
 
 
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
+      if (e.key === 'Escape') {
+        setShowKYCModal(false);
+        setShowBattlePass(false);
+        setShowAirdrop(false);
+        setShowWithdrawModal(false);
+        setShowMerchModal(false);
+        setShowBuyModal(false);
+      }
+      if (!e.ctrlKey && !e.metaKey) return;
+      const shortcuts: Record<string, typeof currentTab> = { '1': 'dashboard', '2': 'offerwall', '3': 'army', '4': 'market', '5': 'quests', '6': 'games' };
+      if (shortcuts[e.key]) { e.preventDefault(); setCurrentTab(shortcuts[e.key]); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentTab]);
 
   // Computed
   const rank = getRank(db.totalEarned);
@@ -488,6 +513,29 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 <div className="text-5xl mb-6 group-hover:animate-subtle-float">{'\u{1F4DC}'}</div>
                 <div className="text-2xl md:text-3xl font-black group-hover:text-amber-400 transition-colors">MISSIONS</div>
                 <div className="text-zinc-400 mt-2 text-sm">daily & weekly grinds {'\u2022'} stack rewards</div>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-4 gap-4 mt-4">
+              <div onClick={() => setCurrentTab("memes")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
+                <div className="text-3xl mb-3">{'\u{1F92A}'}</div>
+                <div className="text-lg font-black group-hover:text-amber-400 transition-colors">MEME FEED</div>
+                <div className="text-zinc-500 mt-1 text-xs">post {'\u2022'} vote {'\u2022'} earn</div>
+              </div>
+              <div onClick={() => setCurrentTab("guilds")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
+                <div className="text-3xl mb-3">{'\u{1F3F0}'}</div>
+                <div className="text-lg font-black group-hover:text-amber-400 transition-colors">GUILDS</div>
+                <div className="text-zinc-500 mt-1 text-xs">clans {'\u2022'} raids {'\u2022'} chat</div>
+              </div>
+              <div onClick={() => setCurrentTab("ambassador")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
+                <div className="text-3xl mb-3">{'\u{1F4E3}'}</div>
+                <div className="text-lg font-black group-hover:text-amber-400 transition-colors">AMBASSADOR</div>
+                <div className="text-zinc-500 mt-1 text-xs">share {'\u2022'} grow {'\u2022'} earn</div>
+              </div>
+              <div onClick={() => setCurrentTab("events")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group border border-amber-500/20">
+                <div className="text-3xl mb-3">{'\u{1F3D6}\uFE0F'}</div>
+                <div className="text-lg font-black group-hover:text-amber-400 transition-colors">EVENTS</div>
+                <div className="text-zinc-500 mt-1 text-xs">seasonal {'\u2022'} limited {'\u2022'} exclusive</div>
+                <div className="text-xs text-green-400 mt-1 font-semibold">LIVE NOW</div>
               </div>
             </div>
           </motion.div>
@@ -939,6 +987,55 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 sfx.purchase();
                 db.triggerSuccess(`Sold ${amount.toLocaleString()} $SHIT via ${method}!`);
                 db.addTransaction({ type: 'withdrawal', amount: -amount, description: `Sold via ${method}`, status: 'completed' });
+              }}
+            />
+          </motion.div>
+        )}
+
+        {/* MEME FEED */}
+        {currentTab === "memes" && (
+          <motion.div key="memes" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <MemeFeed
+              balance={db.shitBalance}
+              onSpend={(amount, reason) => {
+                db.setShitBalance(prev => Math.max(0, prev - amount));
+                db.addTransaction({ type: 'withdrawal', amount: -amount, description: reason, status: 'completed' });
+              }}
+            />
+          </motion.div>
+        )}
+
+        {/* GUILDS */}
+        {currentTab === "guilds" && (
+          <motion.div key="guilds" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <Guilds
+              balance={db.shitBalance}
+              onSpend={(amount, reason) => {
+                db.setShitBalance(prev => Math.max(0, prev - amount));
+                db.addTransaction({ type: 'withdrawal', amount: -amount, description: reason, status: 'completed' });
+              }}
+            />
+          </motion.div>
+        )}
+
+        {/* AMBASSADOR */}
+        {currentTab === "ambassador" && (
+          <motion.div key="ambassador" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <AmbassadorPanel />
+          </motion.div>
+        )}
+
+        {/* SEASONAL EVENTS */}
+        {currentTab === "events" && (
+          <motion.div key="events" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <SeasonalEvents
+              balance={db.shitBalance}
+              onEarn={(amount, reason) => {
+                db.setShitBalance(prev => prev + amount);
+                sfx.win();
+                fireWinConfetti();
+                db.triggerSuccess(`+${amount} $SHIT from ${reason}!`);
+                db.addTransaction({ type: 'offer', amount, description: reason, status: 'completed' });
               }}
             />
           </motion.div>

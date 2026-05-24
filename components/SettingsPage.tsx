@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { isSoundMuted, setSoundMuted } from '@/lib/sounds';
+import { SUPPORTED_LOCALES, type Locale } from '@/lib/i18n';
 
 interface SettingsPageProps {
   userId: string;
@@ -32,6 +33,20 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
     }
     return 'dark';
   });
+
+  const [locale, setLocale] = useState<Locale>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('shit-locale') as Locale) || 'en';
+    }
+    return 'en';
+  });
+
+  const handleLocaleChange = (newLocale: Locale) => {
+    setLocale(newLocale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('shit-locale', newLocale);
+    }
+  };
 
   const handleSoundToggle = (val: boolean) => {
     setNotifSound(val);
@@ -497,6 +512,27 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
                   <div className="text-3xl mb-2">{opt.icon}</div>
                   <div className="font-bold text-sm">{opt.label}</div>
                   <div className="text-xs text-zinc-500 mt-1">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/10">
+            <h3 className="text-xl font-bold mb-2">{'\u{1F30D}'} Language</h3>
+            <p className="text-sm text-zinc-500 mb-4">Choose your preferred language</p>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              {SUPPORTED_LOCALES.map(loc => (
+                <button
+                  key={loc.code}
+                  onClick={() => handleLocaleChange(loc.code)}
+                  className={`p-3 rounded-xl border-2 text-center transition-all ${
+                    locale === loc.code
+                      ? 'border-amber-500 bg-amber-500/10'
+                      : 'border-white/10 hover:border-white/20 bg-zinc-800/50'
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{loc.flag}</div>
+                  <div className="text-xs font-semibold">{loc.name}</div>
                 </button>
               ))}
             </div>

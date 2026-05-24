@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import NotificationCenter from './NotificationCenter';
 import type { Notification } from '@/lib/types';
 
-type TabId = "dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud";
+type TabId = "dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "ambassador" | "events";
 
 interface DashboardNavProps {
   currentTab: TabId;
@@ -51,7 +51,7 @@ export default function DashboardNav({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const moreTabIds = ['battlepass', 'achievements', 'leaderboard', 'referral', 'army', 'history', 'settings', 'admin', 'stake', 'merch', 'spin', 'games', 'vip', 'fiat', 'antifraud'];
+  const moreTabIds = ['battlepass', 'achievements', 'leaderboard', 'referral', 'army', 'history', 'settings', 'admin', 'stake', 'merch', 'spin', 'games', 'vip', 'fiat', 'antifraud', 'memes', 'guilds', 'ambassador', 'events'];
 
   return (
     <>
@@ -142,6 +142,24 @@ export default function DashboardNav({
                     { id: "games", label: "Mini Games", icon: "\u{1F3B2}" },
                     { id: "vip", label: "VIP Tiers", icon: "\u{1F48E}" },
                     { id: "fiat", label: "Buy/Sell", icon: "\u{1F4B5}" },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => { setCurrentTab(item.id as TabId); setShowMoreMenu(false); }}
+                      className={`w-full px-3 py-2 text-left flex items-center gap-3 hover:bg-white/5 text-sm ${currentTab === item.id ? 'text-amber-400' : ''}`}
+                    >
+                      <span>{item.icon}</span> <span>{item.label}</span>
+                    </button>
+                  ))}
+
+                  <div className="px-3 py-1.5 text-[10px] text-zinc-500 uppercase font-bold tracking-widest mt-1 border-t border-white/5 pt-2">
+                    Social
+                  </div>
+                  {[
+                    { id: "memes", label: "Meme Feed", icon: "🤪" },
+                    { id: "guilds", label: "Guilds", icon: "🏰" },
+                    { id: "ambassador", label: "Ambassador", icon: "📣" },
+                    { id: "events", label: "Events", icon: "🏖️" },
                   ].map((item) => (
                     <button
                       key={item.id}
