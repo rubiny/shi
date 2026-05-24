@@ -584,9 +584,9 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             <div>
               <h4 className="font-bold mb-4 text-zinc-400">BORING STUFF</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
-                <li><a href="/terms" className="hover:text-white transition-colors">Terms</a></li>
-                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="/kyc-policy" className="hover:text-white transition-colors">KYC Policy</a></li>
+                <li><a href="/legal/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/legal/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/legal/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
               </ul>
             </div>
           </div>

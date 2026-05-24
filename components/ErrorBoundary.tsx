@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Component, type ReactNode } from 'react';
+import { sentry } from '@/lib/sentry';
 
 interface Props {
   children: ReactNode;
@@ -23,6 +24,10 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    sentry.captureException(error, {
+      component: this.props.fallbackTitle || 'unknown',
+      componentStack: errorInfo.componentStack,
+    });
     if (process.env.NODE_ENV === 'development') {
       console.error('ErrorBoundary caught:', error, errorInfo);
     }
