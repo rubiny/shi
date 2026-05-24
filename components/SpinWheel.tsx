@@ -8,15 +8,14 @@ interface SpinWheelProps {
 }
 
 const SEGMENTS = [
-  { label: '50 $SHIT', value: 50, color: '#3f3f46', colorEnd: '#52525b', chance: 25 },
-  { label: '100 $SHIT', value: 100, color: '#b45309', colorEnd: '#92400e', chance: 20 },
-  { label: '250 $SHIT', value: 250, color: '#52525b', colorEnd: '#3f3f46', chance: 15 },
-  { label: '500 $SHIT', value: 500, color: '#d97706', colorEnd: '#b45309', chance: 12 },
-  { label: '1K $SHIT', value: 1000, color: '#3f3f46', colorEnd: '#52525b', chance: 10 },
-  { label: '2x JUICE', value: 0, color: '#7c3aed', colorEnd: '#6d28d9', chance: 8 },
-  { label: '2.5K $SHIT', value: 2500, color: '#f59e0b', colorEnd: '#d97706', chance: 5 },
-  { label: '5K $SHIT', value: 5000, color: '#ea580c', colorEnd: '#c2410c', chance: 3 },
-  { label: 'MOON BAG', value: 10000, color: '#eab308', colorEnd: '#ca8a04', chance: 2 },
+  { label: '50', emoji: '\u{1F4A9}', value: 50, color: '#1e1b4b', chance: 30 },
+  { label: '100', emoji: '\u{1F4B0}', value: 100, color: '#78350f', chance: 25 },
+  { label: '250', emoji: '\u{1F525}', value: 250, color: '#1e1b4b', chance: 18 },
+  { label: '500', emoji: '\u{1F48E}', value: 500, color: '#78350f', chance: 12 },
+  { label: '1K', emoji: '\u{1F680}', value: 1000, color: '#1e1b4b', chance: 8 },
+  { label: 'JUICE', emoji: '\u{1F9EA}', value: 0, color: '#4c1d95', chance: 4 },
+  { label: '5K', emoji: '\u{2B50}', value: 5000, color: '#78350f', chance: 2 },
+  { label: 'MOON', emoji: '\u{1F31D}', value: 10000, color: '#4c1d95', chance: 1 },
 ];
 
 const SCRATCH_PRIZES = [
@@ -299,13 +298,118 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
     [scratchesLeft, scratchCards, onReward]
   );
 
-  /* ─── SVG Wheel ─── */
-  const wheelSize = 340;
-  const cx = wheelSize / 2;
-  const cy = wheelSize / 2;
-  const outerRadius = wheelSize / 2 - 6;
-  const innerRadius = outerRadius - 8;
+  /* ─── Canvas Wheel ─── */
+  const wheelCanvasRef = useRef<HTMLCanvasElement>(null);
+  const wheelSize = 320;
   const segmentAngle = 360 / SEGMENTS.length;
+
+  useEffect(() => {
+    const canvas = wheelCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const size = canvas.width;
+    const c = size / 2;
+    const r = c - 24;
+
+    ctx.clearRect(0, 0, size, size);
+
+    // Draw segments
+    SEGMENTS.forEach((seg, i) => {
+      const startRad = ((i * segmentAngle - 90) * Math.PI) / 180;
+      const endRad = (((i + 1) * segmentAngle - 90) * Math.PI) / 180;
+
+      // Segment fill
+      ctx.beginPath();
+      ctx.moveTo(c, c);
+      ctx.arc(c, c, r, startRad, endRad);
+      ctx.closePath();
+      ctx.fillStyle = seg.color;
+      ctx.fill();
+
+      // Inner shine
+      const grad = ctx.createRadialGradient(c, c, r * 0.15, c, c, r);
+      grad.addColorStop(0, 'rgba(255,255,255,0.06)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.1)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Segment border
+      ctx.strokeStyle = 'rgba(245,158,11,0.25)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Label
+      const midRad = ((i * segmentAngle + segmentAngle / 2 - 90) * Math.PI) / 180;
+      const labelDist = r * 0.65;
+      const lx = c + Math.cos(midRad) * labelDist;
+      const ly = c + Math.sin(midRad) * labelDist;
+
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(midRad + Math.PI / 2);
+
+      // Emoji
+      ctx.font = '24px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(seg.emoji, 0, -6);
+
+      // Value text
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#fff';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 4;
+      ctx.fillText(seg.label, 0, 14);
+      ctx.shadowBlur = 0;
+
+      ctx.restore();
+    });
+
+    // Outer decorative ring
+    ctx.beginPath();
+    ctx.arc(c, c, r + 4, 0, Math.PI * 2);
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    // LED dots
+    for (let i = 0; i < 32; i++) {
+      const dotRad = ((i * (360 / 32) - 90) * Math.PI) / 180;
+      const dx = c + Math.cos(dotRad) * (r + 12);
+      const dy = c + Math.sin(dotRad) * (r + 12);
+      ctx.beginPath();
+      ctx.arc(dx, dy, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = i % 2 === 0 ? '#fbbf24' : '#f97316';
+      ctx.fill();
+    }
+
+    // Outer dark ring behind LEDs
+    ctx.beginPath();
+    ctx.arc(c, c, r + 18, 0, Math.PI * 2);
+    ctx.strokeStyle = '#27272a';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Center hub
+    const hubGrad = ctx.createRadialGradient(c, c, 0, c, c, 36);
+    hubGrad.addColorStop(0, '#3f3f46');
+    hubGrad.addColorStop(1, '#18181b');
+    ctx.beginPath();
+    ctx.arc(c, c, 36, 0, Math.PI * 2);
+    ctx.fillStyle = hubGrad;
+    ctx.fill();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Center emoji
+    ctx.font = '30px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('\u{1F4A9}', c, c + 1);
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
@@ -342,132 +446,40 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
       {activeGame === 'wheel' && (
         <div className="flex flex-col items-center">
           {/* Wheel Container */}
-          <div className="relative mb-8" style={{ width: wheelSize, height: wheelSize }}>
-            {/* Pointer / Triangle - sits on top of wheel */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20" style={{ marginTop: -4 }}>
-              <svg width="28" height="36" viewBox="0 0 28 36">
-                <defs>
-                  <filter id="pointerShadow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.5" />
-                  </filter>
-                </defs>
-                <polygon points="14,36 0,0 28,0" fill="#f59e0b" stroke="#78350f" strokeWidth="1.5" filter="url(#pointerShadow)" />
-              </svg>
+          <div className="relative mb-8 flex items-center justify-center" style={{ width: wheelSize + 32, height: wheelSize + 32 }}>
+            {/* Pointer */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20" style={{ marginTop: 2 }}>
+              <div className="w-0 h-0 border-l-[14px] border-r-[14px] border-t-[28px] border-l-transparent border-r-transparent border-t-amber-500" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }} />
             </div>
 
-            {/* Pulsing outer glow */}
+            {/* Glow */}
             <div
-              className={`absolute -inset-6 rounded-full blur-2xl transition-opacity duration-1000 ${spinning ? 'opacity-60 animate-pulse' : 'opacity-30'}`}
-              style={{
-                background: 'radial-gradient(circle, rgba(245,158,11,0.5) 0%, rgba(234,88,12,0.2) 50%, transparent 70%)',
-              }}
+              className={`absolute inset-0 rounded-full blur-2xl transition-opacity duration-1000 ${spinning ? 'opacity-50 animate-pulse' : 'opacity-20'}`}
+              style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.4) 0%, transparent 70%)' }}
             />
 
-            {/* SVG Wheel */}
-            <svg
-              width={wheelSize}
-              height={wheelSize}
-              viewBox={`0 0 ${wheelSize} ${wheelSize}`}
+            {/* Canvas Wheel */}
+            <canvas
+              ref={wheelCanvasRef}
+              width={wheelSize * 2}
+              height={wheelSize * 2}
               className="relative z-10"
               style={{
+                width: wheelSize,
+                height: wheelSize,
                 transform: `rotate(${rotation}deg)`,
                 transition: spinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
-                filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))',
+                filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.6))',
               }}
-            >
-              <defs>
-                {/* Gradient defs for each segment */}
-                {SEGMENTS.map((segment, i) => (
-                  <radialGradient key={`grad-${i}`} id={`seg-grad-${i}`} cx="50%" cy="50%" r="60%">
-                    <stop offset="0%" stopColor={segment.colorEnd} />
-                    <stop offset="100%" stopColor={segment.color} />
-                  </radialGradient>
-                ))}
-              </defs>
-
-              {/* Decorative outer ring */}
-              <circle cx={cx} cy={cy} r={outerRadius + 4} fill="none" stroke="#f59e0b" strokeWidth="3" opacity="0.7" />
-              <circle cx={cx} cy={cy} r={outerRadius + 1.5} fill="none" stroke="#78350f" strokeWidth="1" opacity="0.5" />
-
-              {/* Segments */}
-              {SEGMENTS.map((segment, i) => {
-                const startAngle = i * segmentAngle;
-                const endAngle = startAngle + segmentAngle;
-                const d = describeArc(cx, cy, innerRadius, startAngle, endAngle);
-
-                // Label position — pushed outward
-                const midAngle = startAngle + segmentAngle / 2;
-                const labelR = innerRadius * 0.62;
-                const labelPos = polarToCartesian(cx, cy, labelR, midAngle);
-
-                // Tick marks at segment boundaries
-                const tickOuter = polarToCartesian(cx, cy, outerRadius + 1, startAngle);
-                const tickInner = polarToCartesian(cx, cy, innerRadius - 6, startAngle);
-
-                return (
-                  <g key={i}>
-                    <path d={d} fill={`url(#seg-grad-${i})`} stroke="#09090b" strokeWidth="1.5" />
-                    {/* Tick mark line at boundary */}
-                    <line
-                      x1={tickOuter.x} y1={tickOuter.y}
-                      x2={tickInner.x} y2={tickInner.y}
-                      stroke="#f59e0b"
-                      strokeWidth="1.5"
-                      opacity="0.4"
-                    />
-                    {/* Label — flip text on bottom half so it stays readable */}
-                    <text
-                      x={labelPos.x}
-                      y={labelPos.y}
-                      fill="white"
-                      fontSize="11"
-                      fontWeight="800"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      transform={`rotate(${midAngle > 180 ? midAngle + 180 : midAngle}, ${labelPos.x}, ${labelPos.y})`}
-                      style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}
-                    >
-                      {segment.label}
-                    </text>
-                  </g>
-                );
-              })}
-
-              {/* Dot markers on outer ring at each boundary */}
-              {SEGMENTS.map((_, i) => {
-                const angle = i * segmentAngle;
-                const dotPos = polarToCartesian(cx, cy, outerRadius + 4, angle);
-                return (
-                  <circle key={`dot-${i}`} cx={dotPos.x} cy={dotPos.y} r="3" fill="#f59e0b" opacity="0.8" />
-                );
-              })}
-
-              {/* Inner decorative rings */}
-              <circle cx={cx} cy={cy} r="42" fill="#09090b" stroke="#f59e0b" strokeWidth="3" />
-              <circle cx={cx} cy={cy} r="37" fill="#18181b" stroke="#27272a" strokeWidth="1" />
-              <circle cx={cx} cy={cy} r="34" fill="url(#centerGrad)" />
-
-              {/* Center gradient */}
-              <defs>
-                <radialGradient id="centerGrad">
-                  <stop offset="0%" stopColor="#27272a" />
-                  <stop offset="100%" stopColor="#18181b" />
-                </radialGradient>
-              </defs>
-
-              {/* Center poop emoji */}
-              <text x={cx} y={cy + 2} fontSize="30" textAnchor="middle" dominantBaseline="middle">
-                {'\u{1F4A9}'}
-              </text>
-            </svg>
+            />
           </div>
 
           {/* Result */}
           {result && (
             <div className="mb-6 px-8 py-5 rounded-2xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-center shadow-lg shadow-amber-500/10">
-              <div className="text-3xl font-black text-amber-400 mb-1">{result.label}</div>
+              <div className="text-3xl font-black text-amber-400 mb-1">{result.emoji} {result.value > 0 ? `${result.label} $SHIT` : result.label}</div>
               <div className="text-sm text-zinc-400">
-                {result.value > 0 ? `+${result.value} $SHIT added ser!` : 'Boost activated! LFG'}
+                {result.value > 0 ? `+${result.value} $SHIT added ser!` : '2x boost activated! LFG'}
               </div>
             </div>
           )}
@@ -495,20 +507,15 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
             <div className="mt-3 text-xs text-amber-400">{'\u{1F451}'} VIP: 3 daily spins + better odds</div>
           )}
 
-          {/* Prize Table */}
-          <div className="mt-8 w-full max-w-sm">
-            <h3 className="font-bold mb-3 text-sm text-zinc-400">PRIZE TABLE</h3>
-            <div className="space-y-1">
-              {SEGMENTS.map((segment, i) => (
-                <div key={i} className="flex items-center justify-between p-2 bg-zinc-800/30 rounded-lg text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: segment.color }} />
-                    <span>{segment.label}</span>
-                  </div>
-                  <span className="text-zinc-500">{segment.chance}%</span>
-                </div>
-              ))}
-            </div>
+          {/* Compact Prize Grid */}
+          <div className="mt-6 grid grid-cols-4 gap-2 w-full max-w-sm">
+            {SEGMENTS.map((seg, i) => (
+              <div key={i} className="flex flex-col items-center p-2 bg-zinc-800/30 rounded-xl text-center">
+                <span className="text-lg">{seg.emoji}</span>
+                <span className="text-xs font-bold mt-0.5">{seg.label}</span>
+                <span className="text-[10px] text-zinc-500">{seg.chance}%</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
