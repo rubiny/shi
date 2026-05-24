@@ -81,33 +81,21 @@
       "short_name": "Offers",
       "description": "Complete offers to earn $SHIT",
       "url": "?tab=offerwall",
-      "icons": [{ "src": "/icons/shortcut-offers.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Battle Pass",
       "short_name": "BP",
       "description": "View Battle Pass progress",
       "url": "?tab=battlepass",
-      "icons": [{ "src": "/icons/shortcut-bp.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Referrals",
       "short_name": "Invite",
       "description": "Invite friends and earn",
       "url": "?tab=referral",
-      "icons": [{ "src": "/icons/shortcut-referral.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
-  ],
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.shitarmy.app",
-      "id": "com.shitarmy.app"
-    },
-    {
-      "platform": "itunes",
-      "url": "https://apps.apple.com/app/shit-army/id1234567890"
-    }
-  ],
-  "prefer_related_applications": false
+  ]
 }

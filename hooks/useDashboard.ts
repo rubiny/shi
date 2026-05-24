@@ -147,7 +147,7 @@ export function useDashboard() {
           id: uo.id as string,
           offerId: uo.offer_id as number,
           progress: uo.progress as number,
-          status: uo.status as string,
+          status: uo.status as ActiveOffer['status'],
           startedAt: new Date(uo.started_at as string),
           estimatedReward: uo.reward as number,
           userOfferId: uo.id as string,
@@ -259,7 +259,7 @@ export function useDashboard() {
           setUserId(user.id);
           await fetchUserData(user.id);
         } else {
-          console.log('Development mode: Loading mock data');
+          process.env.NODE_ENV === 'development' && console.log('Development mode: Loading mock data');
           loadMockData();
           setLoading(false);
         }

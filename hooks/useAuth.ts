@@ -33,7 +33,12 @@ export function useAuth(): UseAuthReturn {
     const checkSession = async () => {
       try {
         if (isSupabaseMockMode) {
-          // Mock user for development
+          // In production with missing env vars, don't auto-login
+          if (process.env.NODE_ENV === 'production') {
+            setIsLoading(false);
+            return;
+          }
+          // Mock user for development only
           setUser({
             id: 'mock-user-id',
             wallet_address: '0x1234...5678',

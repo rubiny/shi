@@ -26,6 +26,7 @@ import SeasonalEvents from './SeasonalEvents';
 import Tooltip from './ui/Tooltip';
 import EmptyState from './ui/EmptyState';
 import { SkeletonDashboard, SkeletonOfferwall } from './SkeletonLoader';
+import ErrorBoundary from './ErrorBoundary';
 
 import { useDashboard } from '@/hooks/useDashboard';
 import { getRank } from '@/lib/types';
@@ -46,7 +47,7 @@ interface DashboardProps {
 
 const tabVariants = {
   initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' as const } },
   exit: { opacity: 0, y: -8, transition: { duration: 0.15 } },
 };
 
@@ -356,10 +357,10 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 <div onClick={() => setShowBattlePass(true)} className="glass-card rounded-2xl p-6 cursor-pointer hover:border-amber-500/40 transition-all active:scale-[0.985] border border-amber-500/20">
                   <div className="text-xs text-zinc-500 mb-2">NEXT BATTLE PASS REWARD</div>
                   <div className="flex items-center gap-4">
-                    <div className="text-4xl">{nextBPReward.free.icon}</div>
+                    <div className="text-4xl">{'\u{1F3C6}'}</div>
                     <div>
                       <div className="font-bold text-amber-400">Tier {nextBPReward.tier}</div>
-                      <div className="text-sm text-zinc-400">{db.isGeneral ? nextBPReward.premium.description : nextBPReward.free.description}</div>
+                      <div className="text-sm text-zinc-400">{db.isGeneral ? (nextBPReward.premium.extra || nextBPReward.premium.type) : (nextBPReward.free.extra || nextBPReward.free.type)}</div>
                       <div className="text-xs text-amber-400 mt-1 font-bold">+{db.isGeneral ? nextBPReward.premium.amount : nextBPReward.free.amount} $SHIT</div>
                     </div>
                   </div>
@@ -793,14 +794,14 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {/* ARMY (NFT) */}
         {currentTab === "army" && (
           <motion.div key="army" variants={tabVariants} initial="initial" animate="animate" exit="exit">
-            <Army userId={db.userId || 'mock-user'} />
+            <ErrorBoundary fallbackTitle="ARMY CRASHED"><Army userId={db.userId || 'mock-user'} /></ErrorBoundary>
           </motion.div>
         )}
 
         {/* MARKET */}
         {currentTab === "market" && (
           <motion.div key="market2" variants={tabVariants} initial="initial" animate="animate" exit="exit">
-            <Market userId={db.userId || 'mock-user'} />
+            <ErrorBoundary fallbackTitle="BAZAAR CRASHED"><Market userId={db.userId || 'mock-user'} /></ErrorBoundary>
           </motion.div>
         )}
 
@@ -854,7 +855,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {/* ADMIN PANEL */}
         {currentTab === "admin" && db.isGeneral && (
           <motion.div key="admin" variants={tabVariants} initial="initial" animate="animate" exit="exit">
-            <AdminPanel adminUserId={db.userId || 'mock-user'} />
+            <ErrorBoundary fallbackTitle="ADMIN CRASHED"><AdminPanel adminUserId={db.userId || 'mock-user'} /></ErrorBoundary>
           </motion.div>
         )}
 
@@ -872,6 +873,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {/* SPIN WHEEL */}
         {currentTab === "spin" && (
           <motion.div key="spin" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <ErrorBoundary fallbackTitle="WHEEL BROKE">
             <SpinWheel
               isVip={db.vipTier >= 2}
               onReward={(amount, label) => {
@@ -886,12 +888,14 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 }
               }}
             />
+            </ErrorBoundary>
           </motion.div>
         )}
 
         {/* MINI GAMES */}
         {currentTab === "games" && (
           <motion.div key="games" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <ErrorBoundary fallbackTitle="CASINO BROKE">
             <MiniGames
               balance={db.shitBalance}
               onWin={(amount, game) => {
@@ -909,6 +913,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 db.addTransaction({ type: 'withdrawal', amount: -amount, description: `${game} loss`, status: 'completed' });
               }}
             />
+            </ErrorBoundary>
           </motion.div>
         )}
 
@@ -956,6 +961,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {/* MEME FEED */}
         {currentTab === "memes" && (
           <motion.div key="memes" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <ErrorBoundary fallbackTitle="MEME FEED BROKE">
             <MemeFeed
               balance={db.shitBalance}
               onSpend={(amount, reason) => {
@@ -963,12 +969,14 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 db.addTransaction({ type: 'withdrawal', amount: -amount, description: reason, status: 'completed' });
               }}
             />
+            </ErrorBoundary>
           </motion.div>
         )}
 
         {/* GUILDS */}
         {currentTab === "guilds" && (
           <motion.div key="guilds" variants={tabVariants} initial="initial" animate="animate" exit="exit">
+            <ErrorBoundary fallbackTitle="GUILD HALL BROKE">
             <Guilds
               balance={db.shitBalance}
               onSpend={(amount, reason) => {
@@ -976,6 +984,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 db.addTransaction({ type: 'withdrawal', amount: -amount, description: reason, status: 'completed' });
               }}
             />
+            </ErrorBoundary>
           </motion.div>
         )}
 
@@ -1123,7 +1132,6 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                         setSelectedOffer(null);
                       }
                     }}
-                    disabled={isCompleting}
                     className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] disabled:bg-zinc-800 disabled:from-zinc-800 disabled:to-zinc-800 disabled:text-zinc-500 shadow-lg shadow-amber-500/20"
                   >
                     {(() => {
@@ -1353,7 +1361,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
           isOpen={showKYCModal}
           onClose={() => setShowKYCModal(false)}
           onSubmit={(data) => {
-            console.log('KYC submitted:', data);
+            process.env.NODE_ENV === 'development' && console.log('KYC submitted:', data);
             db.setKycStatus('pending');
             db.triggerSuccess('KYC submitted! Under review...');
           }}

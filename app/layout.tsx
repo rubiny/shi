@@ -76,6 +76,39 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'SHIT.ARMY',
+              url: 'https://shit.army',
+              description: 'Complete offers, stake $SHIT, recruit soldiers & earn real crypto.',
+              applicationCategory: 'GameApplication',
+              operatingSystem: 'Web',
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+              },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.7',
+                ratingCount: '12400',
+              },
+              publisher: {
+                '@type': 'Organization',
+                name: 'SHIT.ARMY',
+                url: 'https://shit.army',
+                logo: {
+                  '@type': 'ImageObject',
+                  url: 'https://shit.army/icons/icon-512x512.png',
+                },
+              },
+            }),
+          }}
+        />
         {children}
         <script
           dangerouslySetInnerHTML={{

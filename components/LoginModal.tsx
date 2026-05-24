@@ -30,18 +30,18 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setConnectionError(null);
 
     try {
-      const ethereum = typeof window !== 'undefined' ? (window as Record<string, unknown>).ethereum : null;
+      const ethereum = typeof window !== 'undefined' ? (window as unknown as Record<string, unknown>).ethereum : null;
       if (ethereum && walletId === 'metamask') {
         const accounts = await (ethereum as { request: (args: { method: string }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
         if (accounts?.[0]) {
-          console.log('Connected wallet:', walletId, 'address:', accounts[0]);
+          process.env.NODE_ENV === 'development' && console.log('Connected wallet:', walletId, 'address:', accounts[0]);
           onClose();
           setStep('choose');
           return;
         }
       }
     } catch {
-      console.log('Native wallet connection unavailable, using demo mode');
+      process.env.NODE_ENV === 'development' && console.log('Native wallet connection unavailable, using demo mode');
     }
 
     // Demo mode: simulate connection with progress steps
@@ -49,7 +49,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setConnectionError(null);
     await new Promise(r => setTimeout(r, 700));
     const demoAddress = '0x' + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-    console.log('Demo wallet connected:', walletId, 'address:', demoAddress);
+    process.env.NODE_ENV === 'development' && console.log('Demo wallet connected:', walletId, 'address:', demoAddress);
     onClose();
     setStep('choose');
   };
