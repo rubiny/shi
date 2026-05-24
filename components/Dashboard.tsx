@@ -22,7 +22,6 @@ import FiatRamp from './FiatRamp';
 import AntiFraud from './AntiFraud';
 import MemeFeed from './MemeFeed';
 import Guilds from './Guilds';
-import AmbassadorPanel from './AmbassadorPanel';
 import SeasonalEvents from './SeasonalEvents';
 import Tooltip from './ui/Tooltip';
 import EmptyState from './ui/EmptyState';
@@ -30,7 +29,7 @@ import { SkeletonDashboard, SkeletonOfferwall } from './SkeletonLoader';
 
 import { useDashboard } from '@/hooks/useDashboard';
 import { getRank } from '@/lib/types';
-import type { Network, MerchProduct, MarketplaceListing } from '@/lib/types';
+import type { Network, MerchProduct } from '@/lib/types';
 import { OFFERS, NETWORKS, MERCH_PRODUCTS, BATTLE_PASS_REWARDS } from '@/lib/constants';
 import { CONFIG } from '@/lib/config';
 import { sfx } from '@/lib/sounds';
@@ -56,7 +55,7 @@ function isValidEthAddress(addr: string): boolean {
 }
 
 export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _initialIsGeneral, generalDaysLeft, showOnboarding = false, onCompleteOnboarding }: DashboardProps) {
-  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "ambassador" | "events">("dashboard");
+  const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud" | "memes" | "guilds" | "events">("dashboard");
 
   const db = useDashboard();
 
@@ -72,8 +71,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
   const [withdrawStep, setWithdrawStep] = useState<1 | 2 | 3>(1);
   const [showMerchModal, setShowMerchModal] = useState(false);
   const [selectedMerch, setSelectedMerch] = useState<MerchProduct | null>(null);
-  const [showBuyModal, setShowBuyModal] = useState(false);
-  const [buyingNFT, setBuyingNFT] = useState<MarketplaceListing | null>(null);
+
   const [txFilter, setTxFilter] = useState<string>('all');
 
 
@@ -88,7 +86,6 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         setShowAirdrop(false);
         setShowWithdrawModal(false);
         setShowMerchModal(false);
-        setShowBuyModal(false);
       }
       if (!e.ctrlKey && !e.metaKey) return;
       const shortcuts: Record<string, typeof currentTab> = { '1': 'dashboard', '2': 'offerwall', '3': 'army', '4': 'market', '5': 'quests', '6': 'games' };
@@ -526,10 +523,10 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 <div className="text-lg font-black group-hover:text-amber-400 transition-colors">GUILDS</div>
                 <div className="text-zinc-500 mt-1 text-xs">clans {'\u2022'} raids {'\u2022'} chat</div>
               </div>
-              <div onClick={() => setCurrentTab("ambassador")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
+              <div onClick={() => setCurrentTab("referral")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group">
                 <div className="text-3xl mb-3">{'\u{1F4E3}'}</div>
-                <div className="text-lg font-black group-hover:text-amber-400 transition-colors">AMBASSADOR</div>
-                <div className="text-zinc-500 mt-1 text-xs">share {'\u2022'} grow {'\u2022'} earn</div>
+                <div className="text-lg font-black group-hover:text-amber-400 transition-colors">RECRUIT</div>
+                <div className="text-zinc-500 mt-1 text-xs">refer {'\u2022'} grow {'\u2022'} earn</div>
               </div>
               <div onClick={() => setCurrentTab("events")} className="cursor-pointer glass-card glass-card-hover rounded-2xl p-6 active:scale-[0.985] transition-all group border border-amber-500/20">
                 <div className="text-3xl mb-3">{'\u{1F3D6}\uFE0F'}</div>
@@ -720,42 +717,6 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             {db.stakedPositions.length === 0 && (
               <EmptyState icon="🔒" title="No staked positions" description="Stake your $SHIT to earn passive income with up to 67% APY." />
             )}
-          </motion.div>
-        )}
-
-        {/* MARKETPLACE */}
-        {currentTab === "market" && (
-          <motion.div key="market" variants={tabVariants} initial="initial" animate="animate" exit="exit">
-            <div className="text-center mb-12">
-              <div className="text-6xl md:text-8xl mb-6">🛒</div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">NFT Marketplace</h2>
-              <p className="text-lg md:text-xl text-zinc-400 mt-3">Buy & sell Poop Army Soldiers • 7.5% platform fee</p>
-            </div>
-            {db.marketListings.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-4">
-                {db.marketListings.map((listing) => (
-                  <div key={listing.id} className="glass-card glass-card-hover rounded-3xl p-8 transition-all">
-                    <div className="flex justify-between mb-6">
-                      <div>
-                        <div className="font-bold text-xl">{listing.name}</div>
-                        <div className="text-amber-400 text-sm">{listing.rank} • Power {listing.power}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-black text-amber-400">{listing.price}</div>
-                        <div className="text-xs text-zinc-500">$SHIT</div>
-                      </div>
-                    </div>
-                    <div className="text-xs text-zinc-500 mb-6">Seller: {listing.seller}</div>
-                    <button onClick={() => { setBuyingNFT(listing); setShowBuyModal(true); }} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black active:scale-[0.985] shadow-lg shadow-amber-500/20">
-                      BUY NOW
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <EmptyState icon="🛒" title="Marketplace is empty" description="All NFTs have been sold! Check back later for new listings." action={{ label: "Browse Army", onClick: () => setCurrentTab("army") }} />
-            )}
-            <div className="text-center text-xs text-zinc-500 mt-8">List your own NFTs soon • 7.5% fee on sales</div>
           </motion.div>
         )}
 
@@ -1015,13 +976,6 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 db.addTransaction({ type: 'withdrawal', amount: -amount, description: reason, status: 'completed' });
               }}
             />
-          </motion.div>
-        )}
-
-        {/* AMBASSADOR */}
-        {currentTab === "ambassador" && (
-          <motion.div key="ambassador" variants={tabVariants} initial="initial" animate="animate" exit="exit">
-            <AmbassadorPanel />
           </motion.div>
         )}
 
@@ -1324,25 +1278,6 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             </div>
             <button onClick={() => buyMerch(selectedMerch)} className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">
               CONFIRM ORDER
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showBuyModal && buyingNFT && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-6" onClick={() => setShowBuyModal(false)}>
-          <div className="bg-zinc-950 border border-white/20 rounded-3xl max-w-md w-full p-9" onClick={e => e.stopPropagation()}>
-            <div className="text-center mb-8">
-              <div className="text-6xl mb-4">🪖</div>
-              <div className="text-2xl font-bold">{buyingNFT.name}</div>
-              <div className="text-amber-400">{buyingNFT.rank} • Power {buyingNFT.power}</div>
-            </div>
-            <div className="flex justify-between text-sm mb-8">
-              <div>Price</div>
-              <div className="font-black text-amber-400">{buyingNFT.price} $SHIT</div>
-            </div>
-            <button onClick={() => { db.buyNFT(buyingNFT); setShowBuyModal(false); setBuyingNFT(null); }} className="w-full py-5 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black text-lg active:scale-[0.985] shadow-lg shadow-amber-500/20">
-              CONFIRM PURCHASE
             </button>
           </div>
         </div>
