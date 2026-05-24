@@ -54,7 +54,7 @@ function ScratchCard({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [revealed, setRevealed] = useState(false);
   const isDrawingRef = useRef(false);
-  const scratchedRef = useRef(0);
+  const moveCountRef = useRef(0);
 
   const rarityColors: Record<string, { text: string; glow: string; bg: string }> = {
     common: { text: 'text-zinc-300', glow: '', bg: 'bg-zinc-700/30' },
@@ -134,36 +134,30 @@ function ScratchCard({
       const x = ((clientX - rect.left) / rect.width) * canvas.width;
       const y = ((clientY - rect.top) / rect.height) * canvas.height;
 
-      // Bigger scratch radius for better feel
-      const brushSize = 28;
+      const brushSize = 22;
 
       ctx.globalCompositeOperation = 'destination-out';
-
-      // Main circle
       ctx.beginPath();
       ctx.arc(x, y, brushSize, 0, Math.PI * 2);
       ctx.fill();
-
-      // Softer edge circles for smoother scratch
-      for (let i = 0; i < 3; i++) {
-        const ox = (Math.random() - 0.5) * brushSize * 0.6;
-        const oy = (Math.random() - 0.5) * brushSize * 0.6;
-        ctx.beginPath();
-        ctx.arc(x + ox, y + oy, brushSize * 0.7, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
       ctx.globalCompositeOperation = 'source-over';
 
-      // Estimate scratched area
-      scratchedRef.current += 1;
-      const totalArea = (canvas.width * canvas.height) / (Math.PI * brushSize * brushSize);
-      const pct = Math.min((scratchedRef.current / totalArea) * 100, 100);
+      // Check actual scratched percentage every ~8 moves via pixel sampling
+      moveCountRef.current += 1;
+      if (moveCountRef.current % 8 === 0) {
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let transparent = 0;
+        const total = imgData.data.length / 4;
+        for (let p = 3; p < imgData.data.length; p += 16) {
+          if (imgData.data[p] === 0) transparent++;
+        }
+        const sampled = imgData.data.length / 16;
+        const pct = (transparent / sampled) * 100;
 
-      // Auto-reveal at 60%
-      if (pct > 60 && !revealed) {
-        setRevealed(true);
-        onReveal();
+        if (pct > 70 && !revealed) {
+          setRevealed(true);
+          onReveal();
+        }
       }
     },
     [revealed, disabled, onReveal]
@@ -421,7 +415,7 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
                       strokeWidth="1.5"
                       opacity="0.4"
                     />
-                    {/* Label */}
+                    {/* Label — flip text on bottom half so it stays readable */}
                     <text
                       x={labelPos.x}
                       y={labelPos.y}
@@ -430,7 +424,7 @@ export default function SpinWheel({ onReward, isVip = false }: SpinWheelProps) {
                       fontWeight="800"
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      transform={`rotate(${midAngle}, ${labelPos.x}, ${labelPos.y})`}
+                      transform={`rotate(${midAngle > 180 ? midAngle + 180 : midAngle}, ${labelPos.x}, ${labelPos.y})`}
                       style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}
                     >
                       {segment.label}
