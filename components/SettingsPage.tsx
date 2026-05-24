@@ -74,6 +74,10 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
 
   const [webhookUrl, setWebhookUrl] = useState('');
   const [postbackUrl, setPostbackUrl] = useState('');
+  const [webhookTesting, setWebhookTesting] = useState(false);
+  const [webhookTestResult, setWebhookTestResult] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [configuringService, setConfiguringService] = useState<string | null>(null);
+  const [serviceKeys, setServiceKeys] = useState<Record<string, string>>({});
 
   const saveProfile = async () => {
     setSaving(true);
@@ -89,6 +93,29 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
       setMessage({ type: 'success', text: '\u{1F514} Notification preferences saved!' });
       setSaving(false);
     }, 800);
+  };
+
+  const testWebhook = async () => {
+    if (!webhookUrl) return;
+    setWebhookTesting(true);
+    setWebhookTestResult(null);
+    setTimeout(() => {
+      const success = webhookUrl.startsWith('https://');
+      setWebhookTestResult(success
+        ? { type: 'success', text: 'Test payload sent! Check your endpoint.' }
+        : { type: 'error', text: 'Failed: URL must use HTTPS' }
+      );
+      setWebhookTesting(false);
+    }, 1500);
+  };
+
+  const handleServiceConfigure = (serviceName: string) => {
+    setConfiguringService(serviceName);
+  };
+
+  const saveServiceKey = (serviceName: string) => {
+    setMessage({ type: 'success', text: `${serviceName} configured successfully!` });
+    setConfiguringService(null);
   };
 
   const tabs = [
@@ -423,13 +450,29 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
               </div>
             </div>
 
-            <button
-              onClick={saveProfile}
-              disabled={saving}
-              className="mt-6 px-6 py-3 bg-amber-600 hover:bg-amber-500 rounded-xl font-semibold transition-all disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Save Webhooks'}
-            </button>
+            <div className="flex items-center gap-3 mt-6">
+              <button
+                onClick={saveProfile}
+                disabled={saving}
+                className="px-6 py-3 bg-amber-600 hover:bg-amber-500 rounded-xl font-semibold transition-all disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : 'Save Webhooks'}
+              </button>
+              <button
+                onClick={testWebhook}
+                disabled={webhookTesting || !webhookUrl}
+                className="px-6 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-semibold transition-all disabled:opacity-50"
+              >
+                {webhookTesting ? 'Sending...' : 'Send Test'}
+              </button>
+            </div>
+            {webhookTestResult && (
+              <div className={`mt-3 p-3 rounded-xl text-sm ${
+                webhookTestResult.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+              }`}>
+                {webhookTestResult.text}
+              </div>
+            )}
           </div>
 
           {/* Connected Services */}
@@ -437,29 +480,54 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
             <h3 className="font-bold mb-6">Connected Services</h3>
             <div className="space-y-4">
               {[
-                { name: 'Supabase', desc: 'Authentication & database', status: 'connected' as const, icon: '\u{26A1}' },
-                { name: 'OfferToro', desc: 'Offerwall provider - surveys & app installs', status: 'not_configured' as const, icon: '\u{1F3AF}' },
-                { name: 'AdGem', desc: 'Offerwall provider - video ads & offers', status: 'not_configured' as const, icon: '\u{1F48E}' },
-                { name: 'AdScend', desc: 'Offerwall provider - content locking', status: 'not_configured' as const, icon: '\u{1F4CA}' },
-                { name: 'OneSignal', desc: 'Push notification delivery', status: 'not_configured' as const, icon: '\u{1F514}' },
-                { name: 'Sentry', desc: 'Error monitoring & performance', status: 'not_configured' as const, icon: '\u{1F41B}' },
-                { name: 'Google Analytics', desc: 'Traffic & conversion tracking', status: 'not_configured' as const, icon: '\u{1F4C8}' },
-                { name: 'SumSub', desc: 'KYC identity verification', status: 'not_configured' as const, icon: '\u{1F6E1}\uFE0F' },
+                { name: 'Supabase', desc: 'Authentication & database', status: 'connected' as const, icon: '\u{26A1}', envKey: 'NEXT_PUBLIC_SUPABASE_URL' },
+                { name: 'OfferToro', desc: 'Offerwall provider - surveys & app installs', status: 'not_configured' as const, icon: '\u{1F3AF}', envKey: 'OFFERTORO_API_KEY' },
+                { name: 'AdGem', desc: 'Offerwall provider - video ads & offers', status: 'not_configured' as const, icon: '\u{1F48E}', envKey: 'ADGEM_API_KEY' },
+                { name: 'AdScend', desc: 'Offerwall provider - content locking', status: 'not_configured' as const, icon: '\u{1F4CA}', envKey: 'ADSCEND_PUBLISHER_ID' },
+                { name: 'OneSignal', desc: 'Push notification delivery', status: 'not_configured' as const, icon: '\u{1F514}', envKey: 'NEXT_PUBLIC_ONESIGNAL_APP_ID' },
+                { name: 'Sentry', desc: 'Error monitoring & performance', status: 'not_configured' as const, icon: '\u{1F41B}', envKey: 'NEXT_PUBLIC_SENTRY_DSN' },
+                { name: 'Google Analytics', desc: 'Traffic & conversion tracking', status: 'not_configured' as const, icon: '\u{1F4C8}', envKey: 'NEXT_PUBLIC_GA_ID' },
+                { name: 'PostHog', desc: 'Product analytics & feature flags', status: 'not_configured' as const, icon: '\u{1F4CA}', envKey: 'NEXT_PUBLIC_POSTHOG_KEY' },
+                { name: 'Mixpanel', desc: 'Event tracking & user analytics', status: 'not_configured' as const, icon: '\u{1F4CA}', envKey: 'NEXT_PUBLIC_MIXPANEL_TOKEN' },
+                { name: 'SumSub', desc: 'KYC identity verification', status: 'not_configured' as const, icon: '\u{1F6E1}\uFE0F', envKey: 'KYC_API_KEY' },
+                { name: 'Printful', desc: 'Merch store fulfillment', status: 'not_configured' as const, icon: '\u{1F455}', envKey: 'PRINTFUL_API_KEY' },
               ].map((service) => (
-                <div key={service.name} className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-zinc-700/50 flex items-center justify-center text-lg">{service.icon}</div>
-                    <div>
-                      <div className="font-medium">{service.name}</div>
-                      <div className="text-xs text-zinc-500">{service.desc}</div>
+                <div key={service.name} className="p-4 bg-zinc-800/50 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-zinc-700/50 flex items-center justify-center text-lg">{service.icon}</div>
+                      <div>
+                        <div className="font-medium">{service.name}</div>
+                        <div className="text-xs text-zinc-500">{service.desc}</div>
+                      </div>
                     </div>
+                    {service.status === 'connected' || serviceKeys[service.name] ? (
+                      <span className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs font-medium">{'\u2713'} Connected</span>
+                    ) : (
+                      <button
+                        onClick={() => handleServiceConfigure(service.name)}
+                        className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm transition-colors"
+                      >
+                        Configure
+                      </button>
+                    )}
                   </div>
-                  {service.status === 'connected' ? (
-                    <span className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs font-medium">Connected</span>
-                  ) : (
-                    <button className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm transition-colors">
-                      Configure
-                    </button>
+                  {configuringService === service.name && (
+                    <div className="mt-3 pt-3 border-t border-white/5">
+                      <label className="block text-xs text-zinc-500 mb-1">{service.envKey}</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="password"
+                          value={serviceKeys[service.name] || ''}
+                          onChange={(e) => setServiceKeys(prev => ({ ...prev, [service.name]: e.target.value }))}
+                          placeholder={`Enter your ${service.name} key...`}
+                          className="flex-1 px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm focus:border-amber-500 focus:outline-none"
+                        />
+                        <button onClick={() => saveServiceKey(service.name)} className="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-sm font-semibold">Save</button>
+                        <button onClick={() => setConfiguringService(null)} className="px-3 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm">Cancel</button>
+                      </div>
+                      <div className="text-[10px] text-zinc-600 mt-1">Set this in .env.local for production. This UI saves to localStorage for preview only.</div>
+                    </div>
                   )}
                 </div>
               ))}

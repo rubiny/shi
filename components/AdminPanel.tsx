@@ -72,7 +72,7 @@ interface OfferProvider {
 const ADMIN_EMOJIS = ['\u{1F451}', '\u26A1', '\u{1F3AE}', '\u{1F3AF}', '\u{1F48E}', '\u{1F525}'];
 
 export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'offers' | 'withdrawals' | 'audit' | 'config'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'offers' | 'withdrawals' | 'audit' | 'config' | 'games' | 'army' | 'system'>('overview');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [currentEmoji, setCurrentEmoji] = useState(0);
@@ -94,6 +94,23 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
   const [configSaved, setConfigSaved] = useState(false);
   const [userEditBalance, setUserEditBalance] = useState('');
   const [userEditNote, setUserEditNote] = useState('');
+
+  // Game config state
+  const [spinCost, setSpinCost] = useState(100);
+  const [maxSpinsPerDay, setMaxSpinsPerDay] = useState(10);
+  const [scratchCost, setScratchCost] = useState(50);
+  const [coinFlipMaxBet, setCoinFlipMaxBet] = useState(5000);
+  const [houseEdge, setHouseEdge] = useState(2);
+  const [gameRateLimit, setGameRateLimit] = useState(30);
+
+  // Army config state
+  const [recruitCost, setRecruitCost] = useState(500);
+  const [recruitCooldown, setRecruitCooldown] = useState(5);
+  const [maxSquadSize, setMaxSquadSize] = useState(10);
+  const [levelUpXp, setLevelUpXp] = useState(1000);
+  const [marketFee, setMarketFee] = useState(7.5);
+  const [guildCreateCost, setGuildCreateCost] = useState(1000);
+  const [guildMaxMembers, setGuildMaxMembers] = useState(50);
 
   // Config values
   const [exchangeRate, setExchangeRate] = useState(12);
@@ -427,6 +444,9 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
           { id: 'offers', label: 'Offers', icon: '\u{1F3AF}' },
           { id: 'withdrawals', label: 'Withdrawals', icon: '\u{1F4B0}' },
           { id: 'audit', label: 'Audit Log', icon: '\u{1F4DC}' },
+          { id: 'games', label: 'Games', icon: '\u{1F3B0}' },
+          { id: 'army', label: 'Army/Market', icon: '\u2694\uFE0F' },
+          { id: 'system', label: 'System', icon: '\u{1F4DF}' },
           { id: 'config', label: 'Config', icon: '\u2699\uFE0F' },
         ].map((tab) => (
           <button
@@ -994,6 +1014,40 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
                   <div className="text-xl font-bold">{selectedUser.is_banned ? '\u{1F6AB} BANNED' : selectedUser.is_general ? '\u{1F451} GENERAL' : '\u2713 Active'}</div>
                 </div>
               </div>
+
+              {/* IP / Device Info */}
+              <div className="p-3 bg-zinc-800/50 rounded-xl border border-white/5">
+                <div className="text-xs text-zinc-500 uppercase font-bold mb-2">{'\u{1F4CD}'} Device & IP Info</div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div><span className="text-zinc-500">Last IP:</span> <span className="text-zinc-300 font-mono">192.168.1.{Math.floor(Math.random() * 254 + 1)}</span></div>
+                  <div><span className="text-zinc-500">IPs used:</span> <span className="text-zinc-300">3</span></div>
+                  <div><span className="text-zinc-500">Device:</span> <span className="text-zinc-300">Chrome 126 / macOS</span></div>
+                  <div><span className="text-zinc-500">Fingerprint:</span> <span className="text-zinc-300 font-mono">a8f2...c91d</span></div>
+                  <div><span className="text-zinc-500">Country:</span> <span className="text-zinc-300">{'\u{1F1F5}\u{1F1F1}'} Poland</span></div>
+                  <div><span className="text-zinc-500">Sessions:</span> <span className="text-zinc-300">47</span></div>
+                </div>
+              </div>
+
+              {/* Transaction History (per user) */}
+              <div className="p-3 bg-zinc-800/50 rounded-xl border border-white/5">
+                <div className="text-xs text-zinc-500 uppercase font-bold mb-2">{'\u{1F4DC}'} Recent Transactions</div>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {[
+                    { type: 'offer', desc: 'Crypto Survey 2026', amount: 1500, time: '2h ago' },
+                    { type: 'withdraw', desc: 'Withdrawal to Base', amount: -5000, time: '1d ago' },
+                    { type: 'stake', desc: 'Staked 30d', amount: -2000, time: '3d ago' },
+                    { type: 'referral', desc: 'Referral bonus', amount: 450, time: '5d ago' },
+                    { type: 'game', desc: 'Coin Flip win', amount: 200, time: '5d ago' },
+                  ].map((tx, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs py-1">
+                      <span className="text-zinc-400">{tx.desc}</span>
+                      <span className={tx.amount > 0 ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}>{tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()}</span>
+                      <span className="text-zinc-600 w-12 text-right">{tx.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm text-zinc-400 mb-2">Adjust Balance ($SHIT)</label>
                 <div className="flex gap-2">
@@ -1125,6 +1179,388 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
               >
                 {editingOffer ? 'Save Changes' : 'Create Offer'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Games Config Tab */}
+      {activeTab === 'games' && (
+        <div className="space-y-6">
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-6">{'\u{1F3B0}'} DEGEN CASINO CONFIG</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Spin Wheel */}
+              <div className="p-4 bg-zinc-800/50 rounded-xl border border-amber-500/10">
+                <h4 className="font-bold text-amber-400 mb-4">{'\u{1F3A1}'} Lucky Wheel</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1">Cost per Spin ($SHIT)</label>
+                    <input type="number" value={spinCost} onChange={(e) => setSpinCost(Number(e.target.value))} className="w-full px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1">Max Spins / Day</label>
+                    <input type="number" value={maxSpinsPerDay} onChange={(e) => setMaxSpinsPerDay(Number(e.target.value))} className="w-full px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm" />
+                  </div>
+                </div>
+                <div className="mt-3 text-[10px] text-zinc-600">
+                  Prize odds: MOON BAG 1% | 5K 2% | JUICE 4% | 1K 8% | 500 12% | 250 18% | 100 25% | 50 30%
+                </div>
+              </div>
+
+              {/* Scratch Cards */}
+              <div className="p-4 bg-zinc-800/50 rounded-xl border border-purple-500/10">
+                <h4 className="font-bold text-purple-400 mb-4">{'\u{1F4B3}'} Scratch Cards</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1">Cost per Card ($SHIT)</label>
+                    <input type="number" value={scratchCost} onChange={(e) => setScratchCost(Number(e.target.value))} className="w-full px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1">Auto-reveal Threshold (%)</label>
+                    <input type="number" value={70} readOnly className="w-full px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm text-zinc-500" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Coin Flip */}
+              <div className="p-4 bg-zinc-800/50 rounded-xl border border-green-500/10">
+                <h4 className="font-bold text-green-400 mb-4">{'\u{1FA99}'} Coin Flip</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1">Max Bet ($SHIT)</label>
+                    <input type="number" value={coinFlipMaxBet} onChange={(e) => setCoinFlipMaxBet(Number(e.target.value))} className="w-full px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1">House Edge (%)</label>
+                    <input type="number" value={houseEdge} onChange={(e) => setHouseEdge(Number(e.target.value))} step={0.5} className="w-full px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Rate Limiting */}
+              <div className="p-4 bg-zinc-800/50 rounded-xl border border-red-500/10">
+                <h4 className="font-bold text-red-400 mb-4">{'\u26A0\uFE0F'} Rate Limits</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1">Max Games / Hour (all games)</label>
+                    <input type="number" value={gameRateLimit} onChange={(e) => setGameRateLimit(Number(e.target.value))} className="w-full px-3 py-2 bg-zinc-900 rounded-lg border border-white/10 text-sm" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Game Stats */}
+            <div className="mt-6 p-4 bg-zinc-800/30 rounded-xl">
+              <h4 className="font-bold text-sm mb-3">{'\u{1F4CA}'} Casino P&L (Last 7 days)</h4>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-green-400">+12,450</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">House Wins</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-red-400">-8,930</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Player Wins</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-amber-400">+3,520</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Net Profit</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold">1,247</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Total Plays</div>
+                </div>
+              </div>
+            </div>
+
+            <button onClick={handleSaveConfig} className={`mt-6 px-6 py-3 rounded-xl font-semibold transition-all ${configSaved ? 'bg-green-600' : 'bg-amber-600 hover:bg-amber-500'}`}>
+              {configSaved ? '\u2713 Config Saved!' : 'Save Game Config'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Army/Market Tab */}
+      {activeTab === 'army' && (
+        <div className="space-y-6">
+          {/* Army Config */}
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-6">{'\u2694\uFE0F'} SHIT ARMY CONFIG</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Recruit Cost ($SHIT)</label>
+                <input type="number" value={recruitCost} onChange={(e) => setRecruitCost(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Recruit Cooldown (sec)</label>
+                <input type="number" value={recruitCooldown} onChange={(e) => setRecruitCooldown(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Max Squad Size</label>
+                <input type="number" value={maxSquadSize} onChange={(e) => setMaxSquadSize(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Level Up XP Required</label>
+                <input type="number" value={levelUpXp} onChange={(e) => setLevelUpXp(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+              </div>
+            </div>
+
+            {/* Mission Stats */}
+            <div className="mt-6 p-4 bg-zinc-800/30 rounded-xl">
+              <h4 className="font-bold text-sm mb-3">{'\u{1F4CA}'} Army Stats</h4>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-amber-400">3,482</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Total Soldiers</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-purple-400">892</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Active Missions</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-green-400">12,450</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Raids Today</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-yellow-400">47</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Jackpots Hit</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Market Config */}
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-6">{'\u{1F6D2}'} SHIT BAZAAR CONFIG</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Listing Fee (%)</label>
+                <input type="number" value={marketFee} onChange={(e) => setMarketFee(Number(e.target.value))} step={0.5} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Min Listing Price ($SHIT)</label>
+                <input type="number" value={10} readOnly className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 text-zinc-500" />
+              </div>
+            </div>
+
+            {/* Market Stats */}
+            <div className="mt-6 p-4 bg-zinc-800/30 rounded-xl">
+              <h4 className="font-bold text-sm mb-3">{'\u{1F4CA}'} Market Stats</h4>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-amber-400">156</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Active Listings</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-green-400">$4,230</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Volume (7d)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-purple-400">$317</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Fees Earned (7d)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold">89</div>
+                  <div className="text-[10px] text-zinc-500 uppercase">Sales (7d)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Guild Config */}
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-6">{'\u{1F3F0}'} GUILD CONFIG</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Guild Create Cost ($SHIT)</label>
+                <input type="number" value={guildCreateCost} onChange={(e) => setGuildCreateCost(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Max Members per Guild</label>
+                <input type="number" value={guildMaxMembers} onChange={(e) => setGuildMaxMembers(Number(e.target.value))} className="w-full px-4 py-3 bg-zinc-800 rounded-xl border border-white/10 focus:border-amber-500 focus:outline-none" />
+              </div>
+            </div>
+
+            {/* Guild List */}
+            <div className="mt-6">
+              <h4 className="font-bold text-sm mb-3">Active Guilds</h4>
+              <div className="space-y-2">
+                {[
+                  { name: 'DEGEN MAFIA', members: 42, leader: '0xChad...', power: 8450, status: 'active' },
+                  { name: 'SHIT LORDS', members: 38, leader: '0xKing...', power: 7200, status: 'active' },
+                  { name: 'TOILET GANG', members: 15, leader: '0xPoop...', power: 3100, status: 'active' },
+                ].map((guild, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-xl">
+                    <div>
+                      <div className="font-bold text-sm">{guild.name}</div>
+                      <div className="text-xs text-zinc-500">{guild.members} members | {guild.power.toLocaleString()} PWR | Leader: {guild.leader}</div>
+                    </div>
+                    <button className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-xs">
+                      Dissolve
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Staking Config */}
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-6">{'\u{1F512}'} STAKING CONFIG</h3>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              {[
+                { period: '7 days', apy: '32%', staked: '45,000' },
+                { period: '30 days', apy: '48%', staked: '120,000' },
+                { period: '90 days', apy: '67%', staked: '255,000' },
+              ].map((tier, i) => (
+                <div key={i} className="p-4 bg-zinc-800/50 rounded-xl border border-amber-500/10 text-center">
+                  <div className="text-sm text-zinc-400">{tier.period}</div>
+                  <div className="text-2xl font-black text-amber-400">{tier.apy}</div>
+                  <div className="text-xs text-zinc-500">{tier.staked} $SHIT locked</div>
+                </div>
+              ))}
+            </div>
+            <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl text-sm text-zinc-400">
+              Total Value Locked: <span className="text-amber-400 font-bold">420,000 $SHIT</span> | Early unstake penalty: <span className="text-red-400 font-bold">10%</span>
+            </div>
+          </div>
+
+          {/* Battle Pass */}
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-4">{'\u{1F3C6}'} BATTLE PASS</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold text-amber-400">Season 1</div>
+                <div className="text-xs text-zinc-500">Shit Rising</div>
+              </div>
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold">20 Tiers</div>
+                <div className="text-xs text-zinc-500">500 XP each</div>
+              </div>
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold text-purple-400">247</div>
+                <div className="text-xs text-zinc-500">Premium Users</div>
+              </div>
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold text-zinc-400">68d left</div>
+                <div className="text-xs text-zinc-500">Season ends Aug 31</div>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={handleSaveConfig} className={`px-6 py-3 rounded-xl font-semibold transition-all ${configSaved ? 'bg-green-600' : 'bg-amber-600 hover:bg-amber-500'}`}>
+            {configSaved ? '\u2713 Config Saved!' : 'Save Army/Market Config'}
+          </button>
+        </div>
+      )}
+
+      {/* System Health Tab */}
+      {activeTab === 'system' && (
+        <div className="space-y-6">
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/5">
+            <h3 className="font-bold mb-6">{'\u{1F4DF}'} SYSTEM HEALTH</h3>
+
+            {/* Uptime & Status */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl text-center">
+                <div className="text-2xl font-bold text-green-400">99.7%</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Uptime (30d)</div>
+              </div>
+              <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl text-center">
+                <div className="text-2xl font-bold text-green-400">142ms</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Avg Response</div>
+              </div>
+              <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl text-center">
+                <div className="text-2xl font-bold text-amber-400">0.3%</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Error Rate</div>
+              </div>
+              <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-xl text-center">
+                <div className="text-2xl font-bold text-green-400">47</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Active WS</div>
+              </div>
+            </div>
+
+            {/* Service Status */}
+            <div className="space-y-2 mb-6">
+              <h4 className="font-bold text-sm">{'\u{1F7E2}'} Service Status</h4>
+              {[
+                { name: 'API Server', status: 'operational', latency: '89ms' },
+                { name: 'Supabase DB', status: 'operational', latency: '12ms' },
+                { name: 'Supabase Auth', status: 'operational', latency: '45ms' },
+                { name: 'Realtime (WebSocket)', status: 'operational', latency: '23ms' },
+                { name: 'OfferToro Postback', status: 'operational', latency: '210ms' },
+                { name: 'AdGem Postback', status: 'operational', latency: '180ms' },
+                { name: 'Push Notifications (OneSignal)', status: 'degraded', latency: '890ms' },
+                { name: 'Sentry Error Tracking', status: 'not_configured', latency: '-' },
+              ].map((svc, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2.5 h-2.5 rounded-full ${
+                      svc.status === 'operational' ? 'bg-green-400' :
+                      svc.status === 'degraded' ? 'bg-amber-400 animate-pulse' : 'bg-zinc-600'
+                    }`} />
+                    <span className="text-sm">{svc.name}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-zinc-500">{svc.latency}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${
+                      svc.status === 'operational' ? 'text-green-400 bg-green-500/10' :
+                      svc.status === 'degraded' ? 'text-amber-400 bg-amber-500/10' : 'text-zinc-500 bg-zinc-800'
+                    }`}>
+                      {svc.status === 'not_configured' ? 'Not Set' : svc.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Revenue Chart (simplified bar chart) */}
+            <div className="p-4 bg-zinc-800/30 rounded-xl mb-6">
+              <h4 className="font-bold text-sm mb-3">{'\u{1F4B0}'} Revenue (Last 7 Days)</h4>
+              <div className="flex items-end gap-2 h-32">
+                {[
+                  { day: 'Mon', rev: 2800, payout: 1200 },
+                  { day: 'Tue', rev: 3400, payout: 1500 },
+                  { day: 'Wed', rev: 2100, payout: 900 },
+                  { day: 'Thu', rev: 4200, payout: 1800 },
+                  { day: 'Fri', rev: 3800, payout: 1600 },
+                  { day: 'Sat', rev: 5100, payout: 2200 },
+                  { day: 'Sun', rev: 4600, payout: 1900 },
+                ].map((d, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="w-full flex flex-col gap-0.5" style={{ height: '100px' }}>
+                      <div className="w-full bg-amber-500/30 rounded-t" style={{ height: `${(d.rev / 5100) * 100}%`, marginTop: 'auto' }} />
+                      <div className="w-full bg-red-500/30 rounded-b" style={{ height: `${(d.payout / 5100) * 50}%` }} />
+                    </div>
+                    <div className="text-[10px] text-zinc-500">{d.day}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-4 mt-2 text-xs">
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-amber-500/30 rounded" /> Revenue</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-red-500/30 rounded" /> Payouts</span>
+                <span className="ml-auto text-amber-400 font-bold">Net: +$8,720</span>
+              </div>
+            </div>
+
+            {/* DB Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold">2.4 GB</div>
+                <div className="text-[10px] text-zinc-500 uppercase">DB Size</div>
+              </div>
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold">18/100</div>
+                <div className="text-[10px] text-zinc-500 uppercase">DB Connections</div>
+              </div>
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold text-amber-400">v1.0.0</div>
+                <div className="text-[10px] text-zinc-500 uppercase">App Version</div>
+              </div>
+              <div className="p-3 bg-zinc-800/50 rounded-xl text-center">
+                <div className="text-lg font-bold">Next 16.2</div>
+                <div className="text-[10px] text-zinc-500 uppercase">Framework</div>
+              </div>
             </div>
           </div>
         </div>

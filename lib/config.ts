@@ -118,6 +118,77 @@ export const CONFIG = {
         WEEKLY: '/leaderboard/weekly',
         ALL_TIME: '/leaderboard/all-time',
       },
+
+      // Army
+      ARMY: {
+        SOLDIERS: '/army/soldiers',
+        RECRUIT: '/army/recruit',
+        DEPLOY: '/army/deploy',
+        CLAIM: '/army/claim',
+        LEVEL_UP: '/army/level-up',
+        RAID_LOG: '/army/raid-log',
+      },
+
+      // Market
+      MARKET: {
+        LISTINGS: '/market/listings',
+        BUY: '/market/buy',
+        SELL: '/market/sell',
+        INVENTORY: '/market/inventory',
+        ACTIVE_BOOSTS: '/market/boosts/active',
+      },
+
+      // Guilds
+      GUILDS: {
+        LIST: '/guilds',
+        CREATE: '/guilds/create',
+        JOIN: '/guilds/join',
+        LEAVE: '/guilds/leave',
+        CHAT: '/guilds/chat',
+        MEMBERS: '/guilds/members',
+      },
+
+      // Meme Feed
+      MEME_FEED: {
+        POSTS: '/memes',
+        CREATE: '/memes/create',
+        VOTE: '/memes/vote',
+        FEATURED: '/memes/featured',
+      },
+
+      // Events
+      EVENTS: {
+        ACTIVE: '/events/active',
+        PROGRESS: '/events/progress',
+        LEADERBOARD: '/events/leaderboard',
+      },
+
+      // Mini Games
+      GAMES: {
+        SPIN: '/games/spin',
+        SCRATCH: '/games/scratch',
+        COIN_FLIP: '/games/coin-flip',
+        DICE: '/games/dice',
+        PUMP_OR_DUMP: '/games/pump-or-dump',
+        HISTORY: '/games/history',
+      },
+
+      // Admin
+      ADMIN: {
+        STATS: '/admin/stats',
+        USERS: '/admin/users',
+        OFFERS: '/admin/offers',
+        WITHDRAWALS: '/admin/withdrawals',
+        AUDIT_LOG: '/admin/audit',
+        CONFIG: '/admin/config',
+        BROADCAST: '/admin/broadcast',
+        SYSTEM_HEALTH: '/admin/system/health',
+        REVENUE: '/admin/revenue',
+        GAME_STATS: '/admin/games/stats',
+        ARMY_STATS: '/admin/army/stats',
+        MARKET_STATS: '/admin/market/stats',
+        GUILD_MANAGEMENT: '/admin/guilds',
+      },
     },
   },
 
@@ -292,6 +363,103 @@ export const CONFIG = {
       API_KEY: process.env.KYC_API_KEY,
       SECRET_KEY: process.env.KYC_SECRET_KEY,
     },
+  },
+
+  // Army Config
+  ARMY: {
+    RECRUIT_COST: Number(process.env.NEXT_PUBLIC_ARMY_RECRUIT_COST) || 500,
+    RECRUIT_COOLDOWN_SEC: Number(process.env.NEXT_PUBLIC_ARMY_RECRUIT_COOLDOWN) || 5,
+    LEVEL_UP_XP: Number(process.env.NEXT_PUBLIC_ARMY_LEVEL_UP_XP) || 1000,
+    MAX_SQUAD_SIZE: Number(process.env.NEXT_PUBLIC_ARMY_MAX_SQUAD) || 10,
+    SQUAD_POWER_OFFERWALL_BONUS_PER_100: 1, // +1% offerwall bonus per 100 PWR
+    MISSIONS: {
+      SEWER: { DURATION_SEC: 60, BASE_REWARD: 50, JACKPOT_CHANCE: 5, JACKPOT_MULT: 3 },
+      RESTROOM: { DURATION_SEC: 300, BASE_REWARD: 200, JACKPOT_CHANCE: 8, JACKPOT_MULT: 5 },
+      SEPTIC: { DURATION_SEC: 900, BASE_REWARD: 800, JACKPOT_CHANCE: 10, JACKPOT_MULT: 7 },
+      FLUSH: { DURATION_SEC: 3600, BASE_REWARD: 3000, JACKPOT_CHANCE: 15, JACKPOT_MULT: 10 },
+    },
+    STREAK_MULTIPLIERS: { 3: 1.2, 5: 1.5, 7: 1.7, 10: 2.0 },
+  },
+
+  // Market Config
+  MARKET: {
+    LISTING_FEE_PERCENT: Number(process.env.NEXT_PUBLIC_MARKET_FEE) || 7.5,
+    MIN_LISTING_PRICE: 10,
+    MAX_LISTING_PRICE: 1000000,
+    CATEGORIES: ['DEGENS', 'JUICE', 'DRIP', 'FLEX'],
+    BOOST_DURATIONS_HOURS: [1, 6, 24, 72],
+  },
+
+  // Guild Config
+  GUILDS: {
+    CREATE_COST: Number(process.env.NEXT_PUBLIC_GUILD_CREATE_COST) || 1000,
+    MAX_MEMBERS: Number(process.env.NEXT_PUBLIC_GUILD_MAX_MEMBERS) || 50,
+    MIN_NAME_LENGTH: 3,
+    MAX_NAME_LENGTH: 20,
+    OFFICER_SLOTS: 5,
+  },
+
+  // Events Config
+  EVENTS: {
+    MAX_ACTIVE_EVENTS: 3,
+    DEFAULT_DURATION_DAYS: 7,
+    LEADERBOARD_SIZE: 50,
+  },
+
+  // Meme Feed Config
+  MEME_FEED: {
+    POST_COST: Number(process.env.NEXT_PUBLIC_MEME_POST_COST) || 50,
+    VOTE_COST: Number(process.env.NEXT_PUBLIC_MEME_VOTE_COST) || 10,
+    MAX_POSTS_PER_DAY: 5,
+    FEATURED_THRESHOLD_VOTES: 20,
+  },
+
+  // Ambassador Config
+  AMBASSADOR: {
+    TIERS: [
+      { name: 'Bronze', minReferrals: 0, commission: 15 },
+      { name: 'Silver', minReferrals: 10, commission: 18 },
+      { name: 'Gold', minReferrals: 25, commission: 22 },
+      { name: 'Diamond', minReferrals: 50, commission: 30 },
+    ],
+  },
+
+  // Mini Games Config
+  MINI_GAMES: {
+    SPIN_WHEEL: {
+      COST_PER_SPIN: Number(process.env.NEXT_PUBLIC_SPIN_COST) || 100,
+      MAX_SPINS_PER_DAY: Number(process.env.NEXT_PUBLIC_MAX_SPINS) || 10,
+      PRIZES: [
+        { label: '50 $SHIT', value: 50, chance: 30 },
+        { label: '100 $SHIT', value: 100, chance: 25 },
+        { label: '250 $SHIT', value: 250, chance: 18 },
+        { label: '500 $SHIT', value: 500, chance: 12 },
+        { label: '1K $SHIT', value: 1000, chance: 8 },
+        { label: '2x JUICE', value: 0, chance: 4 },
+        { label: '5K $SHIT', value: 5000, chance: 2 },
+        { label: 'MOON BAG', value: 10000, chance: 1 },
+      ],
+    },
+    SCRATCH_CARDS: {
+      COST_PER_CARD: Number(process.env.NEXT_PUBLIC_SCRATCH_COST) || 50,
+      MAX_CARDS_PER_DAY: 20,
+      REVEAL_THRESHOLD_PERCENT: 70,
+    },
+    COIN_FLIP: {
+      MIN_BET: 10,
+      MAX_BET: Number(process.env.NEXT_PUBLIC_COINFLIP_MAX_BET) || 5000,
+      HOUSE_EDGE_PERCENT: Number(process.env.NEXT_PUBLIC_HOUSE_EDGE) || 2,
+    },
+    DICE: {
+      MIN_BET: 10,
+      MAX_BET: Number(process.env.NEXT_PUBLIC_DICE_MAX_BET) || 5000,
+    },
+    PUMP_OR_DUMP: {
+      MIN_BET: 10,
+      MAX_BET: Number(process.env.NEXT_PUBLIC_POD_MAX_BET) || 5000,
+      ROUND_DURATION_SEC: 10,
+    },
+    RATE_LIMIT_PER_HOUR: Number(process.env.NEXT_PUBLIC_GAME_RATE_LIMIT) || 30,
   },
 
   // Platform Stats (landing page, updated periodically from DB or admin panel)
