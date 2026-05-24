@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useState } from 'react';
+import NotificationCenter from './NotificationCenter';
+import type { Notification } from '@/lib/types';
 
 type TabId = "dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard" | "spin" | "games" | "vip" | "fiat" | "antifraud";
 
@@ -12,6 +14,9 @@ interface DashboardNavProps {
   kycStatus: 'none' | 'pending' | 'verified' | 'rejected';
   setShowKYCModal: (show: boolean) => void;
   onDisconnect: () => void;
+  notifications?: Notification[];
+  onMarkNotificationRead?: (id: string) => void;
+  onClearNotifications?: () => void;
 }
 
 export const mainTabs = [
@@ -29,6 +34,9 @@ export default function DashboardNav({
   kycStatus,
   setShowKYCModal,
   onDisconnect,
+  notifications = [],
+  onMarkNotificationRead,
+  onClearNotifications,
 }: DashboardNavProps) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -220,6 +228,13 @@ export default function DashboardNav({
             <div className="hidden sm:block px-4 py-1.5 bg-zinc-900 rounded-full text-xs border border-white/10 font-mono">
               {walletAddress.length > 18 ? walletAddress.slice(0, 18) + '...' : walletAddress}
             </div>
+            {onMarkNotificationRead && onClearNotifications && (
+              <NotificationCenter
+                notifications={notifications}
+                onMarkRead={onMarkNotificationRead}
+                onClearAll={onClearNotifications}
+              />
+            )}
             {isGeneral && (
               <>
                 <div className="text-xl" title="Admin Mode">👑</div>
@@ -242,6 +257,9 @@ export default function DashboardNav({
       </nav>
 
       {/* Mobile Bottom Tab Bar */}
+      {showMoreMenu && (
+        <div className="md:hidden fixed inset-0 bg-black/60 z-40" onClick={() => setShowMoreMenu(false)} />
+      )}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-white/10 z-50 py-2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex justify-around text-xs">
           {mainTabs.map((tab) => (

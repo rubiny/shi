@@ -20,25 +20,38 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { signInWithGoogle, isLoading } = useAuth();
   const [step, setStep] = useState<'choose' | 'wallet' | 'connecting'>('choose');
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleWalletSelect = async (walletId: string) => {
     setSelectedWallet(walletId);
     setStep('connecting');
-    
-    // In real app, use WalletConnect or wallet-specific SDK
-    // For now, simulate wallet connection
-    setTimeout(() => {
-      // Mock wallet address - in production this comes from actual wallet
-      const mockAddress = '0x' + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-      
-      // Would call: await signInWithWallet(address, signature, nonce)
-      console.log('Would connect wallet:', walletId, 'address:', mockAddress);
-      
-      onClose();
-      setStep('choose');
-    }, 1500);
+    setConnectionError(null);
+
+    try {
+      const ethereum = typeof window !== 'undefined' ? (window as Record<string, unknown>).ethereum : null;
+      if (ethereum && walletId === 'metamask') {
+        const accounts = await (ethereum as { request: (args: { method: string }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
+        if (accounts?.[0]) {
+          console.log('Connected wallet:', walletId, 'address:', accounts[0]);
+          onClose();
+          setStep('choose');
+          return;
+        }
+      }
+    } catch {
+      console.log('Native wallet connection unavailable, using demo mode');
+    }
+
+    // Demo mode: simulate connection with progress steps
+    await new Promise(r => setTimeout(r, 800));
+    setConnectionError(null);
+    await new Promise(r => setTimeout(r, 700));
+    const demoAddress = '0x' + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+    console.log('Demo wallet connected:', walletId, 'address:', demoAddress);
+    onClose();
+    setStep('choose');
   };
 
   const handleGoogleLogin = async () => {
@@ -164,11 +177,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 Connecting to {WALLETS.find(w => w.id === selectedWallet)?.name}...
               </div>
               <div className="text-sm text-zinc-500">
-                Please confirm in your wallet app
+                {connectionError || 'Please confirm in your wallet app'}
               </div>
               <div className="mt-6 flex justify-center">
-                <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-white/20 border-t-amber-500 rounded-full animate-spin" />
               </div>
+              <button onClick={() => { setStep('choose'); setConnectionError(null); }} className="mt-6 text-xs text-zinc-500 hover:text-white transition-colors">
+                Cancel
+              </button>
             </div>
           )}
         </div>

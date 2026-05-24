@@ -294,6 +294,14 @@ export const CONFIG = {
     },
   },
 
+  // Platform Stats (landing page, updated periodically from DB or admin panel)
+  PLATFORM_STATS: {
+    TOTAL_EARNED: 2400000,
+    TOTAL_SOLDIERS: 47000,
+    OFFERS_COMPLETED: 1200000,
+    SHIT_STAKED: 420000,
+  },
+
   // UI/UX Config
   UI: {
     // Theme

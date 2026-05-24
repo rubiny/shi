@@ -136,10 +136,10 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mb-12">
               {[
-                { value: '$2.4M', label: 'Total Earned' },
-                { value: '47K', label: 'Soldiers' },
-                { value: '1.2M', label: 'Offers Done' },
-                { value: '420K', label: '$SHIT Staked' }
+                { value: `$${(CONFIG.PLATFORM_STATS.TOTAL_EARNED / 1_000_000).toFixed(1)}M`, label: 'Total Earned' },
+                { value: `${(CONFIG.PLATFORM_STATS.TOTAL_SOLDIERS / 1000).toFixed(0)}K`, label: 'Soldiers' },
+                { value: `${(CONFIG.PLATFORM_STATS.OFFERS_COMPLETED / 1_000_000).toFixed(1)}M`, label: 'Offers Done' },
+                { value: `${(CONFIG.PLATFORM_STATS.SHIT_STAKED / 1000).toFixed(0)}K`, label: '$SHIT Staked' }
               ].map((stat, i) => (
                 <div key={i} className="bg-zinc-900/50 border border-white/10 rounded-2xl px-6 py-4 backdrop-blur-sm">
                   <div className="text-2xl sm:text-3xl font-black text-amber-400">{stat.value}</div>

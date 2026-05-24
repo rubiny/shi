@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { isSoundMuted, setSoundMuted } from '@/lib/sounds';
 
 interface SettingsPageProps {
   userId: string;
@@ -8,7 +9,7 @@ interface SettingsPageProps {
 }
 
 export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) {
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'connections' | 'notifications' | 'api'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'connections' | 'notifications' | 'api' | 'appearance'>('profile');
   const [username, setUsername] = useState('ShitGeneral420');
   const [bio, setBio] = useState('\u{1F4A9} Crypto enthusiast | Stacking $SHIT since 2026 | To the moon \u{1F680}\u{1F9FB}');
   const [discord, setDiscord] = useState('shitsoldier#1234');
@@ -24,7 +25,31 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
   const [notifBattlePass, setNotifBattlePass] = useState(false);
   const [notifEmail, setNotifEmail] = useState(false);
   const [notifPush, setNotifPush] = useState(true);
-  const [notifSound, setNotifSound] = useState(true);
+  const [notifSound, setNotifSound] = useState(() => typeof window !== 'undefined' ? !isSoundMuted() : true);
+  const [theme, setTheme] = useState<'dark' | 'light' | 'auto'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('shit-theme') as 'dark' | 'light' | 'auto') || 'dark';
+    }
+    return 'dark';
+  });
+
+  const handleSoundToggle = (val: boolean) => {
+    setNotifSound(val);
+    setSoundMuted(!val);
+  };
+
+  const handleThemeChange = (newTheme: 'dark' | 'light' | 'auto') => {
+    setTheme(newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('shit-theme', newTheme);
+      const root = document.documentElement;
+      if (newTheme === 'light') {
+        root.classList.add('light-theme');
+      } else {
+        root.classList.remove('light-theme');
+      }
+    }
+  };
 
   // API keys (masked display)
   const [apiKeys] = useState([
@@ -57,6 +82,7 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
     { id: 'connections' as const, label: 'Connect', icon: '\u{1F517}' },
     { id: 'notifications' as const, label: 'Alerts', icon: '\u{1F514}' },
     { id: 'api' as const, label: 'API', icon: '\u{1F527}' },
+    { id: 'appearance' as const, label: 'Theme', icon: '\u{1F3A8}' },
   ];
 
   return (
@@ -251,7 +277,7 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
               {[
                 { label: 'Push Notifications', desc: 'Browser push alerts for important updates', value: notifPush, onChange: setNotifPush, icon: '\u{1F4F1}' },
                 { label: 'Email Notifications', desc: 'Weekly digest and important alerts', value: notifEmail, onChange: setNotifEmail, icon: '\u{1F4E7}' },
-                { label: 'Sound Effects', desc: 'Play sounds on new rewards and achievements', value: notifSound, onChange: setNotifSound, icon: '\u{1F50A}' },
+                { label: 'Sound Effects', desc: 'Play sounds on new rewards and achievements', value: notifSound, onChange: handleSoundToggle, icon: '\u{1F50A}' },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl">
                   <div className="flex items-center gap-3">
@@ -441,6 +467,62 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
               <div className="px-3 py-1.5 bg-zinc-900/50 rounded-lg text-xs font-mono text-zinc-300">
                 GET /api/v1/user/balance
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* APPEARANCE TAB */}
+      {activeTab === 'appearance' && (
+        <div className="space-y-6">
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/10">
+            <h3 className="text-xl font-bold mb-2">{'\u{1F3A8}'} Theme</h3>
+            <p className="text-sm text-zinc-500 mb-6">Choose your preferred appearance</p>
+
+            <div className="grid grid-cols-3 gap-4">
+              {([
+                { id: 'dark' as const, label: 'Dark', icon: '\u{1F31C}', desc: 'Easy on the eyes' },
+                { id: 'light' as const, label: 'Light', icon: '\u2600\uFE0F', desc: 'Bright and clean' },
+                { id: 'auto' as const, label: 'Auto', icon: '\u{1F4BB}', desc: 'Follows system' },
+              ]).map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => handleThemeChange(opt.id)}
+                  className={`p-5 rounded-2xl border-2 text-center transition-all ${
+                    theme === opt.id
+                      ? 'border-amber-500 bg-amber-500/10'
+                      : 'border-white/10 hover:border-white/20 bg-zinc-800/50'
+                  }`}
+                >
+                  <div className="text-3xl mb-2">{opt.icon}</div>
+                  <div className="font-bold text-sm">{opt.label}</div>
+                  <div className="text-xs text-zinc-500 mt-1">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-zinc-900/50 rounded-2xl p-6 border border-white/10">
+            <h3 className="text-xl font-bold mb-4">{'\u{1F50A}'} Sound &amp; Haptics</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl">
+                <div>
+                  <div className="font-semibold">Sound Effects</div>
+                  <div className="text-xs text-zinc-500">Button clicks, wins, notifications</div>
+                </div>
+                <button
+                  onClick={() => handleSoundToggle(!notifSound)}
+                  className={`w-14 h-7 rounded-full transition-all relative ${notifSound ? 'bg-amber-500' : 'bg-zinc-700'}`}
+                >
+                  <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-all ${notifSound ? 'left-7' : 'left-0.5'}`} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 text-center">
+            <div className="text-sm text-amber-400">
+              {'\u{1F6A7}'} Light theme is experimental. Some elements may not look perfect yet.
             </div>
           </div>
         </div>
