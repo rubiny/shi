@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,12 +12,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Shit.Army | Join the Army on Base",
-  description: "Memetic shitcoin army on Base. Earn $SHIT through offerwall, stake, mint NFTs, and climb the leaderboard. 💩🪖",
-  manifest: "/manifest.json",
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: "#f59e0b",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+};
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://shit.army"),
+  title: "SHIT.ARMY | The Meme Army That Pays",
+  description: "Join the most degenerate army on Base. Complete offers, stake $SHIT, recruit soldiers & earn real crypto. No BS. Just poop & profit.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/white-shit-logo.png",
     apple: "/icons/icon-192x192.png",
@@ -26,6 +33,35 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "SHIT.ARMY",
+  },
+  openGraph: {
+    title: "SHIT.ARMY | The Meme Army That Pays",
+    description: "Join the most degenerate army on Base. Earn $SHIT through offerwalls, staking, NFTs, and referrals.",
+    url: "https://shit.army",
+    siteName: "SHIT.ARMY",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SHIT.ARMY - The Meme Army That Pays",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SHIT.ARMY | The Meme Army That Pays",
+    description: "Join the most degenerate army on Base. Earn $SHIT through offerwalls, staking & memes.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  other: {
+    "theme-color": "#f59e0b",
   },
 };
 

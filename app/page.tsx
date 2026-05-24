@@ -1,30 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import LandingPage from './landing-page';
 import Dashboard from '../components/Dashboard';
 import LoginModal from '../components/LoginModal';
 import { useAuth } from '../hooks/useAuth';
 
+function getInitialOnboardingState(): boolean {
+  if (typeof window === 'undefined') return true;
+  const seen = window.localStorage.getItem('shit-onboarding-complete');
+  const hasUserId = window.localStorage.getItem('shit-user-id');
+  return !!(seen || hasUserId);
+}
+
 export default function ShitArmy() {
   const { user, isAuthenticated, signOut, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isGeneral, setIsGeneral] = useState(false);
-  const [generalDaysLeft, setGeneralDaysLeft] = useState(0);
+  const [generalDaysLeft] = useState(0);
   
-  // Onboarding - check if already seen
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(true);
-  
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const seen = window.localStorage.getItem('shit-onboarding-complete');
-      const hasUserId = window.localStorage.getItem('shit-user-id');
-      // Show onboarding only if: never seen AND no user-id (new user)
-      if (!seen && !hasUserId) {
-        setHasSeenOnboarding(false);
-      }
-    }
-  }, []);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(getInitialOnboardingState);
   
   const completeOnboarding = () => {
     if (typeof window !== 'undefined') {
@@ -34,7 +28,6 @@ export default function ShitArmy() {
     setHasSeenOnboarding(true);
   };
 
-  // For mock/development mode
   const [devConnected, setDevConnected] = useState(false);
   const [devWallet, setDevWallet] = useState("");
 
@@ -51,7 +44,6 @@ export default function ShitArmy() {
     }
   };
 
-  // Use real auth or dev mock
   const isUserConnected = isAuthenticated || devConnected;
   const walletAddress = user?.wallet_address || user?.email || devWallet;
 
@@ -66,7 +58,7 @@ export default function ShitArmy() {
   if (!isUserConnected) {
     return (
       <>
-        <LandingPage />
+        <LandingPage onConnect={handleConnect} />
         <LoginModal 
           isOpen={showLoginModal} 
           onClose={() => setShowLoginModal(false)} 
@@ -80,7 +72,7 @@ export default function ShitArmy() {
       <Dashboard 
         onDisconnect={handleDisconnect}
         walletAddress={walletAddress || ''}
-        isGeneral={user?.is_general || isGeneral}
+        isGeneral={user?.is_general || false}
         generalDaysLeft={generalDaysLeft}
         showOnboarding={!hasSeenOnboarding}
         onCompleteOnboarding={completeOnboarding}

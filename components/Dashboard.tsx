@@ -603,7 +603,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       amount,
       lockDays: stakeLock,
       apy,
-      unlockDate: `${new Date(Date.now() + stakeLock * 86400000).getDate()} Jun 2026`,
+      unlockDate: new Date(Date.now() + stakeLock * 86400000).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
       rewards: Math.floor(amount * apy / 1200),
     };
     setStakedPositions(prev => [...prev, newPosition]);

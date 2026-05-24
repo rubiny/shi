@@ -298,7 +298,7 @@ export const CONFIG = {
   UI: {
     // Theme
     DEFAULT_THEME: 'dark',
-    ACCENT_COLOR: '#00FF9F',
+    ACCENT_COLOR: '#f59e0b',
     
     // Animations
     ANIMATIONS_ENABLED: true,

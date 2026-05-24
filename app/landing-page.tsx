@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { CONFIG } from '@/lib/config';
 
 interface LandingPageProps {
   onConnect?: () => void;
   onGoogle?: () => void;
-  onApple?: () => void;
 }
 
 const RANKS = [
@@ -31,7 +31,7 @@ const MEME_IMAGES = [
   { src: '/memes/toilet-finance.png', alt: 'Toilet Finance', likes: '18.7K' }
 ];
 
-export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPageProps) {
+export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
   const [currentEmoji, setCurrentEmoji] = useState(0);
   const [activeRank, setActiveRank] = useState(4);
 
@@ -43,6 +43,17 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
   }, []);
 
   const emojis = ['💩', '🚽', '🧻', '💰', '🔥', '🚀'];
+
+  const getSeasonCountdown = () => {
+    const end = new Date(CONFIG.BUSINESS.BATTLE_PASS.SEASON_END_DATE).getTime();
+    const now = Date.now();
+    const diff = end - now;
+    if (diff <= 0) return 'Season ended';
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    return `${days}d ${String(hours).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m`;
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
@@ -355,7 +366,7 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
             <div className="mt-8 text-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 rounded-full text-sm text-zinc-400">
                 <span className="text-amber-400">⚠️</span>
-                Season ends in: <span className="text-white font-mono">14d 06h 42m</span>
+                Season ends in: <span className="text-white font-mono">{getSeasonCountdown()}</span>
               </div>
             </div>
           </div>
