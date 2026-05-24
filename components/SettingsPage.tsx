@@ -105,10 +105,10 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
       {/* Header */}
       <div className="mb-8 text-center sm:text-left">
         <h1 className="text-4xl sm:text-5xl font-black mb-2 relative inline-block">
-          <span className="relative z-10">{'\u2699\uFE0F'} Settings</span>
+          <span className="relative z-10">{'\u2699\uFE0F'} SETTINGS</span>
           <span className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 blur-lg opacity-50"></span>
         </h1>
-        <p className="text-zinc-400 text-lg">Customize your shitty profile</p>
+        <p className="text-zinc-400 text-lg">configure your degen profile ser</p>
       </div>
 
       {message && (

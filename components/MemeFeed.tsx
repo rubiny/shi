@@ -98,9 +98,9 @@ export default function MemeFeed({ balance, onSpend }: MemeFeedProps) {
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6">
       <div className="mb-8">
-        <div className="text-amber-500 text-sm font-bold tracking-[3px]">COMMUNITY CONTENT</div>
-        <h2 className="text-4xl md:text-5xl font-black tracking-tight">Meme Feed</h2>
-        <p className="text-zinc-400 text-sm mt-1">post memes, vote with $SHIT, top memes get rewarded</p>
+        <div className="text-amber-500 text-sm font-bold tracking-[3px]">DEGEN CONTENT</div>
+        <h2 className="text-4xl md:text-5xl font-black tracking-tight">MEME <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">FEED</span></h2>
+        <p className="text-zinc-400 text-sm mt-1">post shit. vote with $SHIT. top memes get rewarded. shitposting is an art.</p>
       </div>
 
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">

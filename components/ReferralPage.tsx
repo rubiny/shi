@@ -160,8 +160,8 @@ export default function ReferralPage({ userId }: { userId: string }) {
       {/* Header */}
       <div className="mb-8">
         <div className="text-amber-500 text-sm font-bold tracking-[3px]">RECRUIT & EARN</div>
-        <h2 className="text-4xl md:text-5xl font-black tracking-tight">Referral HQ</h2>
-        <p className="text-zinc-400 text-sm mt-1">share your link, grow your army, earn commissions on everything they do</p>
+        <h2 className="text-4xl md:text-5xl font-black tracking-tight">REFERRAL <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">HQ</span></h2>
+        <p className="text-zinc-400 text-sm mt-1">shill your link. grow your army. earn from everything they grind. forever.</p>
       </div>
 
       {/* Tier + Code Card */}

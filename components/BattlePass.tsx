@@ -83,7 +83,7 @@ export default function BattlePass({ userId }: { userId: string }) {
           <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-orange-500 to-purple-500 bg-clip-text text-transparent">
             {BATTLE_PASS_SEASON.name}
           </h1>
-          <p className="text-zinc-400">Climb the ranks. Claim legendary rewards.</p>
+          <p className="text-zinc-400">grind XP. claim loot. flex on normies. or stay a normie forever.</p>
           
           {/* Countdown */}
           <div className="mt-4 inline-flex items-center gap-4 px-6 py-3 bg-zinc-900/50 rounded-2xl border border-white/10">
@@ -120,11 +120,11 @@ export default function BattlePass({ userId }: { userId: string }) {
               onClick={() => setShowUpgrade(true)}
               className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-bold hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
             >
-              🚀 Upgrade to Premium
+              {"\u{1F680}"} GO PREMIUM SER
             </button>
           ) : (
             <div className="px-6 py-3 bg-purple-500/20 border border-purple-500/50 rounded-2xl font-bold text-purple-400">
-              ⭐ Premium Active
+              {"\u{2B50}"} PREMIUM CHAD
             </div>
           )}
         </div>

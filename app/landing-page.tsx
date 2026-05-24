@@ -104,17 +104,17 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <button onClick={() => scrollToSection('how-it-works')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors">
-                How it Works
+              <button onClick={() => scrollToSection('how-it-works')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors font-bold">
+                HOW TO STACK
               </button>
-              <button onClick={() => scrollToSection('rank-system')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors">
-                Leaderboard
+              <button onClick={() => scrollToSection('rank-system')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors font-bold">
+                RANKS
               </button>
               <button 
                 onClick={onConnect}
-                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full font-bold text-sm hover:scale-105 transition-transform"
+                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full font-black text-sm hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
               >
-                Enter App
+                {"\u{1F4A9}"} APE IN
               </button>
             </div>
           </div>
@@ -153,7 +153,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               <span className="text-amber-400 font-bold"> grind offers, stake $SHIT,</span> build your squad &
               <span className="text-amber-300 font-bold"> stack real bags</span>.
               <br />
-              <span className="text-sm text-zinc-500">no rug. no cap. just poop & profit. 💩</span>
+              <span className="text-sm text-zinc-500">no rug. no cap. just poop & profit. {"\u{1F4A9}"}</span>
             </p>
 
             {/* Stats */}
@@ -415,7 +415,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                 ))}
               </div>
               <div className="mt-4 text-center text-sm text-zinc-400">
-                Click ranks to preview rewards
+                tap a rank to see the perks ser
               </div>
             </div>
           </div>
@@ -429,15 +429,15 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             <h2 className="text-4xl sm:text-5xl font-black mb-4">
               SEASON 1: <span className="text-amber-500">SHIT RISING</span>
             </h2>
-            <p className="text-zinc-400">Battle Pass with free & premium rewards</p>
+            <p className="text-zinc-400">grind XP. claim loot. flex on normies.</p>
           </div>
 
           <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-purple-500/10 rounded-3xl border border-amber-500/20 p-8">
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { tier: 5, free: '+500 PTS', premium: '+1000 PTS + NFT', icon: '🎁' },
-                { tier: 15, free: '2x XP Boost', premium: '3x XP + Badge', icon: '⚡' },
-                { tier: 30, premium: 'Exclusive "ShitLord" NFT', icon: '👑', featured: true }
+                { tier: 5, free: '+500 $SHIT', premium: '+1000 $SHIT + NFT', icon: '🎁' },
+                { tier: 15, free: '2x XP JUICE', premium: '3x XP + DEGEN BADGE', icon: '⚡' },
+                { tier: 30, premium: 'Legendary "ShitLord" NFT', icon: '👑', featured: true }
               ].map((reward, i) => (
                 <motion.div
                   key={i}
@@ -449,8 +449,8 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
                   }`}
                 >
                   <div className="text-4xl mb-4">{reward.icon}</div>
-                  <div className="text-sm text-zinc-500 mb-1">Tier {reward.tier}</div>
-                  <h3 className="font-bold mb-2">{reward.featured ? 'MAX REWARD' : 'FREE REWARD'}</h3>
+                  <div className="text-sm text-zinc-500 mb-1">TIER {reward.tier}</div>
+                  <h3 className="font-bold mb-2">{reward.featured ? 'ULTIMATE LOOT' : 'FREE LOOT'}</h3>
                   {reward.free && <div className="text-sm text-zinc-400">Free: {reward.free}</div>}
                   {reward.premium && (
                     <div className="text-sm text-amber-400">Premium: {reward.premium}</div>
@@ -474,7 +474,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-black mb-4">COMMUNITY <span className="text-amber-500">MEMES</span></h2>
-            <p className="text-zinc-400">Best memes get featured & rewarded</p>
+            <p className="text-zinc-400">post degen shit. get upvotes. earn $SHIT. simple.</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -564,7 +564,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               </p>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Earn</h4>
+              <h4 className="font-bold mb-4 text-amber-400">GRIND</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Offerwall</li>
                 <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Staking</li>
@@ -573,7 +573,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Community</h4>
+              <h4 className="font-bold mb-4 text-amber-400">SQUAD</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li><a href="https://discord.gg/shitarmy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Discord</a></li>
                 <li><a href="https://x.com/shitarmy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Twitter/X</a></li>
@@ -582,7 +582,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Legal</h4>
+              <h4 className="font-bold mb-4 text-zinc-400">BORING STUFF</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li><a href="/terms" className="hover:text-white transition-colors">Terms</a></li>
                 <li><a href="/privacy" className="hover:text-white transition-colors">Privacy</a></li>
@@ -591,7 +591,7 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             </div>
           </div>
           <div className="pt-8 border-t border-white/10 text-center text-sm text-zinc-500">
-            <p>© 2026 SHIT.ARMY. All rights reserved. Not financial advice. 💩</p>
+            <p>© 2026 SHIT.ARMY. all rights reserved. NFA. DYOR. WAGMI. {"\u{1F4A9}"}</p>
           </div>
         </div>
       </footer>

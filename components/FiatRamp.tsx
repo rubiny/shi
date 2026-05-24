@@ -79,8 +79,9 @@ export default function FiatRamp({ balance, walletAddress, onBuy, onSell }: Fiat
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <div className="mb-10">
-        <div className="text-amber-500 text-sm font-bold tracking-[3px]">BUY & SELL</div>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Fiat Ramp</h2>
+        <div className="text-amber-500 text-sm font-bold tracking-[3px]">STACK OR DUMP</div>
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">FIAT <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">RAMP</span></h2>
+        <p className="text-zinc-500 text-sm mt-2">buy the dip. sell the top. or just ape in. NFA.</p>
       </div>
 
       {/* Mode Toggle */}
@@ -111,9 +112,9 @@ export default function FiatRamp({ balance, walletAddress, onBuy, onSell }: Fiat
       {showSuccess && (
         <div className="mb-6 p-4 rounded-2xl bg-green-500/20 border border-green-500/40 text-center">
           <div className="text-2xl font-black text-green-400">
-            {mode === 'buy' ? `Purchased ${shitAmount.toLocaleString()} $SHIT!` : `Sold ${numAmount.toLocaleString()} $SHIT!`}
+            {mode === 'buy' ? `BAGS SECURED: ${shitAmount.toLocaleString()} $SHIT! LFG` : `DUMPED ${numAmount.toLocaleString()} $SHIT. paper hands.`}
           </div>
-          <div className="text-sm text-green-300/70 mt-1">Transaction processing via {method.name}</div>
+          <div className="text-sm text-green-300/70 mt-1">processing via {method.name} ser</div>
         </div>
       )}
 

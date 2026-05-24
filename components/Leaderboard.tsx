@@ -123,9 +123,9 @@ export default function Leaderboard({ userId }: { userId: string }) {
       {/* Time Frame */}
       <div className="flex justify-center gap-2 mb-6">
         {[
-          { id: 'week', label: 'This Week' },
-          { id: 'month', label: 'This Month' },
-          { id: 'all', label: 'All Time' },
+          { id: 'week', label: 'THIS WEEK' },
+          { id: 'month', label: 'THIS MONTH' },
+          { id: 'all', label: 'ALL TIME' },
         ].map((tf) => (
           <button
             key={tf.id}
@@ -201,9 +201,9 @@ export default function Leaderboard({ userId }: { userId: string }) {
       <div className="mt-8 text-center">
         <button 
           onClick={() => setShowShareModal(true)}
-          className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl font-bold hover:scale-105 transition-transform"
+          className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-black hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
         >
-          📤 Share Your Rank
+          {"\u{1F4E4}"} FLEX YOUR RANK
         </button>
       </div>
 
@@ -211,10 +211,10 @@ export default function Leaderboard({ userId }: { userId: string }) {
       {showShareModal && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-zinc-900 rounded-3xl max-w-md w-full border border-white/10 p-6">
-            <h2 className="text-2xl font-black mb-4 text-center">Share Your Achievement</h2>
+            <h2 className="text-2xl font-black mb-4 text-center">FLEX ON NORMIES</h2>
             <div className="p-4 bg-zinc-800/50 rounded-2xl mb-4 text-center">
               <div className="text-4xl mb-2">🏆</div>
-              <div className="text-lg font-bold">I'm ranked #{userRank?.rank} on Shit Army!</div>
+              <div className="text-lg font-bold">I&apos;m ranked #{userRank?.rank} on SHIT.ARMY ser</div>
               <div className="text-amber-400">{userRank?.earnings.toLocaleString()} $SHIT earned</div>
             </div>
             <div className="flex gap-3">

@@ -546,7 +546,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
                 EARN REAL $SHIT {db.streakMultiplier > 0 && `(+${db.streakMultiplier}% STREAK)`}
                 {(db.squadPower ?? 0) > 0 && ` (+${Math.floor((db.squadPower ?? 0) / 100)}% ARMY)`}
               </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Offerwall</h2>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">OFFER<span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">WALL</span></h2>
             </div>
 
             {/* ACTIVE OFFERS */}
@@ -660,9 +660,9 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {currentTab === "stake" && (
           <motion.div key="stake" variants={tabVariants} initial="initial" animate="animate" exit="exit" className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <div className="text-6xl md:text-8xl mb-6">🏆</div>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">Staking</h2>
-              <p className="text-lg md:text-2xl text-zinc-400 mt-3">Earn passive income while you sleep</p>
+              <div className="text-6xl md:text-8xl mb-6">{"\u{1F512}"}</div>
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight">LOCK YOUR <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">BAGS</span></h2>
+              <p className="text-lg md:text-2xl text-zinc-400 mt-3">stake $SHIT. earn while you sleep. diamond hands only.</p>
             </div>
             <div className="bg-zinc-950 border border-white/10 rounded-3xl p-10 mb-8">
               <div className="flex justify-between mb-10">
@@ -715,7 +715,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
               </div>
             )}
             {db.stakedPositions.length === 0 && (
-              <EmptyState icon="🔒" title="No staked positions" description="Stake your $SHIT to earn passive income with up to 67% APY." />
+              <EmptyState icon={"\u{1F512}"} title="NO BAGS LOCKED YET" description="lock your $SHIT and earn up to 67% APY. diamond hands get rewarded ser." />
             )}
           </motion.div>
         )}
@@ -724,18 +724,18 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {currentTab === "quests" && (
           <motion.div key="quests" variants={tabVariants} initial="initial" animate="animate" exit="exit" className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <div className="text-6xl md:text-8xl mb-6">📜</div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">Missions</h2>
-              <p className="text-lg md:text-xl text-zinc-400 mt-3">Complete quests. Earn $SHIT. Climb the ranks.</p>
+              <div className="text-6xl md:text-8xl mb-6">{"\u{1F4DC}"}</div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">GRIND <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">LOG</span></h2>
+              <p className="text-lg md:text-xl text-zinc-400 mt-3">complete missions. stack $SHIT. flex on normies.</p>
             </div>
 
             {['daily', 'weekly', 'milestone'].map(category => {
               const filtered = db.quests.filter(q => q.category === category);
               if (filtered.length === 0) return null;
               const labels: Record<string, { title: string; subtitle: string; color: string; gradientFrom: string; gradientTo: string }> = {
-                daily: { title: 'Daily Quests', subtitle: 'RESET IN 6H 42M', color: 'text-amber-500', gradientFrom: 'from-amber-500', gradientTo: 'to-orange-400' },
-                weekly: { title: 'Weekly Quests', subtitle: 'RESET EVERY MONDAY', color: 'text-purple-400', gradientFrom: 'from-purple-500', gradientTo: 'to-pink-500' },
-                milestone: { title: 'Milestones', subtitle: 'PERMANENT PROGRESS', color: 'text-amber-400', gradientFrom: 'from-amber-500', gradientTo: 'to-orange-500' },
+                daily: { title: 'DAILY GRIND', subtitle: 'RESET IN 6H 42M', color: 'text-amber-500', gradientFrom: 'from-amber-500', gradientTo: 'to-orange-400' },
+                weekly: { title: 'WEEKLY RAIDS', subtitle: 'RESET EVERY MONDAY', color: 'text-purple-400', gradientFrom: 'from-purple-500', gradientTo: 'to-pink-500' },
+                milestone: { title: 'LEGENDARY FEATS', subtitle: 'PERMANENT FLEX', color: 'text-amber-400', gradientFrom: 'from-amber-500', gradientTo: 'to-orange-500' },
               };
               const l = labels[category];
               return (
@@ -808,9 +808,9 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         {currentTab === "merch" && (
           <motion.div key="merch" variants={tabVariants} initial="initial" animate="animate" exit="exit">
             <div className="text-center mb-12">
-              <div className="text-6xl md:text-8xl mb-6">👕</div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">Shit Army Merch</h2>
-              <p className="text-lg md:text-xl text-zinc-400 mt-3">Wear the army • Printed & shipped by Printful</p>
+              <div className="text-6xl md:text-8xl mb-6">{"\u{1F455}"}</div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">SHIT ARMY <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">DRIP</span></h2>
+              <p className="text-lg md:text-xl text-zinc-400 mt-3">rep the army IRL. print-on-demand. worldwide shipping ser.</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {MERCH_PRODUCTS.map((product) => (
@@ -832,7 +832,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
               ))}
             </div>
             <div className="text-center text-xs text-zinc-500 mt-12 max-w-md mx-auto">
-              All items printed on-demand via Printful • Ships worldwide • 100% satisfaction guaranteed
+              all items printed on-demand via Printful {"\u2022"} ships worldwide {"\u2022"} no refunds. this is the way.
             </div>
           </motion.div>
         )}
@@ -1007,7 +1007,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
           <motion.div key="history" variants={tabVariants} initial="initial" animate="animate" exit="exit" className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <div className="text-6xl md:text-8xl mb-6">📜</div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">Transaction History</h2>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">TRANSACTION <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">LOG</span></h2>
             </div>
 
             <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -1020,7 +1020,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
 
             <div className="bg-zinc-950 border border-white/10 rounded-3xl overflow-hidden">
               {filteredTransactions.length === 0 ? (
-                <EmptyState icon="📜" title="No transactions yet" description={txFilter === 'all' ? "Complete offers, stake tokens, or play games to see your history here." : `No ${txFilter} transactions found.`} action={txFilter !== 'all' ? { label: "Show All", onClick: () => setTxFilter('all') } : undefined} />
+                <EmptyState icon={"\u{1F4DC}"} title="NO HISTORY YET" description={txFilter === 'all' ? "start grinding offers, locking bags, or degen gambling to fill this up ser." : `no ${txFilter} transactions found.`} action={txFilter !== 'all' ? { label: "SHOW ALL", onClick: () => setTxFilter('all') } : undefined} />
               ) : (
                 filteredTransactions.map((tx) => (
                   <div key={tx.id} className="flex items-center gap-4 px-6 py-5 border-b border-white/10 last:border-0 hover:bg-white/5 transition-all">
@@ -1166,7 +1166,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
               <>
                 <div className="text-center mb-8">
                   <div className="text-6xl mb-4">🏦</div>
-                  <div className="text-3xl font-bold tracking-tight">Withdraw $SHIT</div>
+                  <div className="text-3xl font-black tracking-tight">CASH OUT $SHIT</div>
                   <div className="text-zinc-400 mt-2">Available: {db.shitBalance.toLocaleString()} $SHIT</div>
                 </div>
 
@@ -1251,7 +1251,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
             {withdrawStep === 3 && (
               <div className="text-center py-8">
                 <div className="text-8xl mb-6">✅</div>
-                <div className="text-3xl font-bold tracking-tight mb-2">Withdrawal Sent!</div>
+                <div className="text-3xl font-black tracking-tight mb-2">BAGS SENT SER!</div>
                 <div className="text-zinc-400 mb-8">{(parseFloat(withdrawAmount) - selectedNetwork.fee).toFixed(2)} $SHIT → {selectedNetwork.name}</div>
                 <button onClick={() => setShowWithdrawModal(false)} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black rounded-2xl font-black active:scale-[0.985]">DONE</button>
               </div>

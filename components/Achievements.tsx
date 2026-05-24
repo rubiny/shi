@@ -88,9 +88,9 @@ export default function Achievements({ userId }: { userId: string }) {
       <div className="mb-8 text-center">
         <div className="text-5xl mb-2">🏆</div>
         <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 bg-clip-text text-transparent">
-          Achievements
+          TROPHY ROOM
         </h1>
-        <p className="text-zinc-400">Prove your worth in the Shit Army</p>
+        <p className="text-zinc-400">unlock badges. prove you&apos;re not a normie. show the receipts.</p>
       </div>
 
       {/* Stats */}
@@ -112,7 +112,7 @@ export default function Achievements({ userId }: { userId: string }) {
       {/* Progress Bar */}
       <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/10 mb-8">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-zinc-400">Collection Progress</span>
+          <span className="text-zinc-400">DEGEN PROGRESS</span>
           <span className="text-amber-400 font-bold">{Math.round((unlocked/total)*100)}%</span>
         </div>
         <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">

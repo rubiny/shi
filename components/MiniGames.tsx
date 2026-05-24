@@ -168,8 +168,8 @@ export default function MiniGames({ balance, onWin, onLose }: MiniGamesProps) {
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
       <div className="mb-10">
-        <div className="text-amber-500 text-sm font-bold tracking-[3px]">PLAY TO EARN</div>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Mini Games</h2>
+        <div className="text-amber-500 text-sm font-bold tracking-[3px]">DEGEN CASINO</div>
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">MINI <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">GAMES</span></h2>
         <div className="mt-2 text-sm text-zinc-400">
           {playCount}/{MAX_PLAYS_PER_HOUR} plays this hour
           {cooldownEnd > Date.now() && (
