@@ -14,10 +14,10 @@ interface Event {
 }
 
 const EVENT_TYPES = [
-  { id: 'double_xp', name: 'Double XP Weekend', icon: '⚡', color: 'blue' },
-  { id: 'bonus_rewards', name: 'Bonus Rewards', icon: '💰', color: 'amber' },
-  { id: 'flash_sale', name: 'Flash Sale (Market)', icon: '🛒', color: 'purple' },
-  { id: 'special_quest', name: 'Special Quest', icon: '📜', color: 'amber' },
+  { id: 'double_xp', name: 'Double XP Weekend', icon: '⚡', bgClass: 'bg-blue-500/20' },
+  { id: 'bonus_rewards', name: 'Bonus Rewards', icon: '💰', bgClass: 'bg-amber-500/20' },
+  { id: 'flash_sale', name: 'Flash Sale (Market)', icon: '🛒', bgClass: 'bg-purple-500/20' },
+  { id: 'special_quest', name: 'Special Quest', icon: '📜', bgClass: 'bg-amber-500/20' },
 ];
 
 export default function AdminEventsModal({ onClose }: { onClose: () => void }) {
@@ -93,7 +93,7 @@ export default function AdminEventsModal({ onClose }: { onClose: () => void }) {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 rounded-xl bg-${typeInfo?.color}-500/20 flex items-center justify-center text-2xl`}>
+                      <div className={`w-12 h-12 rounded-xl ${typeInfo?.bgClass || 'bg-zinc-700/20'} flex items-center justify-center text-2xl`}>
                         {typeInfo?.icon}
                       </div>
                       <div>
