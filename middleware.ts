@@ -1,3 +1,4 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -47,7 +48,7 @@ function isRateLimited(ip: string): boolean {
   return entry.count > RATE_LIMIT_MAX;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = getClientIp(request);
 
@@ -61,43 +62,67 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Admin route protection
-  if (ADMIN_PATHS.some(p => pathname.startsWith(p))) {
-    const supabaseAuth = request.cookies.get('sb-access-token')?.value
-      || request.cookies.get('sb-auth-token')?.value;
+  // Create response for cookie manipulation
+  let supabaseResponse = NextResponse.next({ request });
 
-    if (!supabaseAuth) {
-      return NextResponse.redirect(new URL('/', request.url));
+  // Refresh Supabase auth session via cookies
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseAnonKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    });
+
+    // Refresh session — IMPORTANT: do not remove this
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Admin route protection
+    if (ADMIN_PATHS.some(p => pathname.startsWith(p))) {
+      if (!user) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
     }
   }
 
   // Security headers
-  const response = NextResponse.next();
-
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  supabaseResponse.headers.set('X-Frame-Options', 'DENY');
+  supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff');
+  supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  supabaseResponse.headers.set('X-XSS-Protection', '1; mode=block');
+  supabaseResponse.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
   if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-    response.headers.set(
+    supabaseResponse.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    supabaseResponse.headers.set(
       'Content-Security-Policy',
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.onesignal.com https://hcaptcha.com https://*.hcaptcha.com",
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.onesignal.com https://hcaptcha.com https://*.hcaptcha.com https://accounts.google.com",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
         "img-src 'self' data: blob: https:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.offertoro.com https://api.adgem.com https://adscendmedia.com https://*.sentry.io https://*.onesignal.com https://*.google-analytics.com https://*.posthog.com https://*.mixpanel.com https://hcaptcha.com https://*.hcaptcha.com",
-        "frame-src 'self' https://www.offertoro.com https://wall.adgem.com https://adscendmedia.com https://hcaptcha.com https://*.hcaptcha.com",
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.offertoro.com https://api.adgem.com https://adscendmedia.com https://*.sentry.io https://*.onesignal.com https://*.google-analytics.com https://*.posthog.com https://*.mixpanel.com https://hcaptcha.com https://*.hcaptcha.com https://accounts.google.com",
+        "frame-src 'self' https://www.offertoro.com https://wall.adgem.com https://adscendmedia.com https://hcaptcha.com https://*.hcaptcha.com https://accounts.google.com",
         "worker-src 'self' blob:",
       ].join('; ')
     );
   }
 
-  return response;
+  return supabaseResponse;
 }
 
 export const config = {
