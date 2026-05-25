@@ -1,4 +1,3 @@
-import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 
 // Environment variables with fallback for development
@@ -12,12 +11,15 @@ if (isMockMode && typeof window !== 'undefined') {
   console.warn('⚠️ Supabase: Running in MOCK mode. Create .env.local with real credentials for production.');
 }
 
-// Browser client (for client-side) — uses @supabase/ssr for cookie-based auth
-export const supabase = isMockMode
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    })
-  : createBrowserClient(supabaseUrl, supabaseAnonKey);
+// Browser client — uses implicit flow so tokens come in URL hash
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    flowType: 'implicit',
+    persistSession: !isMockMode,
+    autoRefreshToken: !isMockMode,
+    detectSessionInUrl: !isMockMode,
+  },
+});
 
 // Export mock mode flag
 export const isSupabaseMockMode = isMockMode;
