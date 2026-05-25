@@ -108,9 +108,12 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
               <button onClick={() => scrollToSection('how-it-works')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors font-bold">
                 HOW TO STACK
               </button>
-              <button onClick={() => scrollToSection('rank-system')} className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors font-bold">
-                RANKS
-              </button>
+              <a href="/blog" className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors font-bold">
+                BLOG
+              </a>
+              <a href="/offers" className="hidden sm:block text-zinc-400 hover:text-white text-sm transition-colors font-bold">
+                OFFERS
+              </a>
               <button 
                 onClick={onConnect}
                 className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full font-black text-sm hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
@@ -679,10 +682,10 @@ export default function LandingPage({ onConnect, onGoogle }: LandingPageProps) {
             <div>
               <h4 className="font-bold mb-4 text-amber-400">GRIND</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
-                <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Offerwall</li>
+                <li><a href="/offers" className="hover:text-white transition-colors">Browse Offers</a></li>
+                <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">How It Works</li>
                 <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Staking</li>
-                <li onClick={() => scrollToSection('how-it-works')} className="hover:text-white cursor-pointer transition-colors">Referrals</li>
-                <li onClick={() => scrollToSection('battle-pass')} className="hover:text-white cursor-pointer transition-colors">Battle Pass</li>
+                <li><a href="/blog" className="hover:text-white transition-colors">Earn Guides</a></li>
               </ul>
             </div>
             <div>
