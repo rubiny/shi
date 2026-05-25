@@ -1,7 +1,7 @@
 'use client';
 
 const ACHIEVEMENTS_CONTRACT = process.env.NEXT_PUBLIC_ACHIEVEMENTS_CONTRACT || '';
-const BASE_RPC_URL = process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org';
+const BASE_RPC_URL = process.env.NEXT_PUBLIC_BASE_RPC || 'https://mainnet.base.org';
 
 export interface AchievementNFT {
   id: string;

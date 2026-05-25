@@ -292,8 +292,8 @@ export const CONFIG = {
     // CAPTCHA
     CAPTCHA: {
       ENABLED: process.env.NEXT_PUBLIC_CAPTCHA_ENABLED === 'true',
-      PROVIDER: 'recaptcha', // 'recaptcha' | 'hcaptcha' | 'turnstile'
-      SITE_KEY: process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY,
+      PROVIDER: 'hcaptcha', // 'recaptcha' | 'hcaptcha' | 'turnstile'
+      SITE_KEY: process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY,
     },
     
     // Rate Limiting (frontend-side warnings)

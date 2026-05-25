@@ -3,8 +3,8 @@
 // $SHIT Token on Base Network
 // Deploy the contract and update SHIT_TOKEN_ADDRESS
 
-const SHIT_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_SHIT_TOKEN_ADDRESS || '';
-const BASE_RPC_URL = process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org';
+const SHIT_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_SHIT_TOKEN_CONTRACT || '';
+const BASE_RPC_URL = process.env.NEXT_PUBLIC_BASE_RPC || 'https://mainnet.base.org';
 const BASE_CHAIN_ID = 8453;
 
 // ERC20 ABI (minimal)
