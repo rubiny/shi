@@ -32,7 +32,7 @@ export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321';
       const key = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role';
       _adminClient = createClient(url, key, {
-        auth: { persistSession: false, autoRefreshToken: false },
+        auth: { persistSession: false, autoRefreshToken: false, storageKey: 'sb-admin' },
       });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
