@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import EmptyState from './ui/EmptyState';
 
 type SoldierRank = 'Normie' | 'Degen' | 'Ape' | 'Chad' | 'Whale' | 'GigaChad';
 type MissionStatus = 'chilling' | 'grinding' | 'done';
@@ -397,6 +398,16 @@ export default function Army({ userId: _userId }: { userId: string }) {
       {/* MY DEGENS TAB */}
       {activeTab === 'army' && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {soldiers.length === 0 && (
+            <div className="col-span-full">
+              <EmptyState
+                icon="⚔️"
+                title="NO SOLDIERS YET"
+                description="recruit your first degen soldier to start raiding sewers and earning passive $SHIT."
+                action={{ label: '💩 RECRUIT NOW', onClick: () => setActiveTab('recruit') }}
+              />
+            </div>
+          )}
           {soldiers.map((s) => {
             const isGrinding = s.missionStatus === 'grinding';
             const isDone = s.missionStatus === 'done';

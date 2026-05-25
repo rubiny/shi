@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from '@/lib/toast';
 
 interface Achievement {
   id: string;
@@ -229,16 +230,28 @@ export default function Achievements({ userId }: { userId: string }) {
                   )}
                   
                   {ach.unlocked && (
-                    <button 
-                      onClick={() => claimReward(ach.id)}
-                      className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
-                        isClaiming
-                          ? 'bg-amber-500 scale-95'
-                          : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white'
-                      }`}
-                    >
-                      {isClaiming ? '💰 CLAIMED!' : 'CLAIM'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just unlocked "${ach.title}" on SHIT.ARMY! ${ach.icon}\n\n`)}&url=${encodeURIComponent('https://shit.army')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => { e.stopPropagation(); toast.info('Sharing', 'Opening Twitter...', '🐦'); }}
+                        className="px-2.5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm transition-colors"
+                        title="Share on Twitter"
+                      >
+                        🐦
+                      </a>
+                      <button 
+                        onClick={() => claimReward(ach.id)}
+                        className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                          isClaiming
+                            ? 'bg-amber-500 scale-95'
+                            : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white'
+                        }`}
+                      >
+                        {isClaiming ? '💰 CLAIMED!' : 'CLAIM'}
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from '@/lib/toast';
 
 interface LeaderboardEntry {
   rank: number;
@@ -251,16 +252,36 @@ export default function Leaderboard({ userId, userEarnings = 0, userReferrals = 
               <div className="text-amber-400">{userRank?.earnings.toLocaleString()} $SHIT earned</div>
             </div>
             <div className="flex gap-3">
-              {['Twitter', 'Discord', 'Copy'].map((platform) => (
-                <button 
-                  key={platform}
-                  onClick={() => setShowShareModal(false)}
-                  className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold"
-                >
-                  {platform}
-                </button>
-              ))}
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I'm ranked #${userRank?.rank} on SHIT.ARMY with ${userRank?.earnings.toLocaleString()} $SHIT earned 💩🚀\n\nJoin the degen army:`)}&url=${encodeURIComponent('https://shit.army')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold text-center"
+              >
+                🐦 Twitter
+              </a>
+              <a
+                href={`https://t.me/share/url?url=${encodeURIComponent('https://shit.army')}&text=${encodeURIComponent(`I'm ranked #${userRank?.rank} on SHIT.ARMY with ${userRank?.earnings.toLocaleString()} $SHIT earned 💩🚀`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold text-center"
+              >
+                📨 Telegram
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`I'm ranked #${userRank?.rank} on SHIT.ARMY with ${userRank?.earnings.toLocaleString()} $SHIT earned 💩🚀 https://shit.army`);
+                  toast.copied('Share text');
+                  setShowShareModal(false);
+                }}
+                className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold"
+              >
+                📋 Copy
+              </button>
             </div>
+            <button onClick={() => setShowShareModal(false)} className="w-full mt-3 py-2 text-zinc-500 hover:text-white text-sm transition-colors">
+              Close
+            </button>
           </div>
         </div>
       )}

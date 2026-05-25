@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import EmptyState from './ui/EmptyState';
 
 interface Meme {
   id: string;
@@ -146,6 +147,14 @@ export default function MemeFeed({ balance, onSpend }: MemeFeedProps) {
       )}
 
       <div className="space-y-4">
+        {sortedMemes.length === 0 && (
+          <EmptyState
+            icon="🎨"
+            title="NO MEMES YET"
+            description="be the first to post a meme and earn $SHIT from upvotes. shitposting is an art form."
+            action={{ label: '+ POST FIRST MEME', onClick: () => setShowSubmit(true) }}
+          />
+        )}
         {sortedMemes.map(meme => (
           <div key={meme.id} className={`bg-zinc-900/60 rounded-2xl p-5 border ${meme.isFeatured ? 'border-amber-500/30' : 'border-white/5'}`}>
             <div className="flex items-start gap-4">

@@ -243,6 +243,11 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _ini
         notifications={db.notifications}
         onMarkNotificationRead={db.markNotificationRead}
         onClearNotifications={db.clearAllNotifications}
+        onQuickAction={(action) => {
+          if (action === 'daily') db.claimDailyBonus();
+          else if (action === 'convert') db.convertPoints();
+          else if (action === 'spin') setCurrentTab('spin');
+        }}
       />
 
       <div className="pt-20 pb-24 max-w-7xl mx-auto px-4 sm:px-6">

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import EmptyState from './ui/EmptyState';
 
 type ItemCategory = 'all' | 'degens' | 'juice' | 'drip' | 'flex';
 type ItemRank = 'Normie' | 'Degen' | 'Ape' | 'Chad' | 'Whale' | 'GigaChad';
@@ -240,6 +241,16 @@ export default function Market({ userId: _userId }: { userId: string }) {
 
       {/* Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+        {filtered.length === 0 && (
+          <div className="col-span-full">
+            <EmptyState
+              icon="🏪"
+              title="NO LISTINGS FOUND"
+              description={category !== 'all' ? "no items in this category yet. check back later or try a different filter." : "the market is empty. be the first to list something!"}
+              action={category !== 'all' ? { label: 'SHOW ALL', onClick: () => setCategory('all')} : undefined}
+            />
+          </div>
+        )}
         {filtered.map((item) => (
           <div
             key={item.id}

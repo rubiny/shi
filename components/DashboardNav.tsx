@@ -17,6 +17,7 @@ interface DashboardNavProps {
   notifications?: Notification[];
   onMarkNotificationRead?: (id: string) => void;
   onClearNotifications?: () => void;
+  onQuickAction?: (action: 'daily' | 'convert' | 'spin') => void;
 }
 
 export const mainTabs = [
@@ -79,6 +80,7 @@ export default function DashboardNav({
   notifications = [],
   onMarkNotificationRead,
   onClearNotifications,
+  onQuickAction,
 }: DashboardNavProps) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -282,6 +284,35 @@ export default function DashboardNav({
                   <button onClick={() => handleTabClick("antifraud")} className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${currentTab === 'antifraud' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-zinc-900 hover:bg-zinc-800 border border-white/5'}`}>
                     <span className="text-xl">{'\u{1F6E1}\uFE0F'}</span>
                     <span className="text-[11px] font-medium">Anti-Fraud</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {onQuickAction && (
+              <div className="mb-4">
+                <div className="text-[10px] text-amber-500 uppercase font-bold tracking-widest mb-2">Quick Actions</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => { onQuickAction('daily'); setShowMoreMenu(false); }}
+                    className="flex flex-col items-center gap-1 p-3 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 active:scale-95 transition-transform"
+                  >
+                    <span className="text-xl">📅</span>
+                    <span className="text-[11px] font-bold text-amber-400">Daily</span>
+                  </button>
+                  <button
+                    onClick={() => { onQuickAction('convert'); setShowMoreMenu(false); }}
+                    className="flex flex-col items-center gap-1 p-3 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 active:scale-95 transition-transform"
+                  >
+                    <span className="text-xl">🔄</span>
+                    <span className="text-[11px] font-bold text-green-400">Convert</span>
+                  </button>
+                  <button
+                    onClick={() => { onQuickAction('spin'); setShowMoreMenu(false); }}
+                    className="flex flex-col items-center gap-1 p-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 active:scale-95 transition-transform"
+                  >
+                    <span className="text-xl">🎰</span>
+                    <span className="text-[11px] font-bold text-purple-400">Spin</span>
                   </button>
                 </div>
               </div>

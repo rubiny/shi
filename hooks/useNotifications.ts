@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import type { Notification } from '@/lib/types';
 import { sfx } from '@/lib/sounds';
+import { toast } from '@/lib/toast';
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -48,6 +49,20 @@ export function useNotifications() {
       message.toLowerCase().includes('fail') || message.toLowerCase().includes('not enough') ? 'error' : 'success'
     );
     sendBrowserNotification('SHIT.ARMY', message);
+    const isError = message.toLowerCase().includes('fail') || message.toLowerCase().includes('not enough') || message.toLowerCase().includes('already');
+    if (isError) {
+      toast.error('Oops', message, '⚠️');
+    } else if (message.toLowerCase().includes('daily')) {
+      toast.success('Daily Bonus', message, '📅');
+    } else if (message.toLowerCase().includes('convert')) {
+      toast.success('Converted', message, '🔄');
+    } else if (message.toLowerCase().includes('withdraw')) {
+      toast.info('Withdrawal', message, '💸');
+    } else if (message.toLowerCase().includes('level')) {
+      toast.achievement('Level Up!', message, '⬆️');
+    } else {
+      toast.success('SHIT.ARMY', message, '💩');
+    }
     setTimeout(() => setShowSuccess(false), 2600);
   }, [addNotification, sendBrowserNotification]);
 

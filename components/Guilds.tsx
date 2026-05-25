@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import EmptyState from './ui/EmptyState';
 
 interface GuildMember {
   username: string;
@@ -153,6 +154,14 @@ export default function Guilds({ balance, onSpend }: GuildsProps) {
           )}
 
           <div className="space-y-3">
+            {guilds.length === 0 && (
+              <EmptyState
+                icon="🏰"
+                title="NO GUILDS YET"
+                description="create the first guild and recruit degens to dominate the leaderboard together."
+                action={{ label: '+ CREATE GUILD', onClick: () => setShowCreate(true) }}
+              />
+            )}
             {guilds.map(guild => (
               <div key={guild.id} className="bg-zinc-900/60 rounded-2xl p-5 border border-white/5 hover:border-amber-500/20 transition-all">
                 <div className="flex items-center justify-between">
