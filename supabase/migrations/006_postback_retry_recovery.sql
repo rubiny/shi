@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS failed_postbacks (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_failed_postbacks_pending ON failed_postbacks (resolved, next_retry_at) WHERE resolved = false;
+CREATE INDEX IF NOT EXISTS idx_failed_postbacks_pending ON failed_postbacks (resolved, next_retry_at) WHERE resolved = false;
 
 -- Admin alerts for critical issues
 CREATE TABLE IF NOT EXISTS admin_alerts (
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS admin_alerts (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_admin_alerts_unacked ON admin_alerts (acknowledged, created_at) WHERE acknowledged = false;
+CREATE INDEX IF NOT EXISTS idx_admin_alerts_unacked ON admin_alerts (acknowledged, created_at) WHERE acknowledged = false;
 
 -- Account recovery codes
 CREATE TABLE IF NOT EXISTS recovery_codes (
@@ -36,22 +36,12 @@ CREATE TABLE IF NOT EXISTS recovery_codes (
   expires_at TIMESTAMPTZ DEFAULT now() + interval '30 days'
 );
 
-CREATE INDEX idx_recovery_codes_user ON recovery_codes (user_id, used) WHERE used = false;
+CREATE INDEX IF NOT EXISTS idx_recovery_codes_user ON recovery_codes (user_id, used) WHERE used = false;
 
--- Withdrawal idempotency
-CREATE TABLE IF NOT EXISTS withdrawal_requests (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES profiles(id),
-  idempotency_key TEXT UNIQUE NOT NULL,
-  amount NUMERIC NOT NULL,
-  network TEXT NOT NULL,
-  address TEXT NOT NULL,
-  status TEXT DEFAULT 'pending',
-  created_at TIMESTAMPTZ DEFAULT now()
-);
+-- Add idempotency_key to existing withdrawal_requests table
+ALTER TABLE withdrawal_requests ADD COLUMN IF NOT EXISTS idempotency_key TEXT UNIQUE;
 
-CREATE INDEX idx_withdrawal_idempotency ON withdrawal_requests (idempotency_key);
-CREATE INDEX idx_withdrawal_user ON withdrawal_requests (user_id, status);
+CREATE INDEX IF NOT EXISTS idx_withdrawal_idempotency ON withdrawal_requests (idempotency_key);
 
 -- RPC: Safe withdrawal with balance check
 CREATE OR REPLACE FUNCTION submit_withdrawal(
@@ -66,9 +56,11 @@ DECLARE
   v_existing UUID;
 BEGIN
   -- Check idempotency
-  SELECT id INTO v_existing FROM withdrawal_requests WHERE idempotency_key = p_idempotency_key;
-  IF v_existing IS NOT NULL THEN
-    RETURN jsonb_build_object('success', false, 'error', 'duplicate_request');
+  IF p_idempotency_key IS NOT NULL THEN
+    SELECT id INTO v_existing FROM withdrawal_requests WHERE idempotency_key = p_idempotency_key;
+    IF v_existing IS NOT NULL THEN
+      RETURN jsonb_build_object('success', false, 'error', 'duplicate_request');
+    END IF;
   END IF;
 
   -- Lock user row and check balance
@@ -86,8 +78,8 @@ BEGIN
   UPDATE profiles SET shit_balance = shit_balance - p_amount WHERE id = p_user_id;
 
   -- Create withdrawal record
-  INSERT INTO withdrawal_requests (user_id, idempotency_key, amount, network, address, status)
-  VALUES (p_user_id, p_idempotency_key, p_amount, p_network, p_address, 'pending');
+  INSERT INTO withdrawal_requests (user_id, amount, fee, net_amount, network, address, idempotency_key)
+  VALUES (p_user_id, p_amount, 0, p_amount, p_network, p_address, p_idempotency_key);
 
   RETURN jsonb_build_object('success', true, 'new_balance', v_balance - p_amount);
 END;
