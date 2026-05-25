@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LandingPage from './landing-page';
 import Dashboard from '../components/Dashboard';
 import LoginModal from '../components/LoginModal';
@@ -14,11 +14,18 @@ function getInitialOnboardingState(): boolean {
 }
 
 export default function ShitArmy() {
-  const { user, isAuthenticated, signOut, isLoading } = useAuth();
+  const { user, isAuthenticated, signOut, signInWithGoogle, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [generalDaysLeft] = useState(0);
   
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(getInitialOnboardingState);
+
+  // Clean up error params from URL after auth redirect
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('error=auth_callback_failed')) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
   
   const completeOnboarding = () => {
     if (typeof window !== 'undefined') {
@@ -35,8 +42,12 @@ export default function ShitArmy() {
     setShowLoginModal(true);
   };
 
-  const handleGoogle = () => {
-    setShowLoginModal(true);
+  const handleGoogle = async () => {
+    try {
+      await signInWithGoogle();
+    } catch {
+      setShowLoginModal(true);
+    }
   };
 
   const handleDisconnect = async () => {
