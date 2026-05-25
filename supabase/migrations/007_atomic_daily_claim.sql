@@ -1,4 +1,6 @@
 -- Atomic daily claim RPC to prevent race conditions
+DROP FUNCTION IF EXISTS claim_daily_bonus(UUID);
+
 CREATE OR REPLACE FUNCTION claim_daily_bonus(p_user_id UUID)
 RETURNS JSONB AS $$
 DECLARE
