@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from '@/lib/toast';
 
 interface Achievement {
   id: string;
@@ -88,9 +89,9 @@ export default function Achievements({ userId }: { userId: string }) {
       <div className="mb-8 text-center">
         <div className="text-5xl mb-2">🏆</div>
         <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 bg-clip-text text-transparent">
-          Achievements
+          TROPHY ROOM
         </h1>
-        <p className="text-zinc-400">Prove your worth in the Shit Army</p>
+        <p className="text-zinc-400">unlock badges. prove you&apos;re not a normie. show the receipts.</p>
       </div>
 
       {/* Stats */}
@@ -100,7 +101,7 @@ export default function Achievements({ userId }: { userId: string }) {
           <div className="text-xs text-zinc-500 uppercase">Unlocked</div>
         </div>
         <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/10 text-center">
-          <div className="text-3xl font-black text-emerald-400">{totalRewards.toLocaleString()}</div>
+          <div className="text-3xl font-black text-amber-400">{totalRewards.toLocaleString()}</div>
           <div className="text-xs text-zinc-500 uppercase">$SHIT Earned</div>
         </div>
         <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/10 text-center">
@@ -112,7 +113,7 @@ export default function Achievements({ userId }: { userId: string }) {
       {/* Progress Bar */}
       <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/10 mb-8">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-zinc-400">Collection Progress</span>
+          <span className="text-zinc-400">DEGEN PROGRESS</span>
           <span className="text-amber-400 font-bold">{Math.round((unlocked/total)*100)}%</span>
         </div>
         <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
@@ -220,7 +221,7 @@ export default function Achievements({ userId }: { userId: string }) {
                 {/* Footer */}
                 <div className="flex items-center justify-between">
                   {ach.unlocked ? (
-                    <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                    <div className="flex items-center gap-2 text-amber-400 text-sm">
                       <span>✓</span>
                       <span>Unlocked {ach.unlockedAt && `• ${new Date(ach.unlockedAt).toLocaleDateString()}`}</span>
                     </div>
@@ -229,16 +230,28 @@ export default function Achievements({ userId }: { userId: string }) {
                   )}
                   
                   {ach.unlocked && (
-                    <button 
-                      onClick={() => claimReward(ach.id)}
-                      className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
-                        isClaiming
-                          ? 'bg-emerald-500 scale-95'
-                          : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white'
-                      }`}
-                    >
-                      {isClaiming ? '💰 CLAIMED!' : 'CLAIM'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just unlocked "${ach.title}" on SHIT.ARMY! ${ach.icon}\n\n`)}&url=${encodeURIComponent('https://shit.army')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => { e.stopPropagation(); toast.info('Sharing', 'Opening Twitter...', '🐦'); }}
+                        className="px-2.5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm transition-colors"
+                        title="Share on Twitter"
+                      >
+                        🐦
+                      </a>
+                      <button 
+                        onClick={() => claimReward(ach.id)}
+                        className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                          isClaiming
+                            ? 'bg-amber-500 scale-95'
+                            : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white'
+                        }`}
+                      >
+                        {isClaiming ? '💰 CLAIMED!' : 'CLAIM'}
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

@@ -10,11 +10,11 @@ interface OnboardingStep {
 }
 
 const STEPS: OnboardingStep[] = [
-  { title: "Welcome to Shit Army", description: "The meme-powered earning platform. Complete offers, stake $SHIT, recruit friends, and climb the ranks.", icon: "💩", action: "Let's Go!" },
-  { title: "Complete Offers", description: "Browse the offerwall and complete tasks to earn $SHIT. The harder the offer, the bigger the reward.", icon: "🎯", action: "Got It" },
-  { title: "Stake & Earn", description: "Lock your $SHIT in staking pools to earn passive income. Longer stakes = higher APY.", icon: "🔒", action: "Nice" },
-  { title: "Recruit Soldiers", description: "Share your referral code and earn commissions from everyone you invite. Build your poop platoon!", icon: "👥", action: "I'm Ready" },
-  { title: "Battle Pass & Quests", description: "Complete daily/weekly quests and climb the Battle Pass for exclusive NFTs and rewards.", icon: "🏆", action: "Start Earning!" },
+  { title: "GM DEGEN", description: "welcome to shit.army — the most unhinged earning platform on chain. grind offers, stake bags, mint degens, and climb from normie to gigachad.", icon: "💩", action: "LFG" },
+  { title: "GRIND THE OFFERWALL", description: "complete offers to stack $SHIT. harder offers = bigger bags. streak bonuses for daily grinders. no shortcuts ser.", icon: "⚡", action: "APE IN" },
+  { title: "LOCK YOUR BAGS", description: "stake $SHIT for 32-67% APY. longer lock = bigger returns. diamond hands only. paper hands get rekt.", icon: "💎", action: "WAGMI" },
+  { title: "BUILD YOUR ARMY", description: "mint degen soldiers, send them on sewer raids, earn $SHIT passively. join a guild. recruit frens for commissions.", icon: "⚔️", action: "SEND IT" },
+  { title: "READY TO STACK?", description: "daily missions, battle pass, mini games, seasonal events — everything earns $SHIT. the grind never stops.", icon: "🏆", action: "START GRINDING" },
 ];
 
 export default function OnboardingModal({ onComplete }: { onComplete: () => void }) {

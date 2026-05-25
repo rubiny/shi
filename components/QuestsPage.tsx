@@ -26,14 +26,14 @@ const QUESTS: Quest[] = [
   // Daily Quests
   { id: 'd1', title: 'Morning Shit', description: 'Complete 3 offers before noon', type: 'daily', category: 'offers', progress: 1, max: 3, reward: 150, xp: 50, icon: '🌅', claimed: false, completed: false, difficulty: 'easy' },
   { id: 'd2', title: 'Referral Hunter', description: 'Share your referral code with 5 friends', type: 'daily', category: 'social', progress: 2, max: 5, reward: 200, xp: 75, icon: '🎯', claimed: false, completed: false, difficulty: 'medium' },
-  { id: 'd3', title: 'Staking Check', description: 'Check your staking rewards', type: 'daily', category: 'staking', progress: 1, max: 1, reward: 50, xp: 25, icon: '🔒', claimed: true, completed: true, difficulty: 'easy' },
-  { id: 'd4', title: 'Market Scout', description: 'Browse the NFT marketplace', type: 'daily', category: 'market', progress: 0, max: 1, reward: 75, xp: 30, icon: '🛒', claimed: false, completed: false, difficulty: 'easy' },
+  { id: 'd3', title: 'Check Your Bags', description: 'Check your staking rewards', type: 'daily', category: 'staking', progress: 1, max: 1, reward: 50, xp: 25, icon: '🔒', claimed: true, completed: true, difficulty: 'easy' },
+  { id: 'd4', title: 'Scout the Bazaar', description: 'Browse the Shit Bazaar', type: 'daily', category: 'market', progress: 0, max: 1, reward: 75, xp: 30, icon: '🏪', claimed: false, completed: false, difficulty: 'easy' },
   
   // Weekly Challenges
   { id: 'w1', title: 'Weekend Warrior', description: 'Complete 20 offers this week', type: 'weekly', category: 'offers', progress: 8, max: 20, reward: 1000, xp: 300, icon: '⚔️', claimed: false, completed: false, difficulty: 'medium' },
   { id: 'w2', title: 'Recruit Master', description: 'Get 3 friends to join', type: 'weekly', category: 'referrals', progress: 1, max: 3, reward: 1500, xp: 500, icon: '👥', claimed: false, completed: false, difficulty: 'hard' },
   { id: 'w3', title: 'Shit Tycoon', description: 'Earn 5,000 $SHIT from offers', type: 'weekly', category: 'offers', progress: 2340, max: 5000, reward: 2000, xp: 750, icon: '💰', claimed: false, completed: false, difficulty: 'hard' },
-  { id: 'w4', title: 'NFT Collector', description: 'Buy or sell 3 NFTs', type: 'weekly', category: 'market', progress: 0, max: 3, reward: 800, xp: 250, icon: '🎨', claimed: false, completed: false, difficulty: 'medium' },
+  { id: 'w4', title: 'Bazaar Degen', description: 'Buy or sell 3 items in Bazaar', type: 'weekly', category: 'market', progress: 0, max: 3, reward: 800, xp: 250, icon: '🏪', claimed: false, completed: false, difficulty: 'medium' },
   
   // Milestone Quests
   { id: 'm1', title: 'First Blood', description: 'Complete your first offer', type: 'milestone', category: 'offers', progress: 1, max: 1, reward: 100, xp: 50, icon: '💩', claimed: true, completed: true, difficulty: 'easy' },
@@ -45,7 +45,7 @@ const QUESTS: Quest[] = [
   { id: 's1-1', title: 'The Flush', description: 'Complete 5 offers', type: 'story', category: 'offers', progress: 5, max: 5, reward: 500, xp: 200, icon: '🚽', claimed: true, completed: true, chainId: 'chain1', chainStep: 1, chainTotal: 5, difficulty: 'easy' },
   { id: 's1-2', title: 'Paper Trail', description: 'Refer 2 friends', type: 'story', category: 'referrals', progress: 2, max: 2, reward: 800, xp: 300, icon: '🧻', claimed: true, completed: true, chainId: 'chain1', chainStep: 2, chainTotal: 5, difficulty: 'medium' },
   { id: 's1-3', title: 'The Stakeout', description: 'Stake 1000 $SHIT', type: 'story', category: 'staking', progress: 450, max: 1000, reward: 1200, xp: 500, icon: '🔒', claimed: false, completed: false, chainId: 'chain1', chainStep: 3, chainTotal: 5, difficulty: 'medium' },
-  { id: 's1-4', title: 'Market Raid', description: 'Buy your first NFT', type: 'story', category: 'market', progress: 0, max: 1, reward: 1500, xp: 600, icon: '🛒', claimed: false, completed: false, chainId: 'chain1', chainStep: 4, chainTotal: 5, difficulty: 'medium' },
+  { id: 's1-4', title: 'Bazaar Raid', description: 'APE IN on your first item', type: 'story', category: 'market', progress: 0, max: 1, reward: 1500, xp: 600, icon: '🏪', claimed: false, completed: false, chainId: 'chain1', chainStep: 4, chainTotal: 5, difficulty: 'medium' },
   { id: 's1-5', title: 'Legend of the Throne', description: 'Reach Battle Pass level 10', type: 'story', category: 'battlepass', progress: 3, max: 10, reward: 5000, xp: 2000, icon: '👑', claimed: false, completed: false, chainId: 'chain1', chainStep: 5, chainTotal: 5, difficulty: 'epic' },
   
   // Story Chains - Chain 2: The Resistance
@@ -53,7 +53,7 @@ const QUESTS: Quest[] = [
 ];
 
 const DIFFICULTY_COLORS = {
-  easy: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+  easy: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
   medium: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
   hard: 'text-orange-400 bg-orange-500/10 border-orange-500/30',
   epic: 'text-purple-400 bg-purple-500/10 border-purple-500/30',
@@ -116,16 +116,16 @@ export default function QuestsPage({ userId }: { userId: string }) {
       {/* Header */}
       <div className="mb-8 text-center">
         <div className="text-6xl mb-2 animate-bounce">📜</div>
-        <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-emerald-400 via-amber-500 to-purple-500 bg-clip-text text-transparent">
-          Quests & Missions
+        <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-amber-500 to-purple-500 bg-clip-text text-transparent">
+          GRIND LOG
         </h1>
-        <p className="text-zinc-400">Complete quests. Earn rewards. Write your legend.</p>
+        <p className="text-zinc-400">complete missions. stack rewards. or stay a normie.</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Daily', count: `${stats.daily.completed}/${stats.daily.total}`, icon: '📅', color: 'emerald' },
+          { label: 'Daily', count: `${stats.daily.completed}/${stats.daily.total}`, icon: '📅', color: 'amber' },
           { label: 'Weekly', count: `${stats.weekly.completed}/${stats.weekly.total}`, icon: '📆', color: 'amber' },
           { label: 'Milestone', count: `${stats.milestone.completed}/${stats.milestone.total}`, icon: '🏆', color: 'purple' },
           { label: 'Story', count: `${stats.story.completed}/${stats.story.total}`, icon: '📖', color: 'blue' },
@@ -140,11 +140,11 @@ export default function QuestsPage({ userId }: { userId: string }) {
 
       {/* Daily Reset Timer */}
       {activeTab === 'daily' || activeTab === 'all' ? (
-        <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-between">
+        <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">⏰</span>
             <div>
-              <div className="font-bold text-emerald-400">Daily Reset</div>
+              <div className="font-bold text-amber-400">Daily Reset</div>
               <div className="text-sm text-zinc-400">New quests in:</div>
             </div>
           </div>
@@ -153,9 +153,9 @@ export default function QuestsPage({ userId }: { userId: string }) {
               { val: timeLeft.hours, label: 'HRS' },
               { val: timeLeft.minutes, label: 'MIN' },
             ].map((t, i) => (
-              <div key={i} className="bg-emerald-500/20 rounded-lg px-3 py-1 min-w-[60px] text-center">
-                <div className="text-xl font-bold text-emerald-400">{t.val.toString().padStart(2, '0')}</div>
-                <div className="text-[10px] text-emerald-400/70">{t.label}</div>
+              <div key={i} className="bg-amber-500/20 rounded-lg px-3 py-1 min-w-[60px] text-center">
+                <div className="text-xl font-bold text-amber-400">{t.val.toString().padStart(2, '0')}</div>
+                <div className="text-[10px] text-amber-400/70">{t.label}</div>
               </div>
             ))}
           </div>
@@ -201,7 +201,7 @@ export default function QuestsPage({ userId }: { userId: string }) {
               key={quest.id}
               className={`group relative p-5 rounded-2xl border transition-all ${
                 quest.completed
-                  ? 'bg-zinc-900/30 border-emerald-500/30'
+                  ? 'bg-zinc-900/30 border-amber-500/30'
                   : 'bg-zinc-900/50 border-white/10 hover:border-amber-500/50'
               }`}
             >
@@ -216,7 +216,7 @@ export default function QuestsPage({ userId }: { userId: string }) {
                 {/* Icon */}
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${
                   quest.completed 
-                    ? 'bg-gradient-to-br from-emerald-500 to-teal-500' 
+                    ? 'bg-gradient-to-br from-amber-500 to-teal-500' 
                     : 'bg-zinc-800'
                 }`}>
                   {quest.icon}
@@ -232,7 +232,7 @@ export default function QuestsPage({ userId }: { userId: string }) {
                       {quest.difficulty}
                     </span>
                     {quest.type === 'daily' && (
-                      <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded text-[10px]">
+                      <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded text-[10px]">
                         DAILY
                       </span>
                     )}
@@ -244,7 +244,7 @@ export default function QuestsPage({ userId }: { userId: string }) {
                   <div className="mb-3">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-zinc-500">Progress</span>
-                      <span className={quest.completed ? 'text-emerald-400' : 'text-amber-400'}>
+                      <span className={quest.completed ? 'text-amber-400' : 'text-amber-400'}>
                         {quest.progress}/{quest.max}
                       </span>
                     </div>
@@ -252,7 +252,7 @@ export default function QuestsPage({ userId }: { userId: string }) {
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${
                           quest.completed 
-                            ? 'bg-emerald-500' 
+                            ? 'bg-amber-500' 
                             : 'bg-gradient-to-r from-amber-500 to-orange-500'
                         }`}
                         style={{ width: `${progress}%` }}
@@ -270,7 +270,7 @@ export default function QuestsPage({ userId }: { userId: string }) {
                 {/* Action */}
                 <div className="flex items-center gap-2">
                   {quest.claimed ? (
-                    <div className="px-6 py-3 bg-emerald-500/20 text-emerald-400 rounded-xl font-bold">
+                    <div className="px-6 py-3 bg-amber-500/20 text-amber-400 rounded-xl font-bold">
                       ✓ CLAIMED
                     </div>
                   ) : quest.completed ? (
@@ -371,14 +371,14 @@ export default function QuestsPage({ userId }: { userId: string }) {
                     key={quest.id}
                     className={`flex items-center gap-4 p-4 rounded-xl ${
                       quest.completed 
-                        ? 'bg-emerald-500/10 border border-emerald-500/30' 
+                        ? 'bg-amber-500/10 border border-amber-500/30' 
                         : index === 0 || quests.filter(q => q.chainId === showChainModal)[index - 1]?.completed
                           ? 'bg-purple-500/10 border border-purple-500/30'
                           : 'bg-zinc-800/50 opacity-50'
                     }`}
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${
-                      quest.completed ? 'bg-emerald-500' : 'bg-zinc-700'
+                      quest.completed ? 'bg-amber-500' : 'bg-zinc-700'
                     }`}>
                       {quest.completed ? '✓' : quest.icon}
                     </div>

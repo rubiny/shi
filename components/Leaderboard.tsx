@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { toast } from '@/lib/toast';
 
 interface LeaderboardEntry {
   rank: number;
@@ -41,17 +42,50 @@ const TOP_STAKERS: LeaderboardEntry[] = [
 ];
 
 const CATEGORIES = [
-  { id: 'earners', label: 'Top Earners', icon: '💰', data: TOP_EARNERS },
-  { id: 'referrals', label: 'Top Referrers', icon: '👥', data: TOP_REFERRERS },
-  { id: 'stakers', label: 'Top Stakers', icon: '🔒', data: TOP_STAKERS },
+  { id: 'earners', label: 'TOP LOOTERS', icon: '💰', data: TOP_EARNERS },
+  { id: 'referrals', label: 'ARMY BUILDERS', icon: '👥', data: TOP_REFERRERS },
+  { id: 'stakers', label: 'DIAMOND HANDS', icon: '🔒', data: TOP_STAKERS },
 ];
 
-export default function Leaderboard({ userId }: { userId: string }) {
+interface LeaderboardProps {
+  userId: string;
+  userEarnings?: number;
+  userReferrals?: number;
+  userStaked?: number;
+  username?: string;
+}
+
+function getLeaderboardWithUser(
+  baseData: LeaderboardEntry[],
+  userEarnings: number,
+  userReferrals: number,
+  userStaked: number,
+  username: string,
+  sortKey: 'earnings' | 'referrals' | 'staked'
+): LeaderboardEntry[] {
+  const nonUserData = baseData.filter(e => !e.isCurrentUser);
+  const userData: LeaderboardEntry = {
+    rank: 0,
+    username,
+    avatar: '\u{1F4A9}',
+    earnings: userEarnings,
+    referrals: userReferrals,
+    staked: userStaked,
+    country: '',
+    isCurrentUser: true,
+  };
+  const all = [...nonUserData, userData].sort((a, b) => (b[sortKey] as number) - (a[sortKey] as number));
+  return all.map((entry, i) => ({ ...entry, rank: i + 1 }));
+}
+
+export default function Leaderboard({ userId, userEarnings = 0, userReferrals = 0, userStaked = 0, username = 'You' }: LeaderboardProps) {
   const [activeCategory, setActiveCategory] = useState('earners');
   const [timeFrame, setTimeFrame] = useState<'week' | 'month' | 'all'>('week');
   const [showShareModal, setShowShareModal] = useState(false);
 
-  const currentData = CATEGORIES.find(c => c.id === activeCategory)?.data || TOP_EARNERS;
+  const sortKeys: Record<string, 'earnings' | 'referrals' | 'staked'> = { earners: 'earnings', referrals: 'referrals', stakers: 'staked' };
+  const baseData = CATEGORIES.find(c => c.id === activeCategory)?.data || TOP_EARNERS;
+  const currentData = getLeaderboardWithUser(baseData, userEarnings, userReferrals, userStaked, username, sortKeys[activeCategory] || 'earnings');
   const userRank = currentData.find(u => u.isCurrentUser);
 
   return (
@@ -60,9 +94,9 @@ export default function Leaderboard({ userId }: { userId: string }) {
       <div className="mb-8 text-center">
         <div className="text-6xl mb-2">🏆</div>
         <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 bg-clip-text text-transparent">
-          Leaderboards
+          HALL OF DEGENS
         </h1>
-        <p className="text-zinc-400">Compete with the best. Climb the ranks. Earn glory.</p>
+        <p className="text-zinc-400">flex on normies. climb the ranks. or stay poor.</p>
       </div>
 
       {/* Your Rank Card */}
@@ -123,9 +157,9 @@ export default function Leaderboard({ userId }: { userId: string }) {
       {/* Time Frame */}
       <div className="flex justify-center gap-2 mb-6">
         {[
-          { id: 'week', label: 'This Week' },
-          { id: 'month', label: 'This Month' },
-          { id: 'all', label: 'All Time' },
+          { id: 'week', label: 'THIS WEEK' },
+          { id: 'month', label: 'THIS MONTH' },
+          { id: 'all', label: 'ALL TIME' },
         ].map((tf) => (
           <button
             key={tf.id}
@@ -182,14 +216,14 @@ export default function Leaderboard({ userId }: { userId: string }) {
               {/* Stats */}
               <div className="text-right">
                 <div className="text-xl font-black text-amber-400">
-                  {activeCategory === 'earners' && `${entry.earnings.toLocaleString()} $SHIT`}
-                  {activeCategory === 'referrals' && `${entry.referrals} recruits`}
-                  {activeCategory === 'stakers' && `${entry.staked.toLocaleString()} staked`}
+                  {activeCategory === 'earners' && `${entry.earnings.toLocaleString()} LOOTED`}
+                  {activeCategory === 'referrals' && `${entry.referrals} DEGENS`}
+                  {activeCategory === 'stakers' && `${entry.staked.toLocaleString()} LOCKED`}
                 </div>
                 <div className="text-xs text-zinc-500">
-                  {activeCategory === 'earners' && `${entry.referrals} refs • ${entry.staked.toLocaleString()} staked`}
-                  {activeCategory === 'referrals' && `${entry.earnings.toLocaleString()} earned`}
-                  {activeCategory === 'stakers' && `${entry.earnings.toLocaleString()} earned`}
+                  {activeCategory === 'earners' && `${entry.referrals} army • ${entry.staked.toLocaleString()} bags locked`}
+                  {activeCategory === 'referrals' && `${entry.earnings.toLocaleString()} looted`}
+                  {activeCategory === 'stakers' && `${entry.earnings.toLocaleString()} looted`}
                 </div>
               </div>
             </div>
@@ -201,9 +235,9 @@ export default function Leaderboard({ userId }: { userId: string }) {
       <div className="mt-8 text-center">
         <button 
           onClick={() => setShowShareModal(true)}
-          className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl font-bold hover:scale-105 transition-transform"
+          className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-black hover:scale-105 transition-transform shadow-lg shadow-amber-500/20"
         >
-          📤 Share Your Rank
+          {"\u{1F4E4}"} FLEX YOUR RANK
         </button>
       </div>
 
@@ -211,23 +245,43 @@ export default function Leaderboard({ userId }: { userId: string }) {
       {showShareModal && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-zinc-900 rounded-3xl max-w-md w-full border border-white/10 p-6">
-            <h2 className="text-2xl font-black mb-4 text-center">Share Your Achievement</h2>
+            <h2 className="text-2xl font-black mb-4 text-center">FLEX ON NORMIES</h2>
             <div className="p-4 bg-zinc-800/50 rounded-2xl mb-4 text-center">
               <div className="text-4xl mb-2">🏆</div>
-              <div className="text-lg font-bold">I'm ranked #{userRank?.rank} on Shit Army!</div>
+              <div className="text-lg font-bold">I&apos;m ranked #{userRank?.rank} on SHIT.ARMY ser</div>
               <div className="text-amber-400">{userRank?.earnings.toLocaleString()} $SHIT earned</div>
             </div>
             <div className="flex gap-3">
-              {['Twitter', 'Discord', 'Copy'].map((platform) => (
-                <button 
-                  key={platform}
-                  onClick={() => setShowShareModal(false)}
-                  className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold"
-                >
-                  {platform}
-                </button>
-              ))}
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I'm ranked #${userRank?.rank} on SHIT.ARMY with ${userRank?.earnings.toLocaleString()} $SHIT earned 💩🚀\n\nJoin the degen army:`)}&url=${encodeURIComponent('https://shit.army')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold text-center"
+              >
+                🐦 Twitter
+              </a>
+              <a
+                href={`https://t.me/share/url?url=${encodeURIComponent('https://shit.army')}&text=${encodeURIComponent(`I'm ranked #${userRank?.rank} on SHIT.ARMY with ${userRank?.earnings.toLocaleString()} $SHIT earned 💩🚀`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold text-center"
+              >
+                📨 Telegram
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`I'm ranked #${userRank?.rank} on SHIT.ARMY with ${userRank?.earnings.toLocaleString()} $SHIT earned 💩🚀 https://shit.army`);
+                  toast.copied('Share text');
+                  setShowShareModal(false);
+                }}
+                className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-bold"
+              >
+                📋 Copy
+              </button>
             </div>
+            <button onClick={() => setShowShareModal(false)} className="w-full mt-3 py-2 text-zinc-500 hover:text-white text-sm transition-colors">
+              Close
+            </button>
           </div>
         </div>
       )}

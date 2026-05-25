@@ -6,23 +6,24 @@ import Dashboard from '../components/Dashboard';
 import LoginModal from '../components/LoginModal';
 import { useAuth } from '../hooks/useAuth';
 
+function getInitialOnboardingState(): boolean {
+  if (typeof window === 'undefined') return true;
+  const seen = window.localStorage.getItem('shit-onboarding-complete');
+  const hasUserId = window.localStorage.getItem('shit-user-id');
+  return !!(seen || hasUserId);
+}
+
 export default function ShitArmy() {
-  const { user, isAuthenticated, signOut, isLoading } = useAuth();
+  const { user, isAuthenticated, signOut, signInWithGoogle, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isGeneral, setIsGeneral] = useState(false);
-  const [generalDaysLeft, setGeneralDaysLeft] = useState(0);
+  const [generalDaysLeft] = useState(0);
   
-  // Onboarding - check if already seen
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(true);
-  
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(getInitialOnboardingState);
+
+  // Clean up error params from URL after auth redirect
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const seen = window.localStorage.getItem('shit-onboarding-complete');
-      const hasUserId = window.localStorage.getItem('shit-user-id');
-      // Show onboarding only if: never seen AND no user-id (new user)
-      if (!seen && !hasUserId) {
-        setHasSeenOnboarding(false);
-      }
+    if (typeof window !== 'undefined' && window.location.search.includes('error=auth_callback_failed')) {
+      window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
   
@@ -34,12 +35,19 @@ export default function ShitArmy() {
     setHasSeenOnboarding(true);
   };
 
-  // For mock/development mode
   const [devConnected, setDevConnected] = useState(false);
   const [devWallet, setDevWallet] = useState("");
 
   const handleConnect = () => {
     setShowLoginModal(true);
+  };
+
+  const handleGoogle = async () => {
+    try {
+      await signInWithGoogle();
+    } catch {
+      setShowLoginModal(true);
+    }
   };
 
   const handleDisconnect = async () => {
@@ -51,7 +59,6 @@ export default function ShitArmy() {
     }
   };
 
-  // Use real auth or dev mock
   const isUserConnected = isAuthenticated || devConnected;
   const walletAddress = user?.wallet_address || user?.email || devWallet;
 
@@ -66,7 +73,7 @@ export default function ShitArmy() {
   if (!isUserConnected) {
     return (
       <>
-        <LandingPage />
+        <LandingPage onConnect={handleConnect} onGoogle={handleGoogle} />
         <LoginModal 
           isOpen={showLoginModal} 
           onClose={() => setShowLoginModal(false)} 
@@ -80,7 +87,7 @@ export default function ShitArmy() {
       <Dashboard 
         onDisconnect={handleDisconnect}
         walletAddress={walletAddress || ''}
-        isGeneral={user?.is_general || isGeneral}
+        isGeneral={user?.is_general || false}
         generalDaysLeft={generalDaysLeft}
         showOnboarding={!hasSeenOnboarding}
         onCompleteOnboarding={completeOnboarding}

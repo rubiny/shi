@@ -11,17 +11,13 @@ if (isMockMode && typeof window !== 'undefined') {
   console.warn('⚠️ Supabase: Running in MOCK mode. Create .env.local with real credentials for production.');
 }
 
-// Browser client (for client-side)
+// Browser client — uses implicit flow so tokens come in URL hash
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: !isMockMode, // Don't persist in mock mode
+    flowType: 'implicit',
+    persistSession: !isMockMode,
     autoRefreshToken: !isMockMode,
-    detectSessionInUrl: true,
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
+    detectSessionInUrl: !isMockMode,
   },
 });
 
@@ -36,7 +32,7 @@ export const supabaseAdmin = new Proxy({} as ReturnType<typeof createClient>, {
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321';
       const key = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role';
       _adminClient = createClient(url, key, {
-        auth: { persistSession: false, autoRefreshToken: false },
+        auth: { persistSession: false, autoRefreshToken: false, storageKey: 'sb-admin' },
       });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

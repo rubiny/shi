@@ -39,7 +39,7 @@ export default function AdminBroadcastModal({ onClose }: { onClose: () => void }
         {sent ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">✅</div>
-            <h3 className="text-2xl font-bold text-emerald-400 mb-2">Broadcast Sent!</h3>
+            <h3 className="text-2xl font-bold text-amber-400 mb-2">Broadcast Sent!</h3>
             <p className="text-zinc-400">Message delivered to {getTargetCount(target)} users</p>
           </div>
         ) : (
@@ -76,7 +76,7 @@ export default function AdminBroadcastModal({ onClose }: { onClose: () => void }
               <div className="flex gap-2">
                 {[
                   { id: 'info', label: 'ℹ️ Info', color: 'blue' },
-                  { id: 'success', label: '✅ Success', color: 'emerald' },
+                  { id: 'success', label: '✅ Success', color: 'amber' },
                   { id: 'warning', label: '⚠️ Warning', color: 'amber' },
                   { id: 'urgent', label: '🚨 Urgent', color: 'red' },
                 ].map((t) => (
