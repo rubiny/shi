@@ -100,7 +100,7 @@ export function withLoading<P extends object>(
   };
 }
 
-export default {
+const Skeletons = {
   Card: SkeletonCard,
   Stats: SkeletonStats,
   Offer: SkeletonOffer,
@@ -108,3 +108,5 @@ export default {
   Leaderboard: SkeletonLeaderboard,
   Dashboard: SkeletonDashboard,
 };
+
+export default Skeletons;

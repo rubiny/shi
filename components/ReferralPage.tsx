@@ -58,6 +58,22 @@ const FUNNY_REFERRAL_MESSAGES = [
   "Reinforcements have arrived! 🚁",
 ];
 
+// Raw shape returned by the referrals query (joined with the profiles table).
+interface RawReferral {
+  id: string;
+  created_at: string;
+  is_active: boolean;
+  commission: number | string | null;
+  profiles?: {
+    wallet_address?: string | null;
+    total_earned?: number | string | null;
+  } | null;
+}
+
+function generateReferralCode() {
+  return 'SHIT' + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 export default function ReferralPage({ userId }: { userId: string }) {
   const [stats, setStats] = useState<ReferralStats | null>(null);
   const [referrals, setReferrals] = useState<Referral[]>([]);
@@ -67,16 +83,12 @@ export default function ReferralPage({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState<'overview' | 'referrals' | 'leaderboard'>('overview');
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [funnyMessage, setFunnyMessage] = useState(FUNNY_REFERRAL_MESSAGES[0]);
+  const [funnyMessage] = useState(FUNNY_REFERRAL_MESSAGES[0]);
 
   useEffect(() => {
-    fetchReferralData();
-  }, [userId]);
+    let cancelled = false;
 
-  const fetchReferralData = async () => {
-    try {
-      setLoading(true);
-
+    const fetchReferralData = async () => {
       // Parallel data fetching
       const [statsRes, referralsRes, tiersRes, leaderboardRes, codeRes] = await Promise.all([
         supabase.from('referral_stats').select('*').eq('user_id', userId).single(),
@@ -86,10 +98,12 @@ export default function ReferralPage({ userId }: { userId: string }) {
         supabase.from('referrals').select('code').eq('referrer_id', userId).limit(1),
       ]);
 
+      if (cancelled) return;
+
       if (statsRes.data) setStats(statsRes.data);
-      
+
       if (referralsRes.data) {
-        setReferrals(referralsRes.data.map((r: any) => ({
+        setReferrals((referralsRes.data as RawReferral[]).map((r) => ({
           id: r.id,
           referred_wallet: r.profiles?.wallet_address || 'Anonymous',
           joined_at: r.created_at,
@@ -101,25 +115,25 @@ export default function ReferralPage({ userId }: { userId: string }) {
 
       if (tiersRes.data) setTiers(tiersRes.data);
       if (leaderboardRes.data) setLeaderboard(leaderboardRes.data);
-      
-      // Generate referral code if doesn't exist
+
+      // Generate referral code if it doesn't exist
       if (!codeRes.data?.[0]?.code) {
-        const newCode = generateReferralCode();
-        setReferralCode(newCode);
-        // In production, save this code to database
+        setReferralCode(generateReferralCode());
       } else {
         setReferralCode(codeRes.data[0].code);
       }
-    } catch (error) {
-      console.error('Fetch referral data error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const generateReferralCode = () => {
-    return 'SHIT' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  };
+    fetchReferralData()
+      .catch((error) => console.error('Fetch referral data error:', error))
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   const copyReferralLink = () => {
     const link = `https://shit.army/r/${referralCode}`;
@@ -229,7 +243,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'overview' | 'referrals' | 'leaderboard')}
             className={`group relative px-6 py-3 rounded-2xl font-bold transition-all transform hover:scale-105 active:scale-95 ${
               activeTab === tab.id
                 ? `bg-gradient-to-r ${tab.color} text-white shadow-lg shadow-${tab.color.split('-')[1]}-500/30`
@@ -313,7 +327,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
                 </p>
               </div>
             ) || (
-              <p className="text-emerald-400 font-semibold">🎉 You've reached the maximum tier!</p>
+              <p className="text-emerald-400 font-semibold">🎉 You&apos;ve reached the maximum tier!</p>
             )}
           </div>
 
@@ -416,7 +430,7 @@ export default function ReferralPage({ userId }: { userId: string }) {
             <h3 className="font-bold">🏆 Top Referrers</h3>
           </div>
           <div className="divide-y divide-white/5">
-            {leaderboard.map((entry, index) => (
+            {leaderboard.map((entry) => (
               <div 
                 key={entry.rank}
                 className={`flex items-center justify-between p-4 hover:bg-white/5 ${

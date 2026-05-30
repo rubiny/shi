@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface Toast {
   id: string;
@@ -10,38 +10,42 @@ interface Toast {
   icon: string;
 }
 
+let toastCounter = 0;
+
 export default function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  // Demo toasts for onboarding
-  useEffect(() => {
-    const demoToasts = [
-      { id: `demo-1`, type: 'success', title: 'Offer Completed!', message: '+150 $SHIT earned from Survey', icon: '💰' },
-      { id: `demo-2`, type: 'info', title: 'Staking Reward', message: '+12 $SHIT from your stake', icon: '🔒' },
-      { id: `demo-3`, type: 'achievement', title: 'Quest Completed!', message: '"Morning Shit" - +50 XP', icon: '🏆' },
-    ] as Toast[];
-
-    // Show demo toasts with delay
-    demoToasts.forEach((toast, index) => {
-      setTimeout(() => {
-        addToast(toast);
-      }, 2000 + index * 3000);
-    });
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const addToast = (toast: Omit<Toast, 'id'>) => {
-    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
+    const id = `toast-${++toastCounter}`;
     setToasts(prev => [...prev, { ...toast, id }]);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
       removeToast(id);
     }, 5000);
-  };
+  }, [removeToast]);
 
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
+  // Demo toasts for onboarding
+  useEffect(() => {
+    const demoToasts: Omit<Toast, 'id'>[] = [
+      { type: 'success', title: 'Offer Completed!', message: '+150 $SHIT earned from Survey', icon: '💰' },
+      { type: 'info', title: 'Staking Reward', message: '+12 $SHIT from your stake', icon: '🔒' },
+      { type: 'achievement', title: 'Quest Completed!', message: '"Morning Shit" - +50 XP', icon: '🏆' },
+    ];
+
+    // Show demo toasts with delay
+    const timers = demoToasts.map((toast, index) =>
+      setTimeout(() => {
+        addToast(toast);
+      }, 2000 + index * 3000)
+    );
+
+    return () => timers.forEach(clearTimeout);
+  }, [addToast]);
 
   const getToastStyles = (type: string) => {
     switch (type) {

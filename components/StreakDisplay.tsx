@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 
 export default function StreakDisplay() {
-  const [loginStreak, setLoginStreak] = useState(5);
-  const [offerStreak, setOfferStreak] = useState(3);
+  const [loginStreak] = useState(5);
+  const [offerStreak] = useState(3);
   const [showWarning, setShowWarning] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ hours: 8, minutes: 42 });
 
@@ -22,9 +22,7 @@ export default function StreakDisplay() {
       });
 
       // Show warning if less than 2 hours left
-      if (diff < 2 * 60 * 60 * 1000 && !showWarning) {
-        setShowWarning(true);
-      }
+      setShowWarning(diff < 2 * 60 * 60 * 1000);
     }, 60000);
 
     return () => clearInterval(timer);
@@ -127,7 +125,7 @@ export default function StreakDisplay() {
           <div className="flex items-center gap-3">
             <span className="text-3xl">⏰</span>
             <div className="flex-1">
-              <div className="font-bold text-red-400">Don't Break Your Streak!</div>
+              <div className="font-bold text-red-400">Don&apos;t Break Your Streak!</div>
               <div className="text-sm text-zinc-400">
                 Only {timeLeft.hours}h {timeLeft.minutes}m left to log in and complete an offer
               </div>

@@ -46,7 +46,7 @@ const CATEGORIES = [
   { id: 'stakers', label: 'Top Stakers', icon: '🔒', data: TOP_STAKERS },
 ];
 
-export default function Leaderboard({ userId }: { userId: string }) {
+export default function Leaderboard({ userId: _userId }: { userId: string }) {
   const [activeCategory, setActiveCategory] = useState('earners');
   const [timeFrame, setTimeFrame] = useState<'week' | 'month' | 'all'>('week');
   const [showShareModal, setShowShareModal] = useState(false);
@@ -129,7 +129,7 @@ export default function Leaderboard({ userId }: { userId: string }) {
         ].map((tf) => (
           <button
             key={tf.id}
-            onClick={() => setTimeFrame(tf.id as any)}
+            onClick={() => setTimeFrame(tf.id as 'week' | 'month' | 'all')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
               timeFrame === tf.id
                 ? 'bg-zinc-700 text-white'
@@ -143,7 +143,7 @@ export default function Leaderboard({ userId }: { userId: string }) {
 
       {/* Leaderboard List */}
       <div className="space-y-3">
-        {currentData.map((entry, index) => {
+        {currentData.map((entry) => {
           const isTop3 = entry.rank <= 3;
           const isCurrentUser = entry.isCurrentUser;
           
@@ -214,7 +214,7 @@ export default function Leaderboard({ userId }: { userId: string }) {
             <h2 className="text-2xl font-black mb-4 text-center">Share Your Achievement</h2>
             <div className="p-4 bg-zinc-800/50 rounded-2xl mb-4 text-center">
               <div className="text-4xl mb-2">🏆</div>
-              <div className="text-lg font-bold">I'm ranked #{userRank?.rank} on Shit Army!</div>
+              <div className="text-lg font-bold">I&apos;m ranked #{userRank?.rank} on Shit Army!</div>
               <div className="text-amber-400">{userRank?.earnings.toLocaleString()} $SHIT earned</div>
             </div>
             <div className="flex gap-3">

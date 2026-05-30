@@ -59,7 +59,7 @@ const DIFFICULTY_COLORS = {
   epic: 'text-purple-400 bg-purple-500/10 border-purple-500/30',
 };
 
-export default function QuestsPage({ userId }: { userId: string }) {
+export default function QuestsPage({ userId: _userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState<'all' | 'daily' | 'weekly' | 'milestone' | 'story'>('all');
   const [quests, setQuests] = useState<Quest[]>(QUESTS);
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0 });
@@ -173,7 +173,7 @@ export default function QuestsPage({ userId }: { userId: string }) {
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'all' | 'daily' | 'weekly' | 'milestone' | 'story')}
             className={`px-4 py-3 rounded-xl font-bold transition-all ${
               activeTab === tab.id
                 ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'

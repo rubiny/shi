@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 interface BattlePassTier {
   level: number;
@@ -34,27 +33,33 @@ const TIERS: BattlePassTier[] = [
   { level: 50, xpRequired: 25000, reward: { type: 'nft', name: 'Golden Throne', description: 'Legendary NFT: Golden Throne' }, claimed: false, premium: true },
 ];
 
-export default function BattlePass({ userId }: { userId: string }) {
-  const [currentXP, setCurrentXP] = useState(1850);
+function getSeasonCountdown() {
+  const end = new Date(BATTLE_PASS_SEASON.endDate);
+  const diff = Math.max(0, end.getTime() - Date.now());
+
+  return {
+    days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+    minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+  };
+}
+
+export default function BattlePass({ userId: _userId }: { userId: string }) {
+  const [currentXP] = useState(1850);
   const [premium, setPremium] = useState(false);
   const [claimedTiers, setClaimedTiers] = useState<number[]>([1]);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      const end = new Date(BATTLE_PASS_SEASON.endDate);
-      const now = new Date();
-      const diff = end.getTime() - now.getTime();
-      
-      setCountdown({
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-      });
-    }, 60000);
-    
-    return () => clearInterval(timer);
+    // Update immediately on mount, then once a minute.
+    const initial = setTimeout(() => setCountdown(getSeasonCountdown()), 0);
+    const timer = setInterval(() => setCountdown(getSeasonCountdown()), 60000);
+
+    return () => {
+      clearTimeout(initial);
+      clearInterval(timer);
+    };
   }, []);
 
   const currentLevel = TIERS.filter(t => currentXP >= t.xpRequired).length;

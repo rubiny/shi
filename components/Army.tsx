@@ -64,10 +64,9 @@ const DIFFICULTY_COLORS = {
   Extreme: 'text-red-400',
 };
 
-export default function Army({ userId }: { userId: string }) {
+export default function Army({ userId: _userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState<'army' | 'missions' | 'recruit'>('army');
   const [selectedNft, setSelectedNft] = useState<NFT | null>(null);
-  const [showMint, setShowMint] = useState(false);
   const [minting, setMinting] = useState(false);
   const [recruitCount, setRecruitCount] = useState(1);
 
@@ -78,7 +77,6 @@ export default function Army({ userId }: { userId: string }) {
     setMinting(true);
     setTimeout(() => {
       setMinting(false);
-      setShowMint(false);
     }, 2000);
   };
 
@@ -118,7 +116,7 @@ export default function Army({ userId }: { userId: string }) {
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'army' | 'missions' | 'recruit')}
             className={`group relative px-6 py-3 rounded-2xl font-bold transition-all transform hover:scale-105 ${
               activeTab === tab.id
                 ? `bg-gradient-to-r ${tab.color} text-white shadow-lg`
@@ -209,7 +207,7 @@ export default function Army({ userId }: { userId: string }) {
           
           {/* Add New Slot */}
           <button 
-            onClick={() => setShowMint(true)}
+            onClick={() => setActiveTab('recruit')}
             className="group p-5 rounded-2xl border-2 border-dashed border-zinc-700 hover:border-amber-500/50 bg-zinc-900/20 hover:bg-zinc-900/40 transition-all min-h-[280px] flex flex-col items-center justify-center gap-4"
           >
             <div className="w-20 h-20 rounded-2xl bg-zinc-800 group-hover:bg-amber-500/20 flex items-center justify-center text-4xl transition-colors">

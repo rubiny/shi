@@ -59,7 +59,7 @@ const RARITY_TEXT = {
   legendary: 'text-amber-400',
 };
 
-export default function Achievements({ userId }: { userId: string }) {
+export default function Achievements({ userId: _userId }: { userId: string }) {
   const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [category, setCategory] = useState<string>('all');
   const [claiming, setClaiming] = useState<string | null>(null);
@@ -132,7 +132,7 @@ export default function Achievements({ userId }: { userId: string }) {
         ].map((f) => (
           <button
             key={f.id}
-            onClick={() => setFilter(f.id as any)}
+            onClick={() => setFilter(f.id as 'all' | 'unlocked' | 'locked')}
             className={`px-4 py-2 rounded-xl font-bold transition-all ${
               filter === f.id
                 ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'

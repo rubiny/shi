@@ -56,7 +56,7 @@ export default function AdminBroadcastModal({ onClose }: { onClose: () => void }
                 ].map((t) => (
                   <button
                     key={t.id}
-                    onClick={() => setTarget(t.id as any)}
+                    onClick={() => setTarget(t.id as 'all' | 'active' | 'inactive' | 'premium')}
                     className={`p-3 rounded-xl text-left border transition-all ${
                       target === t.id
                         ? 'bg-amber-500/20 border-amber-500/50'
@@ -82,7 +82,7 @@ export default function AdminBroadcastModal({ onClose }: { onClose: () => void }
                 ].map((t) => (
                   <button
                     key={t.id}
-                    onClick={() => setType(t.id as any)}
+                    onClick={() => setType(t.id as 'info' | 'success' | 'warning' | 'urgent')}
                     className={`flex-1 py-2 rounded-xl font-bold text-sm border transition-all ${
                       type === t.id
                         ? `bg-${t.color}-500/20 border-${t.color}-500/50 text-${t.color}-400`
