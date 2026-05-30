@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import AdminEventsModal from './AdminEventsModal';
 import AdminBroadcastModal from './AdminBroadcastModal';
 
@@ -58,83 +57,64 @@ interface AuditLog {
 
 const ADMIN_EMOJIS = ['👑', '⚡', '🎮', '🎯', '💎', '🔥'];
 
-export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
+// Mock data for development (replace with real fetch when wiring the backend).
+const MOCK_STATS: AdminStats = {
+  totalUsers: 1247,
+  activeUsers: 892,
+  totalEarned: 2450000,
+  dailyActiveUsers: 456,
+  pendingWithdrawals: 23,
+  totalWithdrawals: 156,
+  newUsersToday: 12,
+  offersCompletedToday: 89,
+};
+
+const MOCK_USERS: User[] = [
+  { id: '1', username: 'CryptoKing', wallet_address: '0x1234...5678', total_earned: 15420, is_general: true, is_banned: false, created_at: '2026-01-15', last_active: '2026-05-24' },
+  { id: '2', username: 'ShitSoldier', wallet_address: '0xabcd...efgh', total_earned: 8930, is_general: false, is_banned: false, created_at: '2026-02-20', last_active: '2026-05-23' },
+  { id: '3', username: 'SuspiciousUser', wallet_address: '0x9999...0000', total_earned: 50, is_general: false, is_banned: true, created_at: '2026-05-20', last_active: '2026-05-21' },
+];
+
+const MOCK_OFFERS: Offer[] = [
+  { id: '1', title: 'Crypto Survey 2026', description: 'Complete a 5-minute survey', reward: 1500, is_active: true, category: 'survey', completions: 234 },
+  { id: '2', title: 'Install Coinbase', description: 'Download and register', reward: 3500, is_active: true, category: 'app', completions: 156 },
+  { id: '3', title: 'Old Offer', description: 'Expired offer', reward: 500, is_active: false, category: 'survey', completions: 45 },
+];
+
+const MOCK_WITHDRAWALS: Withdrawal[] = [
+  { id: 'w1', user_id: '1', username: 'CryptoKing', amount: 5000, network: 'Base', address: '0x1234...5678', status: 'pending', requested_at: '2026-05-24T10:00:00' },
+  { id: 'w2', user_id: '2', username: 'ShitSoldier', amount: 2500, network: 'Ethereum', address: '0xabcd...efgh', status: 'pending', requested_at: '2026-05-24T09:30:00' },
+];
+
+const MOCK_AUDIT: AuditLog[] = [
+  { id: 'a1', user_id: '1', action: 'offer_completed', details: 'Completed Crypto Survey 2026', created_at: '2026-05-24T10:00:00' },
+  { id: 'a2', user_id: 'admin', action: 'user_banned', details: 'Banned user SuspiciousUser for fraud', created_at: '2026-05-24T09:00:00' },
+];
+
+export default function AdminPanel({ adminUserId: _adminUserId }: { adminUserId: string }) {
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'offers' | 'withdrawals' | 'audit'>('overview');
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [stats] = useState<AdminStats | null>(MOCK_STATS);
+  const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [currentEmoji, setCurrentEmoji] = useState(0);
   const [showEventsModal, setShowEventsModal] = useState(false);
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [offers, setOffers] = useState<Offer[]>(MOCK_OFFERS);
+  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>(MOCK_WITHDRAWALS);
+  const [auditLogs] = useState<AuditLog[]>(MOCK_AUDIT);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
 
+  // Rotate admin emojis in the header.
   useEffect(() => {
-    fetchAdminData();
-    
-    // Rotate admin emojis
     const emojiInterval = setInterval(() => {
       setCurrentEmoji(prev => (prev + 1) % ADMIN_EMOJIS.length);
     }, 2000);
-    
+
     return () => clearInterval(emojiInterval);
-  }, [adminUserId]);
-
-  const fetchAdminData = async () => {
-    try {
-      setLoading(true);
-      
-      // Mock data for development
-      const mockStats: AdminStats = {
-        totalUsers: 1247,
-        activeUsers: 892,
-        totalEarned: 2450000,
-        dailyActiveUsers: 456,
-        pendingWithdrawals: 23,
-        totalWithdrawals: 156,
-        newUsersToday: 12,
-        offersCompletedToday: 89,
-      };
-      
-      const mockUsers: User[] = [
-        { id: '1', username: 'CryptoKing', wallet_address: '0x1234...5678', total_earned: 15420, is_general: true, is_banned: false, created_at: '2026-01-15', last_active: '2026-05-24' },
-        { id: '2', username: 'ShitSoldier', wallet_address: '0xabcd...efgh', total_earned: 8930, is_general: false, is_banned: false, created_at: '2026-02-20', last_active: '2026-05-23' },
-        { id: '3', username: 'SuspiciousUser', wallet_address: '0x9999...0000', total_earned: 50, is_general: false, is_banned: true, created_at: '2026-05-20', last_active: '2026-05-21' },
-      ];
-      
-      const mockOffers: Offer[] = [
-        { id: '1', title: 'Crypto Survey 2026', description: 'Complete a 5-minute survey', reward: 1500, is_active: true, category: 'survey', completions: 234 },
-        { id: '2', title: 'Install Coinbase', description: 'Download and register', reward: 3500, is_active: true, category: 'app', completions: 156 },
-        { id: '3', title: 'Old Offer', description: 'Expired offer', reward: 500, is_active: false, category: 'survey', completions: 45 },
-      ];
-      
-      const mockWithdrawals: Withdrawal[] = [
-        { id: 'w1', user_id: '1', username: 'CryptoKing', amount: 5000, network: 'Base', address: '0x1234...5678', status: 'pending', requested_at: '2026-05-24T10:00:00' },
-        { id: 'w2', user_id: '2', username: 'ShitSoldier', amount: 2500, network: 'Ethereum', address: '0xabcd...efgh', status: 'pending', requested_at: '2026-05-24T09:30:00' },
-      ];
-      
-      const mockAudit: AuditLog[] = [
-        { id: 'a1', user_id: '1', action: 'offer_completed', details: 'Completed Crypto Survey 2026', created_at: '2026-05-24T10:00:00' },
-        { id: 'a2', user_id: 'admin', action: 'user_banned', details: 'Banned user SuspiciousUser for fraud', created_at: '2026-05-24T09:00:00' },
-      ];
-
-      setStats(mockStats);
-      setUsers(mockUsers);
-      setOffers(mockOffers);
-      setWithdrawals(mockWithdrawals);
-      setAuditLogs(mockAudit);
-    } catch (error) {
-      console.error('Admin data fetch error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, []);
 
   const handleBanUser = (userId: string, ban: boolean) => {
     setUsers(users.map(u => u.id === userId ? { ...u, is_banned: ban } : u));
@@ -151,14 +131,6 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
   const handleToggleOffer = (offerId: string) => {
     setOffers(offers.map(o => o.id === offerId ? { ...o, is_active: !o.is_active } : o));
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-white/20 border-t-white rounded-full" />
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
@@ -226,12 +198,6 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
         >
           ⚠️ Review {stats?.pendingWithdrawals} Withdrawals
         </button>
-        <button
-          onClick={fetchAdminData}
-          className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-semibold transition-all"
-        >
-          🔄 Refresh Data
-        </button>
       </div>
 
       {/* Tabs */}
@@ -245,7 +211,7 @@ export default function AdminPanel({ adminUserId }: { adminUserId: string }) {
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'overview' | 'users' | 'offers' | 'withdrawals' | 'audit')}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               activeTab === tab.id ? 'bg-white text-zinc-900' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
             }`}

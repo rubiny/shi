@@ -40,7 +40,7 @@ const CATEGORIES = [
   { id: 'titles', label: 'Titles', icon: '🏅' },
 ];
 
-export default function Market({ userId }: { userId: string }) {
+export default function Market({ userId: _userId }: { userId: string }) {
   const [category, setCategory] = useState('all');
   const [sortBy, setSortBy] = useState<'price-low' | 'price-high' | 'power' | 'newest'>('newest');
   const [selectedItem, setSelectedItem] = useState<Listing | null>(null);
@@ -86,7 +86,7 @@ export default function Market({ userId }: { userId: string }) {
             <div className="flex gap-3">
               <select 
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'price-low' | 'price-high' | 'power' | 'newest')}
                 className="px-4 py-3 bg-zinc-900/50 border border-white/10 rounded-2xl focus:outline-none"
               >
                 <option value="newest">Newest</option>

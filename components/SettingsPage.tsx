@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import React, { useState } from 'react';
 
 interface SettingsPageProps {
   userId: string;
@@ -10,7 +9,7 @@ interface SettingsPageProps {
 
 const POOP_EMOJIS = ['💩', '🚽', '🧻', '🚽', '💩', '🧻'];
 
-export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) {
+export default function SettingsPage({ userId: _userId, onKycClick }: SettingsPageProps) {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'connections'>('profile');
   const [username, setUsername] = useState('ShitGeneral420');
   const [bio, setBio] = useState('💩 Crypto enthusiast | Stacking $SHIT since 2026 | To the moon 🚀🧻');
@@ -19,7 +18,6 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
   const [telegram, setTelegram] = useState('@shituser');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [hoverPoop, setHoverPoop] = useState(false);
 
   const saveProfile = async () => {
     setSaving(true);
@@ -56,15 +54,13 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
       {/* Meme Tabs with hover effects */}
       <div className="flex flex-wrap gap-2 mb-8">
         {[
-          { id: 'profile', label: 'Profile', icon: '�', color: 'from-amber-500 to-orange-500' },
+          { id: 'profile', label: 'Profile', icon: '👤', color: 'from-amber-500 to-orange-500' },
           { id: 'security', label: 'Security', icon: '🔒', color: 'from-emerald-500 to-teal-500' },
           { id: 'connections', label: 'Connect', icon: '🔗', color: 'from-blue-500 to-indigo-500' },
-        ].map((tab) => (
+        ].map((tab, i) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            onMouseEnter={() => setHoverPoop(true)}
-            onMouseLeave={() => setHoverPoop(false)}
+            onClick={() => setActiveTab(tab.id as 'profile' | 'security' | 'connections')}
             className={`group relative px-6 py-3 rounded-2xl font-bold transition-all transform hover:scale-105 active:scale-95 ${
               activeTab === tab.id 
                 ? `bg-gradient-to-r ${tab.color} text-white shadow-lg shadow-${tab.color.split('-')[1]}-500/30` 
@@ -77,7 +73,7 @@ export default function SettingsPage({ userId, onKycClick }: SettingsPageProps) 
             {tab.label}
             {activeTab === tab.id && (
               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs">
-                {POOP_EMOJIS[Math.floor(Math.random() * POOP_EMOJIS.length)]}
+                {POOP_EMOJIS[i % POOP_EMOJIS.length]}
               </span>
             )}
           </button>

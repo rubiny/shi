@@ -19,11 +19,6 @@ interface UseAuthReturn {
   signOut: () => Promise<void>;
 }
 
-// Generate nonce for wallet signature
-function generateNonce() {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-}
-
 export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);

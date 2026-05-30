@@ -1,46 +1,60 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import LandingPage from './landing-page';
 import Dashboard from '../components/Dashboard';
 import LoginModal from '../components/LoginModal';
 import { useAuth } from '../hooks/useAuth';
 
+// Onboarding completion is stored in localStorage and exposed to React via an
+// external store so we can read it during render without a setState-in-effect.
+const onboardingListeners = new Set<() => void>();
+
+function subscribeOnboarding(listener: () => void) {
+  onboardingListeners.add(listener);
+  return () => {
+    onboardingListeners.delete(listener);
+  };
+}
+
+function getOnboardingSnapshot(): boolean {
+  const seen = window.localStorage.getItem('shit-onboarding-complete');
+  const hasUserId = window.localStorage.getItem('shit-user-id');
+  // Onboarding is considered "seen" if completed before or the user already exists.
+  return seen != null || hasUserId != null;
+}
+
+// During SSR assume onboarding was seen so it never flashes before hydration.
+function getOnboardingServerSnapshot(): boolean {
+  return true;
+}
+
+function markOnboardingComplete(userId: string) {
+  window.localStorage.setItem('shit-onboarding-complete', 'true');
+  window.localStorage.setItem('shit-user-id', userId);
+  onboardingListeners.forEach((listener) => listener());
+}
+
 export default function ShitArmy() {
   const { user, isAuthenticated, signOut, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isGeneral, setIsGeneral] = useState(false);
-  const [generalDaysLeft, setGeneralDaysLeft] = useState(0);
-  
-  // Onboarding - check if already seen
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(true);
-  
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const seen = window.localStorage.getItem('shit-onboarding-complete');
-      const hasUserId = window.localStorage.getItem('shit-user-id');
-      // Show onboarding only if: never seen AND no user-id (new user)
-      if (!seen && !hasUserId) {
-        setHasSeenOnboarding(false);
-      }
-    }
-  }, []);
-  
+
+  const isGeneral = false;
+  const generalDaysLeft = 0;
+
+  const hasSeenOnboarding = useSyncExternalStore(
+    subscribeOnboarding,
+    getOnboardingSnapshot,
+    getOnboardingServerSnapshot
+  );
+
   const completeOnboarding = () => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('shit-onboarding-complete', 'true');
-      window.localStorage.setItem('shit-user-id', user?.id || 'dev-user');
-    }
-    setHasSeenOnboarding(true);
+    markOnboardingComplete(user?.id || 'dev-user');
   };
 
   // For mock/development mode
   const [devConnected, setDevConnected] = useState(false);
   const [devWallet, setDevWallet] = useState("");
-
-  const handleConnect = () => {
-    setShowLoginModal(true);
-  };
 
   const handleDisconnect = async () => {
     if (user) {
@@ -66,7 +80,11 @@ export default function ShitArmy() {
   if (!isUserConnected) {
     return (
       <>
-        <LandingPage />
+        <LandingPage
+          onConnect={() => setShowLoginModal(true)}
+          onGoogle={() => setShowLoginModal(true)}
+          onApple={() => setShowLoginModal(true)}
+        />
         <LoginModal 
           isOpen={showLoginModal} 
           onClose={() => setShowLoginModal(false)} 

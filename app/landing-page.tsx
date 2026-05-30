@@ -31,7 +31,7 @@ const MEME_IMAGES = [
   { src: '/memes/toilet-finance.png', alt: 'Toilet Finance', likes: '18.7K' }
 ];
 
-export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPageProps) {
+export default function LandingPage({ onConnect, onGoogle, onApple: _onApple }: LandingPageProps) {
   const [currentEmoji, setCurrentEmoji] = useState(0);
   const [activeRank, setActiveRank] = useState(4);
 
@@ -418,7 +418,7 @@ export default function LandingPage({ onConnect, onGoogle, onApple }: LandingPag
               ARMY ON BASE?
             </h2>
             <p className="text-xl text-zinc-400 mb-8">
-              47,000 soldiers already earning. Don't miss the flush.
+              47,000 soldiers already earning. Don&apos;t miss the flush.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

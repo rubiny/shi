@@ -147,7 +147,7 @@ export async function getUserBalance(userId: string) {
 }
 
 // Helper: Subscribe to realtime offer updates
-export function subscribeToOffers(userId: string, callback: (payload: any) => void) {
+export function subscribeToOffers(userId: string, callback: (payload: Record<string, unknown>) => void) {
   if (isMockMode) {
     // Return mock subscription that does nothing
     return { unsubscribe: () => {} };
@@ -185,7 +185,7 @@ export function subscribeToBalance(userId: string, callback: (balance: Tables['u
 }
 
 // Helper: Call edge function
-export async function callEdgeFunction(functionName: string, body: any) {
+export async function callEdgeFunction(functionName: string, body: Record<string, unknown>) {
   if (isMockMode) {
     // Mock responses for development
     console.warn(`Mock mode: Edge function ${functionName} called with`, body);
@@ -204,9 +204,9 @@ export async function callEdgeFunction(functionName: string, body: any) {
 }
 
 // Wallet authentication helpers
-export async function signInWithWallet(walletAddress: string, signature: string, nonce: string) {
+export async function signInWithWallet(walletAddress: string, signature: string, _nonce: string) {
   // 1. Get nonce from database (verify it exists and matches)
-  const { data: profile } = await supabase
+  const { data: _profile } = await supabase
     .from('profiles')
     .select('id')
     .eq('wallet_address', walletAddress.toLowerCase())

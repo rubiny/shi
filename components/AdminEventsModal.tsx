@@ -142,7 +142,7 @@ export default function AdminEventsModal({ onClose }: { onClose: () => void }) {
                 />
                 <select
                   value={newEvent.type}
-                  onChange={(e) => setNewEvent({...newEvent, type: e.target.value as any})}
+                  onChange={(e) => setNewEvent({...newEvent, type: e.target.value as Event['type']})}
                   className="w-full px-4 py-3 bg-zinc-900 rounded-xl border border-white/10"
                 >
                   {EVENT_TYPES.map(t => (

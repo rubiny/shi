@@ -1,7 +1,6 @@
 ﻿"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useState, useEffect, useCallback } from 'react';
 import KYCModal from './KYCModal';
 import ReferralPage from './ReferralPage';
 import SettingsPage from './SettingsPage';
@@ -13,11 +12,8 @@ import Market from './Market';
 import OnboardingModal from './OnboardingModal';
 import Leaderboard from './Leaderboard';
 import ToastContainer from './ToastContainer';
-import StreakDisplay from './StreakDisplay';
-import QuestsPage from './QuestsPage';
 import DashboardNav from './DashboardNav';
 import { supabase, subscribeToBalance, subscribeToOffers, callEdgeFunction } from '@/lib/supabase';
-import { SkeletonDashboard, SkeletonOfferwall } from './SkeletonLoader';
 
 interface DashboardProps {
   onDisconnect: () => void;
@@ -46,14 +42,6 @@ interface StakedPosition {
   apy: number;
   unlockDate: string;
   rewards: number;
-}
-
-interface LeaderboardEntry {
-  rank: number;
-  name: string;
-  earned: number;
-  referrals: number;
-  level: string;
 }
 
 interface MarketplaceListing {
@@ -91,6 +79,7 @@ interface Quest {
   reward: number;
   icon: string;
   claimed: boolean;
+  completed?: boolean;
 }
 
 interface OfferBoost {
@@ -128,6 +117,58 @@ interface Network {
   icon: string;
 }
 
+// Raw row shapes returned by Supabase queries.
+interface RawUserOffer {
+  id: string;
+  offer_id: number;
+  progress: number;
+  status: ActiveOffer['status'];
+  started_at: string;
+  reward: number;
+  offers?: { id: number } | null;
+}
+
+interface RawUserQuest {
+  progress: number;
+  is_claimed: boolean;
+  is_completed: boolean;
+  quests: {
+    id: number;
+    title: string;
+    description: string;
+    category: Quest['category'];
+    max_progress: number;
+    reward: number;
+    icon: string;
+  };
+}
+
+interface RawTransaction {
+  id: string;
+  type: Transaction['type'];
+  amount: number | string;
+  description: string;
+  created_at: string;
+  status: Transaction['status'];
+}
+
+interface RawStakingPosition {
+  id: number;
+  amount: number | string;
+  lock_days: number;
+  apy: number;
+  unlocks_at: string;
+  rewards: number | string;
+}
+
+interface RawOfferBoost {
+  id: string;
+  offer_id: number;
+  multiplier: 2 | 3;
+  expires_at: string;
+  offers?: { id: number } | null;
+}
+
 const NETWORKS: Network[] = [
   { id: 'base', name: 'Base', chain: '8453', fee: 0.5, minWithdraw: 50, icon: '🔵' },
   { id: 'eth', name: 'Ethereum', chain: '1', fee: 2.5, minWithdraw: 100, icon: '⬡' },
@@ -145,14 +186,6 @@ const OFFERS: Offer[] = [
   { id: 8, title: "Meme Coin Tracker App", description: "Install the #1 shitcoin tracking app", reward: 1650, time: "4 min", category: "Installs", icon: "📱", exclusive: true },
 ];
 
-const LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, name: "0xG00N...9F3A", earned: 124890, referrals: 47, level: "General" },
-  { rank: 2, name: "0xSH1T...420B", earned: 98750, referrals: 39, level: "Captain" },
-  { rank: 3, name: "0xPOOP...777", earned: 87620, referrals: 31, level: "Sergeant" },
-  { rank: 4, name: "You (0xYOUR...69)", earned: 1240, referrals: 3, level: "Private" },
-  { rank: 5, name: "0xTANK...C4FE", earned: 65430, referrals: 22, level: "Sergeant" },
-];
-
 const MARKETPLACE_LISTINGS: MarketplaceListing[] = [
   { id: 1, name: "Poop Soldier #1247", rank: "Epic", price: 420, power: 94, seller: "0xG00N...9F3A" },
   { id: 2, name: "Poop Soldier #892", rank: "Rare", price: 185, power: 67, seller: "0xSH1T...420B" },
@@ -168,33 +201,40 @@ const MERCH_PRODUCTS: MerchProduct[] = [
   { id: 5, name: "General Pass Cap", price: 420, emoji: "🧢", description: "Limited edition dad cap", color: "Olive" },
 ];
 
-export default function Dashboard({ onDisconnect, walletAddress, isGeneral: initialIsGeneral, generalDaysLeft, showOnboarding = false, onCompleteOnboarding }: DashboardProps) {
+// Side-effecting id/date helpers kept at module scope so they are not treated
+// as impure calls during React render.
+let idCounter = 0;
+
+function createTransaction(tx: Omit<Transaction, 'id' | 'timestamp'>): Transaction {
+  idCounter += 1;
+  return { ...tx, id: `tx-${Date.now()}-${idCounter}`, timestamp: new Date() };
+}
+
+function nextNumericId(): number {
+  idCounter += 1;
+  return Date.now() + idCounter;
+}
+
+function stakeUnlockLabel(lockDays: number): string {
+  return new Date(Date.now() + lockDays * 86400000).toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+export default function Dashboard({ onDisconnect, walletAddress, isGeneral: _initialIsGeneral, generalDaysLeft, showOnboarding = false, onCompleteOnboarding }: DashboardProps) {
   const [currentTab, setCurrentTab] = useState<"dashboard" | "offerwall" | "stake" | "market" | "quests" | "merch" | "army" | "referral" | "achievements" | "history" | "settings" | "admin" | "battlepass" | "leaderboard">("dashboard");
-  
-  // Refs
-  const moreMenuRef = useRef<HTMLDivElement>(null);
-  
+
   // User & Auth State
   const [userId, setUserId] = useState<string | null>(null);
   const [isGeneral, setIsGeneral] = useState(true); // Always admin for dev
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
-        setShowMoreMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-  
-  // Toast System
-  const [toasts, setToasts] = useState<any[]>([]);
-  
-  // Loading States
-  const [loading, setLoading] = useState(true);
-  const [loadingOffers, setLoadingOffers] = useState(false);
+  // Loading State
+  const [, setLoading] = useState(true);
+
+  // Ticking clock so countdowns can be computed purely during render.
+  const [now, setNow] = useState(() => Date.now());
   
   // Data States (from Supabase)
   const [shitBalance, setShitBalance] = useState(0);
@@ -211,28 +251,25 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
   const [showKYCModal, setShowKYCModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showAirdrop, setShowAirdrop] = useState(false);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
   
   // Data from Supabase
-  const [offers, setOffers] = useState<any[]>([]);
-  const [userOffers, setUserOffers] = useState<any[]>([]);
-  const [quests, setQuests] = useState<any[]>([]);
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [stakedPositions, setStakedPositions] = useState<StakedPosition[]>([]);
+  const [, setOffers] = useState<unknown[]>([]);
+  const [userOffers, setUserOffers] = useState<RawUserOffer[]>([]);
+  const [quests, setQuests] = useState<Quest[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [, setStakedPositions] = useState<StakedPosition[]>([]);
   
   // Local UI States
   const [stakeAmount, setStakeAmount] = useState("");
   const [stakeLock, setStakeLock] = useState(30);
   const [marketListings, setMarketListings] = useState(MARKETPLACE_LISTINGS);
-  const [ownedNFTs, setOwnedNFTs] = useState<OwnedNFT[]>([]);
+  const [, setOwnedNFTs] = useState<OwnedNFT[]>([]);
   const [showMerchModal, setShowMerchModal] = useState(false);
   const [selectedMerch, setSelectedMerch] = useState<MerchProduct | null>(null);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [buyingNFT, setBuyingNFT] = useState<MarketplaceListing | null>(null);
-  const [leaderboardTab, setLeaderboardTab] = useState<"week" | "all">("week");
-  const [leaderboard, setLeaderboard] = useState<any[]>(LEADERBOARD);
   
   // Offer Boosts (from Supabase)
   const [offerBoosts, setOfferBoosts] = useState<OfferBoost[]>([]);
@@ -242,34 +279,9 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
   // ==========================================
   // SUPABASE DATA FETCHING
   // ==========================================
-  
-  // 1. Initialize user and fetch initial data
-  useEffect(() => {
-    const initUser = async () => {
-      try {
-        // Get current user from Supabase auth
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          setUserId(user.id);
-          await fetchUserData(user.id);
-        } else {
-          // DEVELOPMENT MODE: Load mock data
-          console.log('Development mode: Loading mock data');
-          loadMockData();
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error('Auth error:', error);
-        setLoading(false);
-      }
-    };
-    
-    initUser();
-  }, []);
 
-  // 2. Fetch all user data
-  const fetchUserData = async (uid: string) => {
+  // Fetch all user data
+  const fetchUserData = useCallback(async (uid: string) => {
     try {
       setLoading(true);
       
@@ -330,9 +342,10 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       }
       
       if (userOffersRes.data) {
-        setUserOffers(userOffersRes.data);
+        const rawUserOffers = userOffersRes.data as RawUserOffer[];
+        setUserOffers(rawUserOffers);
         // Convert to activeOffers format
-        setActiveOffers(userOffersRes.data.map((uo: any) => ({
+        setActiveOffers(rawUserOffers.map((uo) => ({
           id: uo.id,
           offerId: uo.offer_id,
           progress: uo.progress,
@@ -344,7 +357,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       }
       
       if (questsRes.data) {
-        setQuests(questsRes.data.map((uq: any) => ({
+        setQuests((questsRes.data as RawUserQuest[]).map((uq) => ({
           id: uq.quests.id,
           title: uq.quests.title,
           description: uq.quests.description,
@@ -359,7 +372,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       }
       
       if (transactionsRes.data) {
-        setTransactions(transactionsRes.data.map((t: any) => ({
+        setTransactions((transactionsRes.data as RawTransaction[]).map((t) => ({
           id: t.id,
           type: t.type,
           amount: Number(t.amount),
@@ -375,7 +388,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       }
       
       if (stakingRes.data) {
-        setStakedPositions(stakingRes.data.map((s: any) => ({
+        setStakedPositions((stakingRes.data as RawStakingPosition[]).map((s) => ({
           id: s.id,
           amount: Number(s.amount),
           lockDays: s.lock_days,
@@ -386,7 +399,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       }
       
       if (boostsRes.data) {
-        setOfferBoosts(boostsRes.data.map((b: any) => ({
+        setOfferBoosts((boostsRes.data as RawOfferBoost[]).map((b) => ({
           id: b.id,
           offerId: b.offers?.id || b.offer_id,
           multiplier: b.multiplier,
@@ -399,10 +412,10 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Mock data loader for development
-  const loadMockData = () => {
+  const loadMockData = useCallback(() => {
     setShitBalance(1240);
     setPoints(8740);
     setTotalEarned(3240);
@@ -449,43 +462,14 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       { id: 1, name: "Poop Soldier #1001", rank: "Rare", power: 52 },
       { id: 2, name: "Poop Soldier #1002", rank: "Epic", power: 78 },
     ]);
-  };
+  }, []);
 
-  // 3. Real-time subscriptions
-  useEffect(() => {
-    if (!userId) return;
-
-    // Subscribe to balance changes
-    const balanceSubscription = subscribeToBalance(userId, (newBalance) => {
-      setShitBalance(Number(newBalance.shit_balance) || 0);
-      setPoints(newBalance.points || 0);
-      setTotalEarned(Number(newBalance.total_earned) || 0);
-      setDailyStreak(newBalance.daily_streak || 0);
-    });
-
-    // Subscribe to offer completions
-    const offerSubscription = subscribeToOffers(userId, (payload) => {
-      triggerSuccess(`Offer completed! +${payload.reward} points`);
-      // Refresh offers
-      fetchUserData(userId);
-    });
-
-    return () => {
-      balanceSubscription?.unsubscribe();
-      offerSubscription?.unsubscribe();
-    };
-  }, [userId]);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawAddress, setWithdrawAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(NETWORKS[0]);
   const [withdrawStep, setWithdrawStep] = useState<1 | 2 | 3>(1);
   const addTransaction = (tx: Omit<Transaction, 'id' | 'timestamp'>) => {
-    const newTx: Transaction = {
-      ...tx,
-      id: `tx-${Date.now()}`,
-      timestamp: new Date(),
-    };
-    setTransactions(prev => [newTx, ...prev]);
+    setTransactions(prev => [createTransaction(tx), ...prev]);
   };
 
   const submitWithdrawal = () => {
@@ -512,33 +496,26 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
     }, 4000);
   };
 
-  const triggerSuccess = (message: string) => {
+  const triggerSuccess = useCallback((message: string) => {
     setSuccessMessage(message);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 2600);
-  };
+  }, []);
 
-  // Note: Live progress now comes from Supabase realtime subscriptions
-  // See useEffect with subscribeToOffers above
-
+  // Live progress comes from Supabase realtime subscriptions (see effect below).
+  // `now` ticks every second so the countdown is computed purely during render.
   const formatTimeLeft = (expiresAt: Date) => {
-    const diff = expiresAt.getTime() - Date.now();
+    const diff = expiresAt.getTime() - now;
     if (diff <= 0) return 'EXPIRED';
     const mins = Math.floor(diff / 60000);
     const secs = Math.floor((diff % 60000) / 1000);
     return `${mins}m ${secs}s`;
   };
 
-  const getBoostedReward = (offer: Offer) => {
-    const boost = offerBoosts.find(b => b.offerId === offer.id);
-    if (!boost || boost.expiresAt < new Date()) return offer.reward;
-    return offer.reward * boost.multiplier;
-  };
-
   const startOffer = async (offer: Offer) => {
     if (!userId) return;
     
-    const existing = userOffers.find((a: any) => a.offer_id === offer.id);
+    const existing = userOffers.find((a) => a.offer_id === offer.id);
     if (existing) {
       triggerSuccess("Offer already in progress!");
       return;
@@ -599,11 +576,11 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
     if (!amount || amount <= 0 || amount > shitBalance) return;
     const apy = stakeLock === 7 ? 32 : stakeLock === 30 ? 48 : 67;
     const newPosition: StakedPosition = {
-      id: Date.now(),
+      id: nextNumericId(),
       amount,
       lockDays: stakeLock,
       apy,
-      unlockDate: `${new Date(Date.now() + stakeLock * 86400000).getDate()} Jun 2026`,
+      unlockDate: stakeUnlockLabel(stakeLock),
       rewards: Math.floor(amount * apy / 1200),
     };
     setStakedPositions(prev => [...prev, newPosition]);
@@ -633,7 +610,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
       return;
     }
     const newNFT: OwnedNFT = {
-      id: Date.now(),
+      id: nextNumericId(),
       name: listing.name,
       rank: listing.rank,
       power: listing.power,
@@ -737,13 +714,6 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
     addTransaction({ type: 'airdrop', amount: airdropAmount, description: `Airdrop claim (${totalEarned >= 25000 ? 'Legendary' : totalEarned >= 10000 ? 'Epic' : 'Rare'} tier)`, status: 'completed' });
   };
 
-  const mainTabs = [
-    { id: "dashboard", label: "Home", icon: "🏠" },
-    { id: "offerwall", label: "Earn", icon: "💰" },
-    { id: "market", label: "Market", icon: "🛒" },
-    { id: "quests", label: "Quests", icon: "📜" },
-  ];
-
   const XP_PER_TIER = 500;
   const MAX_TIER = 20;
   const currentTier = Math.min(Math.floor(battlePassXP / XP_PER_TIER) + 1, MAX_TIER);
@@ -803,6 +773,59 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
 
   const streakMultiplier = Math.min(Math.floor(dailyStreak / 2) * 5, 35);
 
+  // ==========================================
+  // EFFECTS (declared after callbacks they depend on)
+  // ==========================================
+
+  // Initialize user and load initial data.
+  useEffect(() => {
+    const initUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUserId(user.id);
+          await fetchUserData(user.id);
+        } else {
+          // Development mode: load mock data.
+          loadMockData();
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Auth error:', error);
+        setLoading(false);
+      }
+    };
+    initUser();
+  }, [fetchUserData, loadMockData]);
+
+  // Real-time subscriptions.
+  useEffect(() => {
+    if (!userId) return;
+
+    const balanceSubscription = subscribeToBalance(userId, (newBalance) => {
+      setShitBalance(Number(newBalance.shit_balance) || 0);
+      setPoints(Number(newBalance.points) || 0);
+      setTotalEarned(Number(newBalance.total_earned) || 0);
+      setDailyStreak(Number(newBalance.daily_streak) || 0);
+    });
+
+    const offerSubscription = subscribeToOffers(userId, (payload) => {
+      triggerSuccess(`Offer completed! +${payload.reward} points`);
+      fetchUserData(userId);
+    });
+
+    return () => {
+      balanceSubscription?.unsubscribe();
+      offerSubscription?.unsubscribe();
+    };
+  }, [userId, fetchUserData, triggerSuccess]);
+
+  // Tick the clock every second for live countdowns.
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       {/* Toast Notifications */}
@@ -853,7 +876,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
               <div onClick={() => setShowAirdrop(true)} className="bg-gradient-to-r from-purple-600 to-pink-500 rounded-3xl p-6 flex items-center justify-between cursor-pointer hover:brightness-110 transition-all active:scale-[0.985]">
                 <div>
                   <div className="font-bold text-xl flex items-center gap-2">🪂 AIRDROP READY</div>
-                  <div className="text-purple-100 text-sm">You've earned {totalEarned.toLocaleString()} $SHIT • Claim your reward!</div>
+                  <div className="text-purple-100 text-sm">You&apos;ve earned {totalEarned.toLocaleString()} $SHIT • Claim your reward!</div>
                 </div>
                 <div className="text-4xl">🎁</div>
               </div>
@@ -1535,7 +1558,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
 
                   <button
                     onClick={() => {
-                      const alreadyActive = userOffers.find((a: any) => a.offer_id === selectedOffer.id || a.offers?.id === selectedOffer.id);
+                      const alreadyActive = userOffers.find((a) => a.offer_id === selectedOffer.id || a.offers?.id === selectedOffer.id);
                       if (alreadyActive) {
                         if (alreadyActive.status === 'completed') {
                           completeOffer(selectedOffer, alreadyActive.id);
@@ -1570,7 +1593,7 @@ export default function Dashboard({ onDisconnect, walletAddress, isGeneral: init
           <div className="bg-zinc-950 border border-white/20 rounded-3xl max-w-md w-full p-9 text-center" onClick={e => e.stopPropagation()}>
             <div className="text-6xl mb-6">🪂</div>
             <div className="text-4xl font-bold mb-2">Airdrop Claim</div>
-            <div className="text-xl text-purple-400 mb-8">You've earned {totalEarned.toLocaleString()} $SHIT</div>
+            <div className="text-xl text-purple-400 mb-8">You&apos;ve earned {totalEarned.toLocaleString()} $SHIT</div>
             
             <div className="bg-black/60 rounded-2xl p-6 mb-8">
               <div className="text-sm text-zinc-400 mb-1">YOUR AIRDROP REWARD</div>
